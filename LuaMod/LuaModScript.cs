@@ -1,15 +1,7 @@
 ﻿using LuaMod.LuaAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
-using MoonSharp.Interpreter.CoreLib;
-using MoonSharp.Interpreter.Platforms;
 using UnityEngine;
-using Il2CppVoxelization;
 
 namespace LuaMod
 {
@@ -24,7 +16,7 @@ namespace LuaMod
         {
             //todo: change luabehaviour to inheret an interface and passa  reference to this function so we can just call postreloadscript()
 
-            if (LuaAsset != null && LoadScript(LuaAsset,true))
+            if (LuaAsset != null && LoadScript(LuaAsset, true))
             {
                 if (PostReloadScript != null)
                 {
@@ -67,10 +59,10 @@ namespace LuaMod
                 catch (ScriptRuntimeException ex)
                 {
                     MelonLoader.MelonLogger.Error("Doh! An error occured! " + ex.DecoratedMessage);
-                 //   throw;
+                    //   throw;
                 }
 
-                
+
                 LuaFileName = filename;
                 LuaScript.Options.DebugPrint = s => { MelonLoader.MelonLogger.Msg(s); };
                 LoadFunctionPointers();
@@ -107,7 +99,7 @@ namespace LuaMod
                 catch (ScriptRuntimeException ex)
                 {
                     MelonLoader.MelonLogger.Error("Doh! An error occured! " + ex.DecoratedMessage);
-                  //  throw;
+                    //  throw;
                 }
 
                 LuaFileName = "";
@@ -120,9 +112,9 @@ namespace LuaMod
                 if (!reloading)
                 {
                     //ugly, refactor
-                    ScriptManager.RegisterScript(this); 
+                    ScriptManager.RegisterScript(this);
                 }
-                
+
 
                 return true;
             }
@@ -159,6 +151,19 @@ namespace LuaMod
             LuaScript.Globals["API_Vector"] = (API_Vector.Instance);
             LuaScript.Globals["API_Event"] = (API_Event.Instance);
             LuaScript.Globals["API_SLZ_Combat"] = (API_SLZ_Combat.Instance);
+            LuaScript.Globals["API_SLZ_NPC"] = (API_SLZ_NPC.Instance);
+            LuaScript.Globals["API_SLZ_VoidLogic"] = (API_SLZ_VoidLogic.Instance);
+            LuaScript.Globals["API_Physics"] = (API_Physics.Instance);
+
+            //LuaScript.Globals["UnityObject"] = UserData.CreateStatic<UnityEngine.Object>();
+            LuaScript.Globals["GameObject"] = UserData.CreateStatic<GameObject>();
+            LuaScript.Globals["Quaternion"] = UserData.CreateStatic<Quaternion>();
+            LuaScript.Globals["Vector3"] = UserData.CreateStatic<Vector3>();
+            LuaScript.Globals["Time"] = UserData.CreateStatic<Time>();
+            LuaScript.Globals["Color"] = UserData.CreateStatic<UnityEngine.Color>();
+            LuaScript.Globals["Physics"] = UserData.CreateStatic<UnityEngine.Physics>();
+            LuaScript.Globals["Transform"] = UserData.CreateStatic<Transform>();
+
             /*
             LuaScript.Globals["BL_testmsg"] = (Func<string, Quaternion,bool>)API_GameObject.BL_testmsg;
             LuaScript.Globals["BL_Vector3"] = (Func<float,float,float, Vector3>)API_Vector.BL_Vector3;

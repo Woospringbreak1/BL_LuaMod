@@ -1,48 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace LuaMod.LuaAPI
 {
-    internal  class API_Input
+    internal class API_Input
     {
 
         public static readonly API_Input Instance = new API_Input();
 
         public static GameObject BL_LeftHand()
         {
-            return BoneLib.Player.LeftHand.gameObject;
+            if(BoneLib.Player.LeftHand != null)
+            {
+                return BoneLib.Player.LeftHand.gameObject;
+            }
+            return null;
+            
         }
 
         public static GameObject BL_RightHand()
         {
-            return BoneLib.Player.RightHand.gameObject;
+            if (BoneLib.Player.RightHand != null)
+            {
+                return BoneLib.Player.RightHand.gameObject;
+            }
+            return null;
         }
 
 
-   
+
         public static bool BL_LeftController_IsGrabbed()
         {
-            return BoneLib.Player.LeftController.IsGrabbed();
+            if (BoneLib.Player.LeftController != null)
+            {
+                return BoneLib.Player.LeftController.IsGrabbed();
+            }
+            return false;
         }
 
         public static bool BL_RightController_IsGrabbed()
         {
-            return BoneLib.Player.RightController.IsGrabbed();
+            if (BoneLib.Player.RightController != null)
+            {
+                return BoneLib.Player.RightController.IsGrabbed();
+            }
+            return false;
         }
 
 
         public static bool BL_RightController_GetAButtonDown()
         {
-            return BoneLib.Player.RightController.GetAButtonDown();
+            if (BoneLib.Player.RightController != null)
+            {
+                return BoneLib.Player.RightController.GetAButtonDown();
+            }
+            return false;
         }
 
         public static bool BL_RightController_GetAButtonUp()
         {
-            return BoneLib.Player.RightController.GetAButtonUp();
+            if (BoneLib.Player.RightController != null)
+            {
+                return BoneLib.Player.RightController.GetAButtonUp();
+            }
+            return false;   
         }
 
 

@@ -1,11 +1,4 @@
-﻿using MoonSharp.Interpreter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LuaMod
+﻿namespace LuaMod
 {
     public static class ScriptManager
     {

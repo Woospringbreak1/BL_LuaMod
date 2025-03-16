@@ -1,11 +1,5 @@
-﻿using Il2CppSLZ.Bonelab;
-using Il2CppSLZ.Marrow.AI;
+﻿using Il2CppSLZ.Marrow.AI;
 using Il2CppSLZ.Marrow.Combat;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace LuaMod.LuaAPI
@@ -15,7 +9,7 @@ namespace LuaMod.LuaAPI
 
         public static readonly API_SLZ_Combat Instance = new API_SLZ_Combat();
 
-        public static Attack BL_CreateAttackStruct(int damage, Collider collider,Vector3 pos,Vector3 normal)
+        public static Attack BL_CreateAttackStruct(int damage, Collider collider, Vector3 pos, Vector3 normal)
         {
             Attack attack = new Attack();
             attack.attackType = Il2CppSLZ.Marrow.Data.AttackType.Piercing;
@@ -24,16 +18,16 @@ namespace LuaMod.LuaAPI
             attack.damage = damage;
             attack.normal = normal;
 
-            return attack;  
+            return attack;
 
         }
 
         public static bool ApplyForce(Rigidbody rb, Vector3 pos, Vector3 normal, float force)
         {
-            if(rb == null || rb.isKinematic)
+            if (rb == null || rb.isKinematic)
             {
                 return false;
-            }    
+            }
             else
             {
                 Vector3 forceapply = normal * force;
@@ -42,7 +36,7 @@ namespace LuaMod.LuaAPI
             }
         }
 
-        public static bool ApplyForce(Vector3 pos,float radius, float force)
+        public static bool ApplyForce(Vector3 pos, float radius, float force)
         {
             return true;
         }
@@ -51,10 +45,10 @@ namespace LuaMod.LuaAPI
         public static bool BL_AttackEnemy(GameObject obj, int damage, Collider col, Vector3 pos, Vector3 normal)
         {
             AIBrain DR = obj.GetComponent<AIBrain>();
-                
+
             if (DR != null)
             {
-                BoneLib.Extensions.DealDamage(DR,damage);
+                BoneLib.Extensions.DealDamage(DR, damage);
                 MelonLoader.MelonLogger.Error("attacking NPC");
                 /*
             Attack attack = new Attack();
@@ -76,7 +70,7 @@ namespace LuaMod.LuaAPI
 
             return false;
         }
-        
+
 
     }
 

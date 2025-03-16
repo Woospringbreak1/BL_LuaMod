@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MoonSharp.Interpreter;
 using UnityEngine;
 
 namespace LuaMod.LuaAPI
@@ -11,6 +7,30 @@ namespace LuaMod.LuaAPI
     {
 
         public static readonly API_Player Instance = new API_Player();
+
+        public enum AmmoType
+        {
+            Light,Medium,Heavy
+        }
+        public static float BL_GetFixedDeltaTime()
+        {
+            return(Time.fixedDeltaTime);
+        }
+
+        public static void SetPlayerAmmo(AmmoType AT,int newAmmo)
+        {
+           
+        }
+
+        public static void ModifyPlayerAmmo(AmmoType AT, int ammoMod)
+        {
+
+        }
+
+        public static int GetPlayerAmmo(AmmoType AT)
+        {
+            return 0;
+        }
 
         public static string BL_GetAvatarName()
         {
@@ -35,9 +55,14 @@ namespace LuaMod.LuaAPI
             return null;
 
         }
-        public static Vector3 BL_GetAvatarPosition()
+        public static DynValue BL_GetAvatarPosition()
         {
-            return BoneLib.Player.PhysicsRig.transform.position;
+            if(BoneLib.Player.Avatar != null)
+            {
+                return UserData.Create(BoneLib.Player.PhysicsRig.transform.position);
+            }    
+            return null;
+           
         }
         public static void BL_SetAvatarPosition(Vector3 pos)
         {
