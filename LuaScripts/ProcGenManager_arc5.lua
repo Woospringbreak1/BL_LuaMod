@@ -19,43 +19,21 @@ function Start()
 
     -- Define hardcoded ProcGenBarcodes
     ProcGenBarcodes = {
-        "sdf.LuaProcGen.Spawnable.Corner2Turrets",
-        "sdf.LuaProcGen.Spawnable.Cube2",
         "sdf.LuaProcGen.Spawnable.Cube9",
-        "sdf.LuaProcGen.Spawnable.Corner2Turrets",
-        "sdf.LuaProcGen.Spawnable.Cube2",
-        "sdf.LuaProcGen.Spawnable.Cube9",
-        "sdf.LuaProcGen.Spawnable.LargeRioomBase",
-        "sdf.LuaProcGen.Spawnable.MediumRoom",
-        "sdf.LuaProcGen.Spawnable.NullbodyRoom1",
-        "sdf.LuaProcGen.Spawnable.NullbodyRoom1",
         "sdf.LuaProcGen.Spawnable.Room1",
         "sdf.LuaProcGen.Spawnable.Room2",
-        "sdf.LuaProcGen.Spawnable.Room1",
         "sdf.LuaProcGen.Spawnable.Room2",
-        "sdf.LuaProcGen.Spawnable.SmallOffice",
-        "sdf.LuaProcGen.Spawnable.SmallRoom",
         "sdf.LuaProcGen.Spawnable.TestWorldEntryWay",
-        "sdf.LuaProcGen.Spawnable.Corner2",
-        "sdf.LuaProcGen.Spawnable.Corner2",
-        "sdf.LuaProcGen.Spawnable.Corner2",
-        "sdf.LuaProcGen.Spawnable.LongHallway",
-        "sdf.LuaProcGen.Spawnable.LongHallway",
-        "sdf.LuaProcGen.Spawnable.LongHallway",
-        "sdf.LuaProcGen.Spawnable.LongHallway",
-        "sdf.LuaProcGen.Spawnable.VentBase",
+        "sdf.LuaProcGen.Spawnable.TestWorldPiece",
+        "sdf.LuaProcGen.Spawnable.TestWorldPiece2",
+        "sdf.LuaProcGen.Spawnable.TestWorldPiece3",
         "sdf.LuaProcGen.Spawnable.DropDown",
-        "sdf.LuaProcGen.Spawnable.DropDown",
-        "sdf.LuaProcGen.Spawnable.Breakroom"
-       -- "sdf.LuaProcGen.Spawnable.VerticalVentBase",
-       -- "sdf.LuaProcGen.Spawnable.DropDownVentBottom",
-      --  "sdf.LuaProcGen.Spawnable.DropDownVentTop"
-
-
+        "sdf.LuaProcGen.Spawnable.TestWorldPiece3",
+        "sdf.LuaProcGen.Spawnable.LargeRioomBase"
     }
 
     -- Entryway barcode
-    EntrywayBarcode = "sdf.LuaProcGen.Spawnable.NullbodyRoom1"
+    EntrywayBarcode = "sdf.LuaProcGen.Spawnable.TestWorldEntryWay"
 
     -- Spawn Entryway
     API_GameObject.BL_SpawnByBarcode_LuaVar(BL_This, "Entryway", EntrywayBarcode, Vector3.one, Quaternion.identity, BL_Host, false)
@@ -110,11 +88,11 @@ function SpawnEntryPoint()
     EntryRoom.SetActive(true)
     EntryRoom.transform.rotation = EntryRoom.transform.rotation * Quaternion.AngleAxis(45, Vector3.up)
     ProccessRoom(EntryRoom)
-    EntryRoomBoxCol = API_GameObject.BL_GetComponent2(EntryRoom,"BoxCollider")
-    API_Player.BL_SetAvatarPosition(EntryRoomBoxCol.bounds.center)
+    EntryRoomRend = API_GameObject.BL_GetComponent2(EntryRoom,"Renderer")
+    API_Player.BL_SetAvatarPosition(EntryRoomRend.bounds.center)
 end
 
-function GetRandomDoor(existingDoor, room)
+function GetRandomDoor(room)
     local RoomBehaviours = API_GameObject.BL_GetComponentsInChildren(room,"LuaBehaviour",true)
    
     if(RoomBehaviours == nil) then
@@ -122,25 +100,10 @@ function GetRandomDoor(existingDoor, room)
     end
 
     local Doors = {}
-    existingDoorType = "DOORTYPE_DOOR"
-
-    for i = 0, existingDoor.ScriptTags.Count - 1 do
-        if(existingDoor.ScriptTags[i]:find("DOORTYPE_")) then
-            existingDoorType = existingDoor.ScriptTags[i]
-        end
-    end
-
-
-    if(existingDoorType == "DOORTYPE_VENT_VERT_DOWN") then
-        existingDoorType = "DOORTYPE_VENT_VERT_UP" --lazy fix, but avoids mirrored components
-    elseif(existingDoorType == "DOORTYPE_VENT_VERT_UP") then
-        existingDoorType = "DOORTYPE_VENT_VERT_DOWN" 
-    end
-
     
     for Behaviour in RoomBehaviours do
        -- print("tags " .. tostring(Behaviour.ScriptTags))
-        if (Behaviour.ScriptTags.Contains("ProcGen_Door") and Behaviour.ScriptTags.Contains(existingDoorType) and not Behaviour.ScriptTags.Contains("ProcGen_Door_ExitOnly") and not Behaviour.ScriptTags.Contains("ProcGen_Door_Generated")  )  then
+        if (Behaviour.ScriptTags.Contains("ProcGen_Door") and not Behaviour.ScriptTags.Contains("ProcGen_Door_Generated"))  then
            table.insert(Doors, Behaviour)
         end
     end
@@ -150,8 +113,8 @@ function GetRandomDoor(existingDoor, room)
         local randomDoorIndex = math.random(1, #Doors)
         local randomDoor = Doors[randomDoorIndex]
         --randomDoor.gameObject.setActive(true)
-        if(string.match(randomDoor.transform.parent.name,"DoorFrame") or string.match(randomDoor.transform.parent.name,"VentFrame") ) then
-            randomDoor.transform.parent = randomDoor.transform.root
+        if(string.match(randomDoor.transform.parent.name,"DoorFrame")) then
+            randomDoor.transform.parent = randomDoor.transform.parent.parent
         end 
        
         return randomDoor
@@ -189,7 +152,7 @@ function MoveChildToTarget(A, B)
    
 
     if(string.match(B.transform.parent.name,"DoorFrame")) then
-        B.transform.parent = B.transform.root
+        B.transform.parent = B.transform.parent.parent
     end 
 
     -- Get A and B's world forward vectors
@@ -235,7 +198,7 @@ end
 -- Function to attempt spawning a room, returns true if successful, false otherwise
 function AttemptSpawnRoom(door, prefab)
     local NewRoom = API_GameObject.BL_InstantiateGameObject(prefab)
-    local NewDoor = GetRandomDoor(door,NewRoom)
+    local NewDoor = GetRandomDoor(NewRoom)
 
     if not NewDoor then
         API_GameObject.BL_DestroyGameObject(NewRoom)
@@ -258,8 +221,8 @@ function AttemptSpawnRoom(door, prefab)
 
     for f in colliders do
         local obj = f.gameObject
-        if (obj ~= NewRoom and not obj.transform:IsChildOf(NewRoom.transform) and obj ~= door and not obj.transform:IsChildOf(door.transform.root) ) then
-            print("Collision detected " .. obj.name .. " ")
+        if (obj ~= NewRoom and not obj.transform:IsChildOf(NewRoom.transform) and obj ~= door and not obj.transform:IsChildOf(door.transform.parent) ) then
+          --  print("Collision detected " .. obj.name .. " ")
             API_GameObject.BL_DestroyGameObject(NewRoom)
             return false
         end
@@ -356,7 +319,7 @@ function Update()
         for i = 1, #ProcGenBarcodes do
             local prefabVar = _G["P" .. i] -- Dynamically access P1, P2, ..., Pn
             if prefabVar == nil then
-                print("Prefab " .. ProcGenBarcodes[i] .. " not loaded yet")
+                print("Prefab " .. prefabVar .. " not loaded yet")
                 allLoaded = false
                 break
             end
@@ -375,26 +338,6 @@ function Update()
         else
             print("Waiting for all prefabs to load...")
         end
-    else
-
-        if( API_Input.BL_LeftHand() ~= nil) then
-            local PlayerPos = API_Input.BL_LeftHand().transform.position
-            local colliders = FireCameraRaycastGrid(Camera.main, 100, 10, 99999,0.2)
-           
-            for _, f in pairs(colliders) do
-                local obj = f.gameObject
-                local Behaviour = API_GameObject.BL_GetComponentInChildren(obj.transform.root.gameObject,"LuaBehaviour")
-                
-                if(Behaviour ~= nil and Behaviour.ScriptTags.Contains("ProcGen_Section")) then
-                    Behaviour.CallFunction("SeenByPlayer")
-                    if(not Behaviour.ScriptTags.Contains("ProcGen_Section_Generated")) then
-                        ProccessRoom(Behaviour.gameObject)
-                    end
-                end
-            end
-    
-        end
-
     end
 end
 
@@ -417,7 +360,23 @@ end
 SearchRadius = 200.0
 function SlowUpdate()
    
-    
+    if( API_Input.BL_LeftHand() ~= nil) then
+        local PlayerPos = API_Input.BL_LeftHand().transform.position
+        local colliders = FireCameraRaycastGrid(Camera.main, 10, 10, 99999)
+       
+        for _, f in pairs(colliders) do
+            local obj = f.gameObject
+            local Behaviour = API_GameObject.BL_GetComponentInChildren(obj.transform.root.gameObject,"LuaBehaviour")
+            
+            if(Behaviour ~= nil and Behaviour.ScriptTags.Contains("ProcGen_Section")) then
+                Behaviour.CallFunction("SeenByPlayer")
+                if(not Behaviour.ScriptTags.Contains("ProcGen_Section_Generated")) then
+                    ProccessRoom(Behaviour.gameObject)
+                end
+            end
+        end
+
+    end
 end
 
 RoomSeemCount = 0
@@ -438,27 +397,20 @@ function IncrementRoomSeenCount()
     return false
 end
 
-function FireCameraRaycastGrid(camera, gridSizeX, gridSizeY, maxDistance, jitterAmount)
+function FireCameraRaycastGrid(camera, gridSizeX, gridSizeY, maxDistance)
     local hitColliders = {}  -- Table to store unique colliders hit
-
+    print("Camera clip plane " .. tostring(camera.nearClipPlane))
     -- Loop through the grid in viewport space
     for i = 0, gridSizeX - 1 do
         for j = 0, gridSizeY - 1 do
             -- Convert grid coordinates to normalized viewport space
             local viewportX = i / (gridSizeX - 1)
             local viewportY = j / (gridSizeY - 1)
-
-            -- Add jitter
-            local jitterX =  math.random(-jitterAmount, jitterAmount)
-            local jitterY = math.random(-jitterAmount, jitterAmount)
-
-            -- Ensure viewport coordinates remain in range [0,1]
-            local jitteredViewportX = math.max(0, math.min(1, viewportX + jitterX))
-            local jitteredViewportY = math.max(0, math.min(1, viewportY + jitterY))
-
+            
             -- Get world position and direction of the ray
-            local worldPos = camera.ViewportToWorldPoint(API_Vector.BL_Vector3(jitteredViewportX, jitteredViewportY, 0.3))
-            local worldTarget = camera.ViewportToWorldPoint(API_Vector.BL_Vector3(jitteredViewportX, jitteredViewportY, maxDistance))
+            local worldPos =    camera.ViewportToWorldPoint(API_Vector.BL_Vector3(viewportX, viewportY, 0.3))
+            local worldTarget = camera.ViewportToWorldPoint(API_Vector.BL_Vector3(viewportX, viewportY, maxDistance))
+            --local direction = (worldTarget - worldPos).normalized
 
             -- Perform the raycast
             local hitInfo = API_Physics.BL_RayCast(worldPos, worldTarget)
@@ -541,7 +493,7 @@ function GetObjectsInCameraView(camera, range, layerMask)
         --print("collider " .. tostring(f.gameObject.name))
         if IsObjectVisibleFromCamera(camera, f, 5) then
             table.insert(visibleObjects, f)
-            --print("object visible " .. tostring(f.gameObject.name))
+            print("object visible " .. tostring(f.gameObject.name))
         end
         --i = i+1
     end

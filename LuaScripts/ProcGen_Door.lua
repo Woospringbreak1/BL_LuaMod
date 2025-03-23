@@ -45,3 +45,4 @@ function PrintChildren(gameObject)
         print(child.name)
     end
 end
+

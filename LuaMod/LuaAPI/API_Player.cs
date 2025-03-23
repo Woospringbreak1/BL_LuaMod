@@ -58,8 +58,8 @@ namespace LuaMod.LuaAPI
         public static DynValue BL_GetAvatarPosition()
         {
             if(BoneLib.Player.Avatar != null)
-            {
-                return UserData.Create(BoneLib.Player.PhysicsRig.transform.position);
+            {   
+                return UserData.Create(BoneLib.Player.Avatar.transform.position);
             }    
             return null;
            

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Il2CppSLZ.Marrow;
+using UnityEngine;
 
 namespace LuaMod.LuaAPI
 {
@@ -26,13 +27,30 @@ namespace LuaMod.LuaAPI
             return null;
         }
 
+        public static bool BL_RightHandEmpty()
+        {
+            if (BoneLib.Player.RightHand != null)
+            {
+                return BoneLib.Player.GetComponentInHand<Component>(BoneLib.Player.RightHand) == null;
+            }
+            return true;
+        }
+
+        public static bool BL_LeftHandEmpty()
+        {
+            if (BoneLib.Player.LeftHand != null)
+            {
+                return BoneLib.Player.GetComponentInHand<Component>(BoneLib.Player.LeftHand) == null;
+            }
+            return true;
+        }
 
 
         public static bool BL_LeftController_IsGrabbed()
         {
             if (BoneLib.Player.LeftController != null)
             {
-                return BoneLib.Player.LeftController.IsGrabbed();
+                return BoneLib.Player.LeftController.GetGrabbedState();
             }
             return false;
         }
@@ -41,7 +59,7 @@ namespace LuaMod.LuaAPI
         {
             if (BoneLib.Player.RightController != null)
             {
-                return BoneLib.Player.RightController.IsGrabbed();
+                return BoneLib.Player.RightController.GetGrabbedState();
             }
             return false;
         }

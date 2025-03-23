@@ -1,4 +1,7 @@
-﻿using Il2CppSLZ.Marrow.AI;
+﻿using Il2Cpp;
+using Il2CppSLZ.Bonelab;
+using Il2CppSLZ.Marrow;
+using Il2CppSLZ.Marrow.AI;
 using Il2CppSLZ.Marrow.Combat;
 using UnityEngine;
 
@@ -36,35 +39,33 @@ namespace LuaMod.LuaAPI
             }
         }
 
-        public static bool ApplyForce(Vector3 pos, float radius, float force)
-        {
-            return true;
-        }
 
 
         public static bool BL_AttackEnemy(GameObject obj, int damage, Collider col, Vector3 pos, Vector3 normal)
         {
             AIBrain DR = obj.GetComponent<AIBrain>();
-
+            ObjectDestructible DP = obj.GetComponent<ObjectDestructible>();
+            //DP.OnDestruction
             if (DR != null)
             {
-                BoneLib.Extensions.DealDamage(DR, damage);
+               // BoneLib.Extensions.DealDamage(DR, damage);
                 MelonLoader.MelonLogger.Error("attacking NPC");
-                /*
-            Attack attack = new Attack();
-            attack.attackType = Il2CppSLZ.Marrow.Data.AttackType.Piercing;
-            attack.collider = col;
-            attack.origin = pos;
-            attack.damage = damage;
-            attack.normal = normal;
-            attack.direction = normal;
-
-            DR.rec
-            */
+            }
+            else if(DP != null)
+            {
+                
+                Attack attack = new Attack();
+                attack.attackType = Il2CppSLZ.Marrow.Data.AttackType.Piercing;
+                attack.collider = col;
+                attack.origin = pos;
+                attack.damage = damage;
+                attack.normal = normal;
+                attack.direction = normal;
+                DP.ReceiveAttack(attack);
             }
             else
             {
-                MelonLoader.MelonLogger.Error("no AI brain found");
+                MelonLoader.MelonLogger.Error("no IAttackReciever found");
             }
 
 

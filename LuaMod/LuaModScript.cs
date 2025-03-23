@@ -143,17 +143,24 @@ namespace LuaMod
         }
 
 
+
         private void LoadFunctionPointers()
         {
             LuaScript.Globals["API_GameObject"] = (API_GameObject.Instance);
             LuaScript.Globals["API_Input"] = (API_Input.Instance);
             LuaScript.Globals["API_Player"] = (API_Player.Instance);
             LuaScript.Globals["API_Vector"] = (API_Vector.Instance);
-            LuaScript.Globals["API_Event"] = (API_Event.Instance);
+            LuaScript.Globals["API_Events"] = (API_Events.Instance);
             LuaScript.Globals["API_SLZ_Combat"] = (API_SLZ_Combat.Instance);
             LuaScript.Globals["API_SLZ_NPC"] = (API_SLZ_NPC.Instance);
             LuaScript.Globals["API_SLZ_VoidLogic"] = (API_SLZ_VoidLogic.Instance);
             LuaScript.Globals["API_Physics"] = (API_Physics.Instance);
+            LuaScript.Globals["API_Random"] = (API_Random.Instance);
+            LuaScript.Globals["API_Utils"] = (API_Utils.Instance);
+            LuaScript.Globals["API_BoneMenu"] = (API_BoneMenu.Instance);
+            LuaScript.Globals["API_Audio"] = (API_Audio.Instance);
+            
+
 
             //LuaScript.Globals["UnityObject"] = UserData.CreateStatic<UnityEngine.Object>();
             LuaScript.Globals["GameObject"] = UserData.CreateStatic<GameObject>();
@@ -163,7 +170,9 @@ namespace LuaMod
             LuaScript.Globals["Color"] = UserData.CreateStatic<UnityEngine.Color>();
             LuaScript.Globals["Physics"] = UserData.CreateStatic<UnityEngine.Physics>();
             LuaScript.Globals["Transform"] = UserData.CreateStatic<Transform>();
-
+            LuaScript.Globals["Time"] = UserData.CreateStatic<Time>();
+            LuaScript.Globals["Camera"] = UserData.CreateStatic<Camera>();
+            LuaScript.Globals["ConfigurableJointMotion"] = UserData.CreateStatic<ConfigurableJointMotion>();
             /*
             LuaScript.Globals["BL_testmsg"] = (Func<string, Quaternion,bool>)API_GameObject.BL_testmsg;
             LuaScript.Globals["BL_Vector3"] = (Func<float,float,float, Vector3>)API_Vector.BL_Vector3;

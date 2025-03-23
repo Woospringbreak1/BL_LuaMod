@@ -8,6 +8,7 @@ using MelonLoader;
 using MoonSharp.Interpreter;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UIElements;
 
 //using Il2CppSystem;
@@ -47,6 +48,14 @@ namespace LuaMod.LuaAPI
             LoadAssemblyTypes("Il2CppSLZ.Marrow");
             LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
             LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
+
+
+            PrintAssemblyTypes("Il2CppSLZ.Algorithms");
+            PrintAssemblyTypes("Il2CppSLZ.Algorithms.Unity");
+            PrintAssemblyTypes("Il2CppSLZ.Marrow");
+            PrintAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
+            PrintAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
+
             LoadAssemblyTypes();
             //come back for more later...
 
@@ -86,7 +95,48 @@ namespace LuaMod.LuaAPI
         }
 
 
+        private static void PrintAssemblyTypes(string assemblyPathOrName)
+        {
+            try
+            {
+                Assembly assembly;
 
+                // Try loading by name first, if that fails, try loading by file path
+                try
+                {
+                    assembly = Assembly.Load(assemblyPathOrName);
+                }
+                catch (Exception)
+                {
+                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY 
+                }
+
+                // Get types and append to the static list
+                var types = assembly.GetTypes();
+                List<System.Type> AcceptedTypes = new List<System.Type>();
+
+                foreach (System.Type type in types)
+                {
+                    if (InheritsFromUnityComponent(type))
+                    {
+                        
+                        MelonLoader.MelonLogger.Msg("UserData.RegisterType<" + type.Name + ">();");
+                    }
+                    else
+                    {
+                        //MelonLoader.MelonLogger.Warning(type.Name + " Is not a subtype of Component, skipping");
+                    }
+                }
+
+                LoadedTypes.AddRange(AcceptedTypes);
+
+                MelonLoader.MelonLogger.Msg($"Successfully loaded {AcceptedTypes.Count} types from {assembly.FullName}");
+            }
+            catch (Exception ex)
+            {
+                MelonLoader.MelonLogger.Error($"Error loading assembly: {ex.Message}");
+            }
+        }
 
         private static void LoadAssemblyTypes(string assemblyPathOrName)
         {
@@ -134,6 +184,11 @@ namespace LuaMod.LuaAPI
         public GameObject BL_CreateEmptyGameObject()
         {
             return new GameObject();
+        }
+
+        public bool BL_IsValid(UnityEngine.Object obj)
+        {
+            return obj != null;
         }
 
         public GameObject BL_InstantiateGameObject(GameObject original)
@@ -228,10 +283,17 @@ namespace LuaMod.LuaAPI
 
         public static DynValue BL_GetComponent2(GameObject obj, string CompType)
         {
-          //  MeshFilter Test1 = obj.GetComponent<MeshFilter>();
-         //   object Test2 = obj.GetComponent<MeshFilter>();
+            //  MeshFilter Test1 = obj.GetComponent<MeshFilter>();
+            //   object Test2 = obj.GetComponent<MeshFilter>();
 
-            System.Type Monoconversiontype = LoadedTypes.Find(t => t.Name == CompType);
+            if (obj == null)
+            {
+                MelonLoader.MelonLogger.Error("provided GameObject is nil");
+                return null;
+            }
+
+
+                System.Type Monoconversiontype = LoadedTypes.Find(t => t.Name == CompType);
             if (Monoconversiontype != null)
             {
                 
@@ -254,6 +316,38 @@ namespace LuaMod.LuaAPI
         }
 
 
+        public static DynValue BL_AddComponent(GameObject obj, string CompType)
+        {
+
+            if (obj == null)
+            {
+                MelonLoader.MelonLogger.Error("provided GameObject is nil");
+                return null;
+            }
+
+
+            System.Type Monoconversiontype = LoadedTypes.Find(t => t.Name == CompType);
+            if (Monoconversiontype != null)
+            {
+
+                System.Reflection.MethodInfo method = typeof(GameObject)
+                    .GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                    .First(m => m.Name == "AddComponent" && m.IsGenericMethod);
+
+                System.Reflection.MethodInfo genericMethod = method.MakeGenericMethod(Monoconversiontype);
+                object ConvertedOutComp = genericMethod.Invoke(obj, null);
+
+                return ConvertedOutComp != null ? UserData.Create(ConvertedOutComp) : DynValue.Nil;
+            }
+            else
+            {
+                MelonLoader.MelonLogger.Error("Monoconversiontype is nil");
+            }
+
+
+            return DynValue.Nil; // Ensure function always returns a value
+        }
+
         public static DynValue BL_GetComponentInChildren(GameObject obj, string CompType)
         {
             if (obj == null)
@@ -269,7 +363,7 @@ namespace LuaMod.LuaAPI
                 MethodInfo method = typeof(GameObject)
                     .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .First(m => m.Name == "GetComponentInChildren" && m.IsGenericMethod);
-
+                
                 MethodInfo genericMethod = method.MakeGenericMethod(componentType);
 
                 // Invoke with the bool parameter
@@ -285,7 +379,7 @@ namespace LuaMod.LuaAPI
 
             return DynValue.Nil;
     }
-
+        /*
     private static MonoBehaviour GetMonoBehaviour(GameObject obj, string CompType)
         {
 
@@ -310,6 +404,7 @@ namespace LuaMod.LuaAPI
             }
             return null;
         }
+        */
 
         public static float TimeSinceOpen()
         {
@@ -415,7 +510,7 @@ namespace LuaMod.LuaAPI
             };
 
             AssetSpawner.Register(spawnable);
-            UniTask<Poolee> task = AssetSpawner.SpawnAsync(spawnable, pos, rotation, new Il2CppSystem.Nullable<Vector3>(Vector3.one), NewParent.transform, true, new Il2CppSystem.Nullable<int>());
+            UniTask<Poolee> task = AssetSpawner.SpawnAsync(spawnable, pos, rotation, new Il2CppSystem.Nullable<Vector3>(Vector3.one),NewParent != null ? NewParent.transform : null, true, new Il2CppSystem.Nullable<int>());
             task.ContinueWith(captureSpawnedCrate);
       
         }
@@ -470,7 +565,7 @@ namespace LuaMod.LuaAPI
 
         public static GameObject InstantiatePrefab(string PrefabName)
         {
-            return null;
+            throw new NotImplementedException();
         }
     }
 }
