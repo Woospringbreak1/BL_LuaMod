@@ -20,6 +20,7 @@ namespace LuaMod.LuaAPI
             // Does the ray intersect any objects excluding the player layer
             if (Physics.SphereCast(origin,radius, direction, out hit, maxdistance))
             {
+              
                 return UserData.Create(hit);
 
             }
@@ -30,13 +31,13 @@ namespace LuaMod.LuaAPI
 
         }
 
-        public static DynValue BL_RayCast(Vector3 start, Vector3 end, float radius, float maxdistance)
+        public static DynValue BL_SphereCast(Vector3 start, Vector3 end, float radius)
         {
             RaycastHit hit;
             Vector3 direction = (end - start).normalized; // Normalize direction
             float length = (end - start).magnitude; // Calculate distance
 
-            if (Physics.SphereCast(start,radius, direction, out hit, maxdistance))
+            if (Physics.SphereCast(start, radius, direction, out hit, length))
             {
                 return UserData.Create(hit);
             }

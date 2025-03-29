@@ -48,12 +48,15 @@ function SetupJetpack()
    end
 end
 
-NextCheckTime = 0
 function SetupVertigoTeleporter()
    local locate = GameObject.Find("VertigoTeleporter")
-   if(Time.time > NextCheckTime and ( locate == nil or not API_GameObject.BL_IsValid(locate))) then
-      API_GameObject.BL_SpawnByBarcode_LuaVar(BL_This,"VertigoTeleporter","33.33.Spawnable.VertigoTeleporterAttachment", Vector3.zero, Quaternion.identity,nil, true)
-      NextCheckTime = Time.time + 0.5
+   if(locate == nil or not API_GameObject.BL_IsValid(locate)) then
+      VertigoTeleporter = API_GameObject.BL_CreateEmptyGameObject()
+      VertigoTeleporter.SetActive(false)
+      VertigoTeleporter.name = "VertigoTeleporter"
+      VertigoTeleporterBehaviour = API_GameObject.BL_AddComponent(VertigoTeleporter,"LuaBehaviour")
+      VertigoTeleporterBehaviour.ScriptName = ("Vertigo2_Teleporter_AvatarAttachment.lua")
+      VertigoTeleporter.SetActive(true)      
    else
       VertigoTeleporter = locate
    end

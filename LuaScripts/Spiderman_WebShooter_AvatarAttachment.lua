@@ -3,13 +3,6 @@
 
 function Start()
     print("Hello, World from Spiderman_Webshooter!")
-    --print("locating LuaGun")
-
-    print("locating Rigidbody")
-    HandTransform = API_Input.BL_LeftHand().transform
-    HandRB= API_GameObject.BL_GetComponent2(HandTransform.gameObject,"Rigidbody")
-    FireSound = 
-    print("CastTestRigidbody mass: " .. HandRB.mass)
 
     WebLaunchSound = nil
     
@@ -38,6 +31,12 @@ function DestroyConnections()
     WebShooterProjectiles = {}
 end
 
+function PlayWebLaunchSound()
+    if(WebLaunchSound ~= nil and not WebLaunchSound.isPlaying) then
+        WebLaunchSound.Play()
+    end
+end
+
 function ShouldShoot()
     local ControllerGrabbed = false
     local HandEmpty = false
@@ -48,12 +47,16 @@ function ShouldShoot()
         ControllerGrabbed = API_Input.BL_RightController_IsGrabbed()
         HandEmpty = API_Input.BL_RightHandEmpty()
     end
-
-    return ControllerGrabbed and HandEmpty and WebLaunchSound ~= nil
+    --print("ShouldShoot? " + tostring())
+    return ControllerGrabbed and HandEmpty --and WebLaunchSound ~= nil
 end
 
 
 function SetLeftHanded(leftHandMode)
+
+    if(API_Input.BL_LeftHand() == nil or API_Input.BL_RightHand() == nil) then
+        return
+    end
 
     if(leftHandMode == Lefthanded) then
         return
@@ -75,10 +78,29 @@ WebShooterProjectiles = {}
 ActOnce = false
 function Update()
 
+    if(BL_This == nil or not API_GameObject.BL_IsValid(BL_Host) or not BL_This.Ready) then
+        return
+    end
+
+    if(SpiderManResources == nil or not API_GameObject.BL_IsValid(SpiderManResources)) then
+        SpawnResources()
+        return
+    else
+
+    if(WebLaunchSound == nil and API_GameObject.BL_IsValid(SpiderManResources) ) then
+        WebLaunchSound = API_GameObject.BL_GetComponent2(SpiderManResources,"AudioSource")
+        return
+    end
+
+    if(HandTransform == nil and API_Input.BL_LeftHand() ~= nil) then
+        HandTransform = API_Input.BL_LeftHand().transform
+        HandRB= API_GameObject.BL_GetComponent2(HandTransform.gameObject,"Rigidbody")
+        return
+    end
+
     if(ShouldShoot()) then
         if(not ActOnce) then
-            API_Audio.BL_Play3DOneShot(WebLaunchSound,HandTransform.position,100.0)
-            print("web launch sound: " .. WebLaunchSound.name)
+            PlayWebLaunchSound()
             print("spawning projectile from spiderman webshooter!")
             Fpoint = HandTransform
             Pos = Fpoint.position + Fpoint.forward*0.35
@@ -103,12 +125,8 @@ function Update()
         end
     end
 
-    if(SpiderManResources == nill or not API_GameObject.BL_IsValid(SpiderManResources)) then
-        SpawnResources()
-    else
-        if(WebLaunchSound == nil) then
-            WebLaunchSound = API_GameObject.BL_GetComponentInChildren(SpiderManResources,"AudioSource").clip
-        end
+
+
     end
 
 

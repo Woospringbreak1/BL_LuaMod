@@ -1,9 +1,12 @@
 ﻿#if !(UNITY_EDITOR || UNITY_STANDALONE)
 using HarmonyLib;
+using Il2CppSLZ.Interaction;
 using Il2CppSLZ.Marrow;
 using Il2CppSLZ.Marrow.Data;
+using Il2CppSLZ.Marrow.Interaction;
 using LuaMod.LuaAPI;
 using MoonSharp.Interpreter;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 #else
 using MoonSharp.Interpreter;
@@ -106,17 +109,18 @@ namespace LuaMod
         MoonSharp.Interpreter.DynValue SpawnCartridgeFunction;
 
 
-
+      
         new public void Start()
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
             MelonLoader.MelonLogger.Msg("LUAGUN start function called");
             Magazine InsertedMag;
-           
+           //AttachedGun._magState.Refill()
             if (ScriptName == "" || ScriptName == null)
             {
-                ScriptName = "TestWeapon.lua";
+                ScriptName = "Spiderman_WebShooter.lua";
             }
+           
             this.AttachedGun = this.gameObject.GetComponent<Gun>();
             this.AttachedGunSlide = this.gameObject.GetComponent<SlideVirtualController>();
             
@@ -191,6 +195,7 @@ namespace LuaMod
                         //dif is negitive.
                         AttachedGun._magState.ClearMagazine();
                         AttachedGun._magState.AddCartridge(rounds);
+                     
                         return true;
                     }
                     
@@ -222,10 +227,14 @@ namespace LuaMod
 
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
             MelonLoader.MelonLogger.Msg("OnFire called");
-            CallScriptFunction(OnFireFunction);
-            return !SupressBullet;
+            DynValue FireReturn = CallScriptFunction(OnFireFunction);
+
+            if(FireReturn != null&& FireReturn != DynValue.Nil && FireReturn.Type == DataType.Boolean)
+            {
+                return FireReturn.Boolean;
+            }
 #endif
-            return true;
+            return !SupressBullet;
         }
 
         public bool LuaTriggerPulled()

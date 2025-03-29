@@ -3,6 +3,7 @@ using Il2CppSLZ.Bonelab;
 using Il2CppSLZ.Marrow;
 using Il2CppSLZ.Marrow.AI;
 using Il2CppSLZ.Marrow.Combat;
+using Il2CppSLZ.Marrow.PuppetMasta;
 using UnityEngine;
 
 namespace LuaMod.LuaAPI
@@ -41,27 +42,39 @@ namespace LuaMod.LuaAPI
 
 
 
-        public static bool BL_AttackEnemy(GameObject obj, int damage, Collider col, Vector3 pos, Vector3 normal)
+        public static bool BL_AttackEnemy(GameObject obj, float damage, Collider col, Vector3 pos, Vector3 normal)
         {
-            AIBrain DR = obj.GetComponent<AIBrain>();
-            ObjectDestructible DP = obj.GetComponent<ObjectDestructible>();
+
+            Attack attack = new Attack();
+            attack.attackType = Il2CppSLZ.Marrow.Data.AttackType.Piercing;
+            attack.collider = col;
+            attack.origin = pos;
+            attack.damage = damage;
+            attack.normal = normal;
+            attack.direction = normal;
+
+
+            BehaviourBaseNav DR = obj.GetComponentInChildren<BehaviourBaseNav>();
+            BehaviourCrablet DC = obj.GetComponentInChildren<BehaviourCrablet>();
+            ObjectDestructible DP = obj.GetComponentInChildren<ObjectDestructible>();
+            PhysicsRig PR = obj.GetComponentInChildren<PhysicsRig>();
             //DP.OnDestruction
             if (DR != null)
             {
-               // BoneLib.Extensions.DealDamage(DR, damage);
-                MelonLoader.MelonLogger.Error("attacking NPC");
+                DR.health.TakeDamage(1, attack);
+            }
+            else if (DC != null)
+            {
+                DC.health.TakeDamage(1, attack);
+                DC.MountAttack(damage);
             }
             else if(DP != null)
             {
-                
-                Attack attack = new Attack();
-                attack.attackType = Il2CppSLZ.Marrow.Data.AttackType.Piercing;
-                attack.collider = col;
-                attack.origin = pos;
-                attack.damage = damage;
-                attack.normal = normal;
-                attack.direction = normal;
                 DP.ReceiveAttack(attack);
+            }
+            else if (PR != null)
+            {
+                API_Player.BL_PlayerHealth().TAKEDAMAGE(damage);
             }
             else
             {

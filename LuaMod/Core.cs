@@ -21,6 +21,7 @@ using Il2CppSLZ.Marrow.Utilities;
 using Il2CppSLZ.Marrow.VoidLogic;
 using Il2CppSLZ.Marrow.Warehouse;
 using Il2CppSLZ.Marrow.Zones;
+using Il2CppSLZ.SFX;
 using Il2CppSLZ.VFX;
 using Il2CppSLZ.VRMK;
 using Il2CppSteam.VR.Features;
@@ -30,9 +31,11 @@ using LuaMod.LuaAPI;
 using MelonLoader;
 using MoonSharp.Interpreter;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Video;
 using static Il2CppSLZ.Bonelab.SceneAmmoUI;
+using static UnityEngine.ParticleSystem;
 [assembly: MelonInfo(typeof(LuaMod.Core), "LuaMod", "1.0.0", "pc", null)]
 [assembly: MelonGame("Stress Level Zero", "BONELAB")]
 
@@ -53,7 +56,7 @@ namespace LuaMod
 
             UserData.RegisterType<List<DynValue>>();
             UserData.RegisterType<List<string>>();
-
+            UserData.RegisterType<Particle[]>();
             //lua API
             UserData.RegisterType<API_GameObject>();
             UserData.RegisterType<API_Input>();
@@ -68,6 +71,7 @@ namespace LuaMod
             UserData.RegisterType<API_Utils>();
             UserData.RegisterType<API_BoneMenu>();
             UserData.RegisterType<API_Audio>();
+            UserData.RegisterType<API_Particles>();
             
 
             UserData.RegisterType<LuaBehaviour>();
@@ -302,6 +306,7 @@ namespace LuaMod
             UserData.RegisterType<FlareLayer>();
             UserData.RegisterType<FrictionJoint2D>();
             UserData.RegisterType<FrustumPlanes>();
+            UserData.RegisterType<ForceMode>();
             UserData.RegisterType<GameObject>();
             UserData.RegisterType<GeometryUtility>();
             UserData.RegisterType<Gradient>();
@@ -364,8 +369,10 @@ namespace LuaMod
             UserData.RegisterType<ModifiableMassProperties>();
             UserData.RegisterType<MonoBehaviour>();
             UserData.RegisterType<Motion>();
+            UserData.RegisterType<NavMeshAgent>();
             UserData.RegisterType<UnityEngine.Object>();
             UserData.RegisterType<ParticleSystem>();
+            UserData.RegisterType<Particle>();
             UserData.RegisterType<Physics>();
             UserData.RegisterType<Physics2D>();
             UserData.RegisterType<PhysicsMaterial2D>();
@@ -404,6 +411,7 @@ namespace LuaMod
 
         public void RegisterSLZTypes()
         {
+            UserData.RegisterType<Gun.HammerStates>();
             UserData.RegisterType<Attack>();
             UserData.RegisterType<SpawnDeathEvent>();
             UserData.RegisterType<SanityTester>();
@@ -608,6 +616,8 @@ namespace LuaMod
             UserData.RegisterType<JointBreakBroadcaster>();
             UserData.RegisterType<MuscleCollisionBroadcaster>();
             UserData.RegisterType<MuscleCollisionBroadcasterSensor>();
+            UserData.RegisterType<Muscle>();
+            UserData.RegisterType<Muscle.State>();
             UserData.RegisterType<PID_Controller>();
             UserData.RegisterType<PressureSensor>();
             UserData.RegisterType<PuppetMaster>();
@@ -694,9 +704,10 @@ namespace LuaMod
             UserData.RegisterType<TriggerRefProxy>();
             UserData.RegisterType<VoidLogicSubgraph>();
             UserData.RegisterType<VoidLogicManager>();
-
-
+            UserData.RegisterType<TriggeredAudio>();
+            UserData.RegisterType<AgentLinkControl>();
         }
+        
         public void ReloadScripts()
         {
 
@@ -767,14 +778,16 @@ namespace LuaMod
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.F7))
+            if (Input.GetKeyDown(KeyCode.F8))
             {
-               // GameObject SpiderManSkills = new GameObject();
-               // SpiderManSkills.SetActive(false);
-              //  SpiderManSkills.name = "SpidermanSkills";
-             //   LuaBehaviour SpiderBehaviour = SpiderManSkills.AddComponent<LuaBehaviour>();
-              //  SpiderBehaviour.ScriptName = ("Spiderman_WebShooter_AvatarAttachment.lua");
-              //  SpiderManSkills.SetActive(true);
+               GameObject TestObject = new GameObject();
+               TestObject.SetActive(false);
+               TestObject.name = "TestObject";
+               LineRenderer line = TestObject.AddComponent<LineRenderer>();
+               line.numPositions = 5;
+               Vector3[] pos = new Vector3[5];
+               line.GetPositions(pos);
+               TestObject.SetActive(true);
               
             }
         }
@@ -798,6 +811,7 @@ namespace LuaMod
             FieldInjector.SerialisationHandler.Inject<LuaBehaviour>();
             FieldInjector.SerialisationHandler.Inject<LuaGun>();
             FieldInjector.SerialisationHandler.Inject<LuaNPC>();
+            FieldInjector.SerialisationHandler.Inject<LuaResources>();
 
             GameObject LuaMenu = new GameObject();
             GameObject.DontDestroyOnLoad(LuaMenu);

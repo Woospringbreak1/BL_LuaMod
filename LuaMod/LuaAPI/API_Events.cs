@@ -152,8 +152,8 @@ namespace LuaMod.LuaAPI
 
             BoneLib.BoneMenu.FloatElement.OnValueChanged += Event_FloatElement_OnValueChanged;
             BoneLib.BoneMenu.Dialog.OnDialogClosed += Event_Dialog_OnDialogClosed;
-           
 
+        
         }
 
         private static void Event_Dialog_OnDialogClosed(BoneLib.BoneMenu.Dialog obj)

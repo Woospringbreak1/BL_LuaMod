@@ -12,9 +12,9 @@ function Start()
 
     -- Find Turret Parts
     TurretParent = BL_Host.transform.root.gameObject
-    TurretWeaponMarker = API_GameObject.BL_FindInChildren(TurretParent,"TurretWeaponMarker").gameObject --FindChild(TurretParent,"TurretWeaponMarker")[1].gameObject
-    TurretBaseRotor = API_GameObject.BL_FindInChildren(TurretParent,"TurretBaseRotor").gameObject--TurretParent.transform.Find("TurretBaseRotor").gameObject
-    TurretWeaponRotor = API_GameObject.BL_FindInChildren(TurretParent,"TurretWeaponRotor").gameObject--TurretParent.transform.Find("TurretWeaponRotor").gameObject
+    TurretWeaponMarker = API_GameObject.BL_FindInChildren(TurretParent,"TurretWeaponMarker").gameObject 
+    TurretBaseRotor = API_GameObject.BL_FindInChildren(TurretParent,"TurretBaseRotor").gameObject
+    TurretWeaponRotor = API_GameObject.BL_FindInChildren(TurretParent,"TurretWeaponRotor").gameObject
 
     -- Get Configurable Joints
     BaseRotorJoint = API_GameObject.BL_GetComponent2(TurretBaseRotor, "ConfigurableJoint")
@@ -36,14 +36,11 @@ function Start()
         print("Initial Base Rotation: " .. tostring(InitialBaseRotation.eulerAngles))
         print("Initial Weapon Rotation: " .. tostring(InitialWeaponRotation.eulerAngles))
 
-        --print("Base rotor joint pos damping: " .. BaseRotorJoint.angularYZDrive.positionDamper)
+        
         BaseRotorJoint.angularYZDrive.positionDamper = 50
-       -- print("Base rotor joint pos damping: " .. BaseRotorJoint.angularYZDrive.positionDamper)
         BaseRotorJoint.angularYZDrive.m_PositionDamper = 50
-        --print("Base rotor joint pos damping: " .. BaseRotorJoint.angularYZDrive.positionDamper)
+       
     end
-
-    -- Target Rotation Setpoints (Degrees)
 
 end
 
@@ -195,9 +192,10 @@ function FixedUpdate()
         -- Apply rotation relative to initial joint rotation
       --  BaseRotorJoint.targetRotation = Quaternion.Inverse(InitialBaseRotation) * BaseRotation
       --  WeaponRotorJoint.targetRotation = Quaternion.Inverse(InitialWeaponRotation) * WeaponRotation
-      BaseRotorJoint.targetRotation = BaseRotation
-      WeaponRotorJoint.targetRotation = WeaponRotation
-
+     -- BaseRotorJoint.targetRotation = BaseRotation
+      --WeaponRotorJoint.targetRotation = WeaponRotation
+        BaseRotorJoint.targetRotation = Quaternion.Inverse(InitialBaseRotation) * BaseRotation
+        WeaponRotorJoint.targetRotation = Quaternion.Inverse(InitialWeaponRotation) * WeaponRotation
         -- Debugging output
         --print("Base Target: " .. tostring(BaseRotationV))
         --print("Weapon Target: " .. tostring(WeaponRotationV))

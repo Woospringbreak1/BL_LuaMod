@@ -11,9 +11,14 @@ namespace LuaMod.LuaAPI
     {
         public static readonly API_Random Instance = new API_Random();
 
-        public Vector3 onUnitSphere()
+        public Vector3 BL_onUnitSphere()
         {
             return UnityEngine.Random.onUnitSphere;
         }
+        public float BL_RandomRange(float min,float max)
+        {
+            return UnityEngine.Random.RandomRange(min,max);
+        }
+
     }
 }

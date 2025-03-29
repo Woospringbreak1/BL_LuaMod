@@ -1,4 +1,7 @@
-﻿using MoonSharp.Interpreter;
+﻿using Il2CppSLZ.Marrow;
+using Il2CppSLZ.Marrow.Pool;
+using Il2CppSLZ.Marrow.Warehouse;
+using MoonSharp.Interpreter;
 using UnityEngine;
 
 namespace LuaMod.LuaAPI
@@ -59,13 +62,59 @@ namespace LuaMod.LuaAPI
         {
             if(BoneLib.Player.Avatar != null)
             {   
-                return UserData.Create(BoneLib.Player.Avatar.transform.position);
+                return UserData.Create(BoneLib.Player.PhysicsRig.transform.position);
             }    
             return null;
            
         }
+
+        public static DynValue BL_GetAvatarCenter()
+        {
+            if (BoneLib.Player.Avatar != null)
+            {
+                return UserData.Create(BoneLib.Player.PhysicsRig.m_chest.transform.position);
+            }
+            return null;
+
+        }
+
+
+        public static PhysicsRig BL_GetPhysicsRig()
+        {
+            if (BoneLib.Player.PhysicsRig != null)
+            {
+                return (BoneLib.Player.PhysicsRig);
+            
+            }
+            return null;
+
+        }
+
+        public static ControllerRig BL_GetControllerRig()
+        {
+            if (BoneLib.Player.PhysicsRig != null)
+            {
+                return (BoneLib.Player.ControllerRig);
+
+            }
+            return null;
+
+        }
+
+        public static Health BL_PlayerHealth()
+        {
+            if (BoneLib.Player.RigManager != null && BoneLib.Player.RigManager.health != null)
+            {
+                return (BoneLib.Player.RigManager.health);
+
+            }
+            return null;
+
+        }
+
         public static void BL_SetAvatarPosition(Vector3 pos)
         {
+     
             BoneLib.Player.PhysicsRig.Teleport(new Il2CppSLZ.Marrow.Utilities.SimpleTransform(pos, Quaternion.identity), true);
         }
 

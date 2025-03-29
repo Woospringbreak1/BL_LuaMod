@@ -27,7 +27,7 @@ namespace LuaMod
             
             if (ScriptName == "" || ScriptName == null)
             {
-                ScriptName = "PetNullbody.lua";
+                ScriptName = "Manhack.lua";
             }
             this.AttachedNPCBrain = this.gameObject.GetComponent<AIBrain>();
             this.AttachedNPCBehaviour = AttachedNPCBrain.behaviour;
@@ -38,9 +38,9 @@ namespace LuaMod
                         
             AttachedNPCBrain.onDeathDelegate += new Action<AIBrain>(OnAIBrainDeath);
             AttachedNPCBrain.onResurrectDelegate += new Action<AIBrain>(OnAIBrainResurrect);
-            AttachedNPCBehaviour.SwitchLocoState(BehaviourBaseNav.LocoState.Walking, 0, true);
-            AttachedNPCBehaviour.SwitchMentalState(BehaviourBaseNav.MentalState.Roam);
+            //AttachedPuppetMaster.muscles[0].sta
 
+               
             base.Start();
 #endif
         }

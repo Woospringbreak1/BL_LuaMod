@@ -1,5 +1,6 @@
 ﻿
 //using Il2CppSLZ.Marrow.Utilities;
+//
 using MoonSharp.Interpreter;
 using System;
 using System.Collections.Generic;
@@ -7,13 +8,15 @@ using System.Security;
 using UnityEngine;
 
 
+
+
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
+using MelonLoader;
 #endif
 
 namespace LuaMod
 {
 
-  //  public class StringValueDictionary : SerializableDictionary<string, SerializableValue> { }
 
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
     //[RegisterTypeInIl2Cpp]  //handled by FieldInjector
@@ -24,13 +27,15 @@ namespace LuaMod
         public TextAsset ScriptAsset;
         public float SlowUpdateTime = 0.5f;
         public List<String> ScriptTags;
-        //public StringValueDictionary myDictionary;
+        public bool Ready = false;
+        public UnityEngine.Object[] Resources;
+        
 
-  
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
 
         protected LuaModScript BehaviourScript;
         protected MoonSharp.Interpreter.DynValue StartFunction;
+        protected MoonSharp.Interpreter.DynValue LateStartFunction;
         protected MoonSharp.Interpreter.DynValue UpdateFunction;
         protected MoonSharp.Interpreter.DynValue FixedUpdateFunction;
 
@@ -80,7 +85,16 @@ namespace LuaMod
                 }
                 this.InvokeRepeating("SlowUpdate",UnityEngine.Random.RandomRange(0,3.0f*invoketime),invoketime);
             }
-#endif
+
+
+            if (LateStartFunction != null && LateStartFunction != DynValue.Nil)
+            {
+                this.Invoke("LateStart",1.5f);
+            }
+
+
+#endif 
+            Ready = true;
         }
         void OnTriggerEnter(Collider othercol)
         {
@@ -89,7 +103,12 @@ namespace LuaMod
 #endif
         }
 
-
+        void LateStart()
+        {
+        #if !(UNITY_EDITOR || UNITY_STANDALONE)
+            CallScriptFunction(LateStartFunction);
+        #endif
+        }
 
         void SlowUpdate()
         {
@@ -114,23 +133,27 @@ namespace LuaMod
         }
 
 
-        public void CallScriptFunction(DynValue DyFunc)
+        public DynValue CallScriptFunction(DynValue DyFunc)
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
             if (BehaviourScript != null && DyFunc != null && DyFunc != DynValue.Nil)
             {
                 try
                 {
-                    BehaviourScript.LuaScript.Call(DyFunc);
+                    return(BehaviourScript.LuaScript.Call(DyFunc));
                 }
                 catch (ScriptRuntimeException ex)
                 {
+
+                    MelonLoader.MelonLogger.Warning("exception when calling " + DyFunc.ToString() + " by object " + this.name + " script name " + ScriptName);  
                     MelonLoader.MelonLogger.Error("An error occured! " + ex.DecoratedMessage);
                     throw;
                     
                 }
             }
 #endif
+            return null;
+
         }
 
         public void SetScriptVariable(string name,DynValue DyVar)
@@ -185,6 +208,7 @@ namespace LuaMod
                     return false;
                 }
             }
+            MelonLoader.MelonLogger.Error("Error when calling function " + DyFunc.ToPrintString() + " " + BehaviourScript.ToString());
             return false;
 #endif
             return false;
@@ -212,6 +236,7 @@ namespace LuaMod
             if (BehaviourScript != null && BehaviourScript.LuaScript != null)
             {
                 BehaviourScript.LuaScript.Globals["BL_deltaTime"] = Time.deltaTime;
+                
                 CallScriptFunction(UpdateFunction);
             }
 #endif
@@ -276,6 +301,7 @@ namespace LuaMod
 
             if (BehaviourScript.LoadScript(Script, false))
             {
+                ScriptAsset = Script;
                 SetupBehaviourFunctions();
                 LoadBehaviourFunctionPointers();
                 BehaviourScript.PostReloadScript = new LuaModScript.del_postreload(ReloadScript);
@@ -295,8 +321,11 @@ namespace LuaMod
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
 
+            
+
             if (BehaviourScript.LoadScript(Script, false))
             {
+                ScriptName = Script;
                 SetupBehaviourFunctions();
                 LoadBehaviourFunctionPointers();
                 BehaviourScript.PostReloadScript = new LuaModScript.del_postreload(ReloadScript);
@@ -317,10 +346,17 @@ namespace LuaMod
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
             if(BehaviourScript == null || BehaviourScript.LuaScript == null)
             {
+                MelonLogger.Error("Attempted to call function on LuaBehaviour with null BehaviourScript " + functionname + " against " + this.name);
                 return false;
             }
 
            DynValue scriptfunc = BehaviourScript.LuaScript.Globals.Get(functionname);
+
+            if(scriptfunc == null || scriptfunc == DynValue.Nil)
+            {
+                MelonLogger.Error("Attempted to call invalid function " + functionname + " against " + this.name);
+            }
+
            return(CallScriptFunctionDynamic(scriptfunc,args));
 #endif
             return false;

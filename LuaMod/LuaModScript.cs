@@ -1,4 +1,5 @@
-﻿using LuaMod.LuaAPI;
+﻿using Il2CppSLZ.Marrow;
+using LuaMod.LuaAPI;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
 using UnityEngine;
@@ -64,7 +65,7 @@ namespace LuaMod
 
 
                 LuaFileName = filename;
-                LuaScript.Options.DebugPrint = s => { MelonLoader.MelonLogger.Msg(s); };
+                LuaScript.Options.DebugPrint = s => { MelonLoader.MelonLogger.Msg("Msg from " + filename + ": " + s); };
                 LoadFunctionPointers();
 
                 if (!reloading)
@@ -105,7 +106,7 @@ namespace LuaMod
                 LuaFileName = "";
                 LuaAsset = scriptasset;
 
-                LuaScript.Options.DebugPrint = s => { MelonLoader.MelonLogger.Msg(s); };
+                LuaScript.Options.DebugPrint = s => { MelonLoader.MelonLogger.Msg("Msg from " + scriptasset.name + ": " + s); };
 
                 LoadFunctionPointers();
 
@@ -159,8 +160,8 @@ namespace LuaMod
             LuaScript.Globals["API_Utils"] = (API_Utils.Instance);
             LuaScript.Globals["API_BoneMenu"] = (API_BoneMenu.Instance);
             LuaScript.Globals["API_Audio"] = (API_Audio.Instance);
+            LuaScript.Globals["API_Particles"] = (API_Particles.Instance);
             
-
 
             //LuaScript.Globals["UnityObject"] = UserData.CreateStatic<UnityEngine.Object>();
             LuaScript.Globals["GameObject"] = UserData.CreateStatic<GameObject>();
@@ -173,6 +174,13 @@ namespace LuaMod
             LuaScript.Globals["Time"] = UserData.CreateStatic<Time>();
             LuaScript.Globals["Camera"] = UserData.CreateStatic<Camera>();
             LuaScript.Globals["ConfigurableJointMotion"] = UserData.CreateStatic<ConfigurableJointMotion>();
+            LuaScript.Globals["ForceMode"] = UserData.CreateStatic<ForceMode>();
+            LuaScript.Globals["Mathf"] = UserData.CreateStatic<Mathf>();
+           
+
+            //SLZ
+            LuaScript.Globals["HammerStates"] = UserData.CreateStatic<Gun.HammerStates>();
+            
             /*
             LuaScript.Globals["BL_testmsg"] = (Func<string, Quaternion,bool>)API_GameObject.BL_testmsg;
             LuaScript.Globals["BL_Vector3"] = (Func<float,float,float, Vector3>)API_Vector.BL_Vector3;

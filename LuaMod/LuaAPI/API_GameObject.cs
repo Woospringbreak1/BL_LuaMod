@@ -1,9 +1,11 @@
 ﻿using Il2CppCysharp.Threading.Tasks;
+using Il2CppSLZ.Bonelab;
 using Il2CppSLZ.Marrow.AI;
 using Il2CppSLZ.Marrow.Data;
 using Il2CppSLZ.Marrow.LateReferences;
 using Il2CppSLZ.Marrow.Pool;
 using Il2CppSLZ.Marrow.Warehouse;
+using Il2CppSLZ.SFX;
 using MelonLoader;
 using MoonSharp.Interpreter;
 using System.Reflection;
@@ -48,8 +50,12 @@ namespace LuaMod.LuaAPI
             LoadAssemblyTypes("Il2CppSLZ.Marrow");
             LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
             LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
-
-
+            LoadAssemblyTypes("Il2CppSLZ.SFX");
+            LoadAssemblyTypes("Il2CppSLZ.VFX");
+            LoadAssemblyTypes("SLZ.VFX");
+            LoadAssemblyTypes("Il2CppSLZ.Bonelab");
+            LoadAssemblyTypes("Assembly-CSharp");
+            PrintAssemblyTypes("Il2CppSLZ.SFX");
             PrintAssemblyTypes("Il2CppSLZ.Algorithms");
             PrintAssemblyTypes("Il2CppSLZ.Algorithms.Unity");
             PrintAssemblyTypes("Il2CppSLZ.Marrow");
@@ -66,7 +72,7 @@ namespace LuaMod.LuaAPI
             //load types from this mod
             var types = Assembly.GetExecutingAssembly().GetTypes();
             List<System.Type> AcceptedTypes = new List<System.Type>();
-
+            
             foreach (System.Type type in types)
             {
                 if (InheritsFromUnityComponent(type))
@@ -79,18 +85,18 @@ namespace LuaMod.LuaAPI
                     //MelonLoader.MelonLogger.Warning(type.Name + " Is not a subtype of Component, skipping");
                 }
             }
-
+            
             LoadedTypes.AddRange(AcceptedTypes);
 
             MelonLoader.MelonLogger.Msg($"Successfully loaded {types.Length} types from local mod assembly");
         }
-
+        
 
         public static bool InheritsFromUnityComponent(System.Type type)
         {
             if (type == null)
                 return false;
-
+           
             return type.IsSubclassOf(typeof(UnityEngine.Component)) || type == typeof(UnityEngine.Component);
         }
 
@@ -108,7 +114,7 @@ namespace LuaMod.LuaAPI
                 }
                 catch (Exception)
                 {
-                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY 
+                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY RISK
                 }
 
                 // Get types and append to the static list
@@ -217,6 +223,17 @@ namespace LuaMod.LuaAPI
 
         }
 
+
+        public DynValue BL_FindInWorld(string name)
+        {
+            GameObject gameObject = GameObject.Find(name);
+
+            if(gameObject != null)
+            {
+                return(UserData.Create(gameObject));
+            }
+            return null;
+        }
         public DynValue BL_FindAllInChildren(GameObject gameObject, string name)
         {
            Transform[] tfs = gameObject.GetComponentsInChildren<Transform>();
@@ -285,7 +302,8 @@ namespace LuaMod.LuaAPI
         {
             //  MeshFilter Test1 = obj.GetComponent<MeshFilter>();
             //   object Test2 = obj.GetComponent<MeshFilter>();
-
+            
+            
             if (obj == null)
             {
                 MelonLoader.MelonLogger.Error("provided GameObject is nil");
@@ -308,13 +326,59 @@ namespace LuaMod.LuaAPI
             }
             else
             {
-                MelonLoader.MelonLogger.Error("Monoconversiontype is nil");
+                MelonLoader.MelonLogger.Error("Monoconversiontype is nil - " + CompType);
             }
                
 
             return DynValue.Nil; // Ensure function always returns a value
         }
 
+        public static List<DynValue> BL_GetComponents(GameObject obj, string CompType)
+        {
+
+            if (obj == null)
+            {
+                MelonLogger.Error("[BL_GetComponentsInChildren] GameObject is null!");
+                return null;
+            }
+
+            Type componentType = LoadedTypes.Find(t => t.Name == CompType);
+            if (componentType != null)
+            {
+                // Get the correct generic method
+                MethodInfo method = typeof(GameObject)
+                    .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .First(m => m.Name == "GetComponents" && m.IsGenericMethod);
+
+                MethodInfo genericMethod = method.MakeGenericMethod(componentType);
+
+                // Invoke the method with 'includeInactive' parameter
+                object[] parameters = new object[] {};
+                dynamic components = genericMethod.Invoke(obj, parameters);
+
+                // if (components is Array componentArray)
+                // {
+                // Convert C# array to Lua-compatible table (array)
+                List<DynValue> luaArray = new List<DynValue>();
+                foreach (object comp in components)
+                {
+                    luaArray.Add(UserData.Create(comp));
+                }
+
+                return luaArray;
+                // }
+                // else
+                // {
+                //     MelonLogger.Error($"[BL_GetComponentsInChildren] returned array invalid");
+                //  }
+            }
+            else
+            {
+                MelonLogger.Error($"[BL_GetComponents] Component type '{CompType}' not found!");
+            }
+
+            return null;
+        }
 
         public static DynValue BL_AddComponent(GameObject obj, string CompType)
         {
@@ -379,74 +443,20 @@ namespace LuaMod.LuaAPI
 
             return DynValue.Nil;
     }
-        /*
-    private static MonoBehaviour GetMonoBehaviour(GameObject obj, string CompType)
-        {
-
-            // doesn't work with textmeshpro - why?
-
-            Component[] Comps = obj.GetComponentsInChildren<Component>(); // probably change this back?
-           // Component[] Comps = obj.GetComponents<Component>();
-
-            foreach (Component comp in Comps)
-            {
-                System.Type type = comp.GetType();
-
-                if (type.Name == CompType)
-                {
-                    //MelonLoader.MelonLogger.Warning("Component of" + obj.name + " " + type.Name + " matches desired type " + CompType);
-                    return (MonoBehaviour)comp;
-                }
-                else
-                {
-                    //MelonLoader.MelonLogger.Warning("Component of" + obj.name + " " + type.Name + " does not match desired type " + CompType);
-                }
-            }
-            return null;
-        }
-        */
+     
 
         public static float TimeSinceOpen()
         {
             return(Time.realtimeSinceStartup);
         }
 
-        /*
-        public static DynValue BL_GetComponent(GameObject obj, string CompType)
-        {
-            System.Type Monoconversiontype = LoadedTypes.Find(t => t.Name == CompType);
-            if (Monoconversiontype != null)
-            {
-                // doesn't work with textmeshpro - why?
-                
-                if (Monoconversiontype.IsSubclassOf(typeof(UnityEngine.MonoBehaviour)))
-                {
-                    //different approach for monobehaviours. need to check that namespaces function
-                    return UserData.Create(GetMonoBehaviour(obj, CompType));
-               }
-
-                //otherwise, dynamically cast to the appropriate Component subclass
-                Il2CppSystem.Object OutComp = obj.GetComponentByName(CompType);
-
-
-                System.Reflection.MethodInfo method = typeof(Il2CppSystem.Object).GetMethod("TryCast", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).MakeGenericMethod(Monoconversiontype);
-                Il2CppSystem.Object ConvertedOutComp = (Il2CppSystem.Object)method.Invoke(OutComp, null);
-                DynValue DV = UserData.Create(ConvertedOutComp);
-                return DV;
-            }
-            else
-            {
-                MelonLoader.MelonLogger.Warning("Component type " + CompType + " not found in unity assemblies");
-                return null;
-            }
-
-        }
-        */
-
-
+       
         public static void BL_DestroyGameObject(GameObject obj)
         {
-            GameObject.Destroy(obj);
+            if (obj != null) 
+            {
+                GameObject.Destroy(obj);
+            }
         }
 
         public static void DestroyRoot(GameObject obj)
@@ -515,31 +525,7 @@ namespace LuaMod.LuaAPI
       
         }
 
-        /*
-        public static IEnumerator BL_SpawnByBarcode_Ref(Script script, string VariableName, string SpawnBCode, Vector3 pos, UnityEngine.Quaternion rotation, GameObject NewParent, bool Active = true)
-        {
-            GameObject outobj = null;
-            Action<Poolee> captureSpawnedCrate = (Poolee obj) =>
-            {
-                // spawnedCrate = obj;
-                MelonLogger.Msg("WORKING " + obj.name);
-                script.Globals["VariableName"] = UserData.Create(obj.gameObject);
-
-                // outobj =  obj.gameObject;
-            };
-
-            SpawnableCrateReference crateReference = new SpawnableCrateReference(SpawnBCode);
-            Spawnable spawnable = new Spawnable()
-            {
-                crateRef = crateReference
-            };
-
-            AssetSpawner.Register(spawnable);
-            UniTask<Poolee> task = AssetSpawner.SpawnAsync(spawnable, pos, rotation, new Il2CppSystem.Nullable<Vector3>(Vector3.one), NewParent.transform, true, new Il2CppSystem.Nullable<int>());
-            yield return task;
-
-        }
-        */
+     
 
 
         public static GameObject BL_GetPrefabReference(string PrefabName)
