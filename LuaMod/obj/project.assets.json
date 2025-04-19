@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "H:\\My Drive\\Bonelab modding\\LUA mod\\MelonLoader mod\\BL_LuaMod\\LuaMod\\LuaMod.csproj",
+      "projectUniqueName": "H:\\My Drive\\Bonelab modding\\LUA mod\\Bonelab_LuaMod\\LuaMod\\LuaMod.csproj",
       "projectName": "LuaMod",
-      "projectPath": "H:\\My Drive\\Bonelab modding\\LUA mod\\MelonLoader mod\\BL_LuaMod\\LuaMod\\LuaMod.csproj",
+      "projectPath": "H:\\My Drive\\Bonelab modding\\LUA mod\\Bonelab_LuaMod\\LuaMod\\LuaMod.csproj",
       "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-      "outputPath": "H:\\My Drive\\Bonelab modding\\LUA mod\\MelonLoader mod\\BL_LuaMod\\LuaMod\\obj\\",
+      "outputPath": "H:\\My Drive\\Bonelab modding\\LUA mod\\Bonelab_LuaMod\\LuaMod\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
