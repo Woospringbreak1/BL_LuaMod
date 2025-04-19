@@ -125,7 +125,6 @@
           "UnityEngine.CoreModule": "0.0.0.0",
           "UnityEngine.CrashReportingModule": "0.0.0.0",
           "UnityEngine.DirectorModule": "0.0.0.0",
-          "UnityEngine": "0.0.0.0",
           "UnityEngine.DSPGraphModule": "0.0.0.0",
           "UnityEngine.GameCenterModule": "0.0.0.0",
           "UnityEngine.GIModule": "0.0.0.0",
@@ -1116,14 +1115,6 @@
       "UnityEngine.DirectorModule/0.0.0.0": {
         "runtime": {
           "UnityEngine.DirectorModule.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "UnityEngine/0.0.0.0": {
-        "runtime": {
-          "UnityEngine.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -2334,11 +2325,6 @@
       "sha512": ""
     },
     "UnityEngine.DirectorModule/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "UnityEngine/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

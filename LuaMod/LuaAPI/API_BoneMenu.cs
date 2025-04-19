@@ -8,15 +8,17 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace LuaMod.LuaAPI
 {
-    internal class API_BoneMenu
+    public class API_BoneMenu
     {
         /// <summary>
         /// NOTE: AS IT STANDS, PLAYERS CAN STILL CALL PAGE.CREATEFUNCTION - NEEDS TO BE REMOVED FOR SAFETY
         /// </summary>
         public static readonly API_BoneMenu Instance = new API_BoneMenu();
 
+ 
         public static Page BL_Page = Page.Root;
 
         public static LuaFunctionElement BL_CreateFunction(Page page,string name,UnityEngine.Color color,LuaBehaviour owner,string function)

@@ -12,21 +12,19 @@ namespace LuaMod
     {
         public Avatar AttachedAvatar;
 
-
+        /// <summary>
+        /// Luabehaviour variant for attaching to avatars. unless someone finds something interesting to bind this will be removed
+        /// </summary>
 
         new public void Start()
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
-            MelonLoader.MelonLogger.Msg("LUAGUN start function called");
-            Magazine InsertedMag;
-            //AttachedGun._magState.Refill()
+       
             if (ScriptName == "" || ScriptName == null)
             {
                 ScriptName = "TestAvatar.lua";
             }
             this.AttachedAvatar = this.gameObject.GetComponent<Avatar>();
-            
-
             base.Start();
 #endif
         }

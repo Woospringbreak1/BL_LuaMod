@@ -1,0 +1,11 @@
+{
+  "assemblies": [ "bin/Debug/net6.0/LuaMod.dll" ],
+  "outputPath": "GeneratedTypes",
+  "generateDependencies": false,
+  "typeBlacklist": [
+    "UnityEngine.*",
+    "Il2CppInterop.*",
+    "Il2CppSystem.*",
+    "BoneLib.*"
+  ]
+}

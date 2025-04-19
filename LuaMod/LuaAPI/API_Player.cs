@@ -1,51 +1,31 @@
-﻿using Il2CppSLZ.Marrow;
+﻿using Il2Cpp;
+using Il2CppSLZ.Marrow;
 using Il2CppSLZ.Marrow.Pool;
 using Il2CppSLZ.Marrow.Warehouse;
+using Il2CppSLZ.VRMK;
 using MoonSharp.Interpreter;
+
 using UnityEngine;
 
 namespace LuaMod.LuaAPI
 {
-    internal class API_Player
+
+    public class API_Player
     {
 
         public static readonly API_Player Instance = new API_Player();
 
-        public enum AmmoType
-        {
-            Light,Medium,Heavy
-        }
-        public static float BL_GetFixedDeltaTime()
-        {
-            return(Time.fixedDeltaTime);
-        }
 
-        public static void SetPlayerAmmo(AmmoType AT,int newAmmo)
+        public static Il2CppSLZ.VRMK.Avatar BL_GetAvatar()
         {
-           
-        }
-
-        public static void ModifyPlayerAmmo(AmmoType AT, int ammoMod)
-        {
-
-        }
-
-        public static int GetPlayerAmmo(AmmoType AT)
-        {
-            return 0;
-        }
-
-        public static string BL_GetAvatarName()
-        {
-            try
+            if(BoneLib.Player.Avatar != null)
             {
-                return BoneLib.Player.Avatar.name;
-            }
-            catch (Exception e)
+                return BoneLib.Player.Avatar;
+            }    
+            else
             {
-                return "";
+                return null;
             }
-
 
         }
 
@@ -57,15 +37,6 @@ namespace LuaMod.LuaAPI
             }
             return null;
 
-        }
-        public static DynValue BL_GetAvatarPosition()
-        {
-            if(BoneLib.Player.Avatar != null)
-            {   
-                return UserData.Create(BoneLib.Player.PhysicsRig.transform.position);
-            }    
-            return null;
-           
         }
 
         public static DynValue BL_GetAvatarCenter()
@@ -81,6 +52,8 @@ namespace LuaMod.LuaAPI
 
         public static PhysicsRig BL_GetPhysicsRig()
         {
+
+          
             if (BoneLib.Player.PhysicsRig != null)
             {
                 return (BoneLib.Player.PhysicsRig);
@@ -92,7 +65,7 @@ namespace LuaMod.LuaAPI
 
         public static ControllerRig BL_GetControllerRig()
         {
-            if (BoneLib.Player.PhysicsRig != null)
+            if (BoneLib.Player.ControllerRig != null)
             {
                 return (BoneLib.Player.ControllerRig);
 
@@ -112,10 +85,27 @@ namespace LuaMod.LuaAPI
 
         }
 
-        public static void BL_SetAvatarPosition(Vector3 pos)
+        public static bool BL_SetAvatarPosition(Vector3 pos, Vector3 fwd,bool zeroVelocity=true)
         {
-     
-            BoneLib.Player.PhysicsRig.Teleport(new Il2CppSLZ.Marrow.Utilities.SimpleTransform(pos, Quaternion.identity), true);
+            if (BoneLib.Player.PhysicsRig != null)
+            {
+                Transform currentpos = BoneLib.Player.PhysicsRig.transform;
+                BoneLib.Player.RigManager.Teleport(pos,fwd, zeroVelocity);
+                return true;
+            }
+            return false;
+        }
+
+
+        public static bool BL_SetAvatarPosition(Vector3 pos, bool zeroVelocity = true)
+        {
+            if (BoneLib.Player.PhysicsRig != null)
+            {
+                Transform currentpos = BoneLib.Player.PhysicsRig.transform;
+                BoneLib.Player.RigManager.Teleport(pos, zeroVelocity);
+                return true;
+            }
+            return false;
         }
 
     }

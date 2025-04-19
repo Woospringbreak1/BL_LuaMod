@@ -1,0 +1,1126 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaAPI.API_GameObject
+  commentId: T:LuaMod.LuaAPI.API_GameObject
+  id: API_GameObject
+  parent: LuaMod.LuaAPI
+  children:
+  - LuaMod.LuaAPI.API_GameObject.BL_AddComponent(UnityEngine.GameObject,System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_CreateEmptyGameObject
+  - LuaMod.LuaAPI.API_GameObject.BL_Destroy(UnityEngine.Object)
+  - LuaMod.LuaAPI.API_GameObject.BL_EntityPose(System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren(UnityEngine.GameObject,System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld(System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld(System.String,System.Boolean)
+  - LuaMod.LuaAPI.API_GameObject.BL_FindInChildren(UnityEngine.GameObject,System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_FindInWorld(System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_GetComponent(UnityEngine.GameObject,System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren(UnityEngine.GameObject,System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_GetComponents(UnityEngine.GameObject,System.String)
+  - LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren(UnityEngine.GameObject,System.String,System.Boolean)
+  - LuaMod.LuaAPI.API_GameObject.BL_InstantiateGameObject(UnityEngine.GameObject)
+  - LuaMod.LuaAPI.API_GameObject.BL_IsValid(UnityEngine.Object)
+  - LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(LuaMod.LuaBehaviour,System.String,System.String,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.GameObject,System.Boolean)
+  - LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(System.String,UnityEngine.Vector3,UnityEngine.Quaternion)
+  - LuaMod.LuaAPI.API_GameObject.Instance
+  langs:
+  - csharp
+  - vb
+  name: API_GameObject
+  nameWithType: API_GameObject
+  fullName: LuaMod.LuaAPI.API_GameObject
+  type: Class
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: API_GameObject
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 27
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: >-
+    Lua-exposed API for GameObject manipulation in Bonelab.
+
+    Provides methods for spawning, destroying, and modifying Unity GameObjects from Lua scripts.
+  example: []
+  syntax:
+    content: public class API_GameObject
+    content.vb: Public Class API_GameObject
+  inheritance:
+  - System.Object
+- uid: LuaMod.LuaAPI.API_GameObject.Instance
+  commentId: F:LuaMod.LuaAPI.API_GameObject.Instance
+  id: Instance
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: Instance
+  nameWithType: API_GameObject.Instance
+  fullName: LuaMod.LuaAPI.API_GameObject.Instance
+  type: Field
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: Instance
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 32
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Singleton instance of the API_GameObject class.
+  example: []
+  syntax:
+    content: public static readonly API_GameObject Instance
+    return:
+      type: LuaMod.LuaAPI.API_GameObject
+    content.vb: Public Shared ReadOnly Instance As API_GameObject
+- uid: LuaMod.LuaAPI.API_GameObject.BL_CreateEmptyGameObject
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_CreateEmptyGameObject
+  id: BL_CreateEmptyGameObject
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_CreateEmptyGameObject()
+  nameWithType: API_GameObject.BL_CreateEmptyGameObject()
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_CreateEmptyGameObject()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_CreateEmptyGameObject
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 37
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Creates a new empty GameObject in the scene.
+  example: []
+  syntax:
+    content: public GameObject BL_CreateEmptyGameObject()
+    return:
+      type: UnityEngine.GameObject
+    content.vb: Public Function BL_CreateEmptyGameObject() As GameObject
+  overload: LuaMod.LuaAPI.API_GameObject.BL_CreateEmptyGameObject*
+- uid: LuaMod.LuaAPI.API_GameObject.BL_IsValid(UnityEngine.Object)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_IsValid(UnityEngine.Object)
+  id: BL_IsValid(UnityEngine.Object)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_IsValid(Object)
+  nameWithType: API_GameObject.BL_IsValid(Object)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_IsValid(UnityEngine.Object)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsValid
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 48
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Returns true if the given Unity Object is valid (not null).
+  example: []
+  syntax:
+    content: public static bool BL_IsValid(Object obj)
+    parameters:
+    - id: obj
+      type: UnityEngine.Object
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsValid(obj As [Object]) As Boolean
+  overload: LuaMod.LuaAPI.API_GameObject.BL_IsValid*
+- uid: LuaMod.LuaAPI.API_GameObject.BL_InstantiateGameObject(UnityEngine.GameObject)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_InstantiateGameObject(UnityEngine.GameObject)
+  id: BL_InstantiateGameObject(UnityEngine.GameObject)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_InstantiateGameObject(GameObject)
+  nameWithType: API_GameObject.BL_InstantiateGameObject(GameObject)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_InstantiateGameObject(UnityEngine.GameObject)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_InstantiateGameObject
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 56
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Instantiates a new GameObject based on the provided original.
+  example: []
+  syntax:
+    content: public GameObject BL_InstantiateGameObject(GameObject original)
+    parameters:
+    - id: original
+      type: UnityEngine.GameObject
+    return:
+      type: UnityEngine.GameObject
+    content.vb: Public Function BL_InstantiateGameObject(original As GameObject) As GameObject
+  overload: LuaMod.LuaAPI.API_GameObject.BL_InstantiateGameObject*
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindInChildren(UnityEngine.GameObject,System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_FindInChildren(UnityEngine.GameObject,System.String)
+  id: BL_FindInChildren(UnityEngine.GameObject,System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_FindInChildren(GameObject, string)
+  nameWithType: API_GameObject.BL_FindInChildren(GameObject, string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindInChildren(UnityEngine.GameObject, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_FindInChildren
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 67
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Finds a child GameObject by name under the specified parent GameObject.
+  example: []
+  syntax:
+    content: public DynValue BL_FindInChildren(GameObject gameObject, string name)
+    parameters:
+    - id: gameObject
+      type: UnityEngine.GameObject
+    - id: name
+      type: System.String
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Function BL_FindInChildren(gameObject As GameObject, name As String) As DynValue
+  overload: LuaMod.LuaAPI.API_GameObject.BL_FindInChildren*
+  nameWithType.vb: API_GameObject.BL_FindInChildren(GameObject, String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_FindInChildren(UnityEngine.GameObject, String)
+  name.vb: BL_FindInChildren(GameObject, String)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindInWorld(System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_FindInWorld(System.String)
+  id: BL_FindInWorld(System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_FindInWorld(string)
+  nameWithType: API_GameObject.BL_FindInWorld(string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindInWorld(string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_FindInWorld
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 84
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Finds a GameObject in the scene by name.
+  example: []
+  syntax:
+    content: public DynValue BL_FindInWorld(string name)
+    parameters:
+    - id: name
+      type: System.String
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Function BL_FindInWorld(name As String) As DynValue
+  overload: LuaMod.LuaAPI.API_GameObject.BL_FindInWorld*
+  nameWithType.vb: API_GameObject.BL_FindInWorld(String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_FindInWorld(String)
+  name.vb: BL_FindInWorld(String)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld(System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld(System.String)
+  id: BL_FindAllInWorld(System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_FindAllInWorld(string)
+  nameWithType: API_GameObject.BL_FindAllInWorld(string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld(string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_FindAllInWorld
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 96
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Finds all GameObjects in the scene with the specified name.
+  example: []
+  syntax:
+    content: public DynValue BL_FindAllInWorld(string name)
+    parameters:
+    - id: name
+      type: System.String
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Function BL_FindAllInWorld(name As String) As DynValue
+  overload: LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld*
+  nameWithType.vb: API_GameObject.BL_FindAllInWorld(String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld(String)
+  name.vb: BL_FindAllInWorld(String)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren(UnityEngine.GameObject,System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren(UnityEngine.GameObject,System.String)
+  id: BL_FindAllInChildren(UnityEngine.GameObject,System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_FindAllInChildren(GameObject, string)
+  nameWithType: API_GameObject.BL_FindAllInChildren(GameObject, string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren(UnityEngine.GameObject, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_FindAllInChildren
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 117
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Finds all child GameObjects with the specified name.
+  example: []
+  syntax:
+    content: public DynValue BL_FindAllInChildren(GameObject gameObject, string name)
+    parameters:
+    - id: gameObject
+      type: UnityEngine.GameObject
+    - id: name
+      type: System.String
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Function BL_FindAllInChildren(gameObject As GameObject, name As String) As DynValue
+  overload: LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren*
+  nameWithType.vb: API_GameObject.BL_FindAllInChildren(GameObject, String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren(UnityEngine.GameObject, String)
+  name.vb: BL_FindAllInChildren(GameObject, String)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren(UnityEngine.GameObject,System.String,System.Boolean)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren(UnityEngine.GameObject,System.String,System.Boolean)
+  id: BL_GetComponentsInChildren(UnityEngine.GameObject,System.String,System.Boolean)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_GetComponentsInChildren(GameObject, string, bool)
+  nameWithType: API_GameObject.BL_GetComponentsInChildren(GameObject, string, bool)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren(UnityEngine.GameObject, string, bool)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetComponentsInChildren
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 138
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Gets all components of the specified type in the GameObject's children.
+  example: []
+  syntax:
+    content: public List<DynValue> BL_GetComponentsInChildren(GameObject obj, string CompType, bool includeInactive = false)
+    parameters:
+    - id: obj
+      type: UnityEngine.GameObject
+    - id: CompType
+      type: System.String
+    - id: includeInactive
+      type: System.Boolean
+    return:
+      type: System.Collections.Generic.List{MoonSharp.Interpreter.DynValue}
+    content.vb: Public Function BL_GetComponentsInChildren(obj As GameObject, CompType As String, includeInactive As Boolean = False) As List(Of DynValue)
+  overload: LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren*
+  nameWithType.vb: API_GameObject.BL_GetComponentsInChildren(GameObject, String, Boolean)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren(UnityEngine.GameObject, String, Boolean)
+  name.vb: BL_GetComponentsInChildren(GameObject, String, Boolean)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld(System.String,System.Boolean)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld(System.String,System.Boolean)
+  id: BL_FindComponentsInWorld(System.String,System.Boolean)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_FindComponentsInWorld(string, bool)
+  nameWithType: API_GameObject.BL_FindComponentsInWorld(string, bool)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld(string, bool)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_FindComponentsInWorld
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 165
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Gets all components of the specified type in the world. Don't overuse this function.
+  example: []
+  syntax:
+    content: public DynValue BL_FindComponentsInWorld(string compType, bool includeInactive = false)
+    parameters:
+    - id: compType
+      type: System.String
+    - id: includeInactive
+      type: System.Boolean
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Function BL_FindComponentsInWorld(compType As String, includeInactive As Boolean = False) As DynValue
+  overload: LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld*
+  nameWithType.vb: API_GameObject.BL_FindComponentsInWorld(String, Boolean)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld(String, Boolean)
+  name.vb: BL_FindComponentsInWorld(String, Boolean)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_GetComponent(UnityEngine.GameObject,System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_GetComponent(UnityEngine.GameObject,System.String)
+  id: BL_GetComponent(UnityEngine.GameObject,System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_GetComponent(GameObject, string)
+  nameWithType: API_GameObject.BL_GetComponent(GameObject, string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_GetComponent(UnityEngine.GameObject, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetComponent
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 197
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Gets a component of the specified type on the GameObject.
+  example: []
+  syntax:
+    content: public DynValue BL_GetComponent(GameObject obj, string CompType)
+    parameters:
+    - id: obj
+      type: UnityEngine.GameObject
+    - id: CompType
+      type: System.String
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Function BL_GetComponent(obj As GameObject, CompType As String) As DynValue
+  overload: LuaMod.LuaAPI.API_GameObject.BL_GetComponent*
+  nameWithType.vb: API_GameObject.BL_GetComponent(GameObject, String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_GetComponent(UnityEngine.GameObject, String)
+  name.vb: BL_GetComponent(GameObject, String)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_GetComponents(UnityEngine.GameObject,System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_GetComponents(UnityEngine.GameObject,System.String)
+  id: BL_GetComponents(UnityEngine.GameObject,System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_GetComponents(GameObject, string)
+  nameWithType: API_GameObject.BL_GetComponents(GameObject, string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_GetComponents(UnityEngine.GameObject, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetComponents
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 221
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Gets all components of the specified type on the GameObject.
+  example: []
+  syntax:
+    content: public List<DynValue> BL_GetComponents(GameObject obj, string CompType)
+    parameters:
+    - id: obj
+      type: UnityEngine.GameObject
+    - id: CompType
+      type: System.String
+    return:
+      type: System.Collections.Generic.List{MoonSharp.Interpreter.DynValue}
+    content.vb: Public Function BL_GetComponents(obj As GameObject, CompType As String) As List(Of DynValue)
+  overload: LuaMod.LuaAPI.API_GameObject.BL_GetComponents*
+  nameWithType.vb: API_GameObject.BL_GetComponents(GameObject, String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_GetComponents(UnityEngine.GameObject, String)
+  name.vb: BL_GetComponents(GameObject, String)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_AddComponent(UnityEngine.GameObject,System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_AddComponent(UnityEngine.GameObject,System.String)
+  id: BL_AddComponent(UnityEngine.GameObject,System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_AddComponent(GameObject, string)
+  nameWithType: API_GameObject.BL_AddComponent(GameObject, string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_AddComponent(UnityEngine.GameObject, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_AddComponent
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 248
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Adds a component of the specified type to the GameObject.
+  example: []
+  syntax:
+    content: public DynValue BL_AddComponent(GameObject obj, string CompType)
+    parameters:
+    - id: obj
+      type: UnityEngine.GameObject
+    - id: CompType
+      type: System.String
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Function BL_AddComponent(obj As GameObject, CompType As String) As DynValue
+  overload: LuaMod.LuaAPI.API_GameObject.BL_AddComponent*
+  nameWithType.vb: API_GameObject.BL_AddComponent(GameObject, String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_AddComponent(UnityEngine.GameObject, String)
+  name.vb: BL_AddComponent(GameObject, String)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren(UnityEngine.GameObject,System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren(UnityEngine.GameObject,System.String)
+  id: BL_GetComponentInChildren(UnityEngine.GameObject,System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_GetComponentInChildren(GameObject, string)
+  nameWithType: API_GameObject.BL_GetComponentInChildren(GameObject, string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren(UnityEngine.GameObject, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetComponentInChildren
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 271
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Gets a component of the specified type from the GameObject's children.
+  example: []
+  syntax:
+    content: public DynValue BL_GetComponentInChildren(GameObject obj, string CompType)
+    parameters:
+    - id: obj
+      type: UnityEngine.GameObject
+    - id: CompType
+      type: System.String
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Function BL_GetComponentInChildren(obj As GameObject, CompType As String) As DynValue
+  overload: LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren*
+  nameWithType.vb: API_GameObject.BL_GetComponentInChildren(GameObject, String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren(UnityEngine.GameObject, String)
+  name.vb: BL_GetComponentInChildren(GameObject, String)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_Destroy(UnityEngine.Object)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_Destroy(UnityEngine.Object)
+  id: BL_Destroy(UnityEngine.Object)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_Destroy(Object)
+  nameWithType: API_GameObject.BL_Destroy(Object)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_Destroy(UnityEngine.Object)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_Destroy
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 296
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Destroys the specified Unity Object.
+  example: []
+  syntax:
+    content: public static void BL_Destroy(Object obj)
+    parameters:
+    - id: obj
+      type: UnityEngine.Object
+    content.vb: Public Shared Sub BL_Destroy(obj As [Object])
+  overload: LuaMod.LuaAPI.API_GameObject.BL_Destroy*
+- uid: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(System.String,UnityEngine.Vector3,UnityEngine.Quaternion)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(System.String,UnityEngine.Vector3,UnityEngine.Quaternion)
+  id: BL_SpawnByBarcode(System.String,UnityEngine.Vector3,UnityEngine.Quaternion)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_SpawnByBarcode(string, Vector3, Quaternion)
+  nameWithType: API_GameObject.BL_SpawnByBarcode(string, Vector3, Quaternion)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(string, UnityEngine.Vector3, UnityEngine.Quaternion)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SpawnByBarcode
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 307
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Spawns a crate by barcode at the specified position and rotation.
+  example: []
+  syntax:
+    content: public static void BL_SpawnByBarcode(string SpawnBCode, Vector3 pos, Quaternion rotation)
+    parameters:
+    - id: SpawnBCode
+      type: System.String
+    - id: pos
+      type: UnityEngine.Vector3
+    - id: rotation
+      type: UnityEngine.Quaternion
+    content.vb: Public Shared Sub BL_SpawnByBarcode(SpawnBCode As String, pos As Vector3, rotation As Quaternion)
+  overload: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode*
+  nameWithType.vb: API_GameObject.BL_SpawnByBarcode(String, Vector3, Quaternion)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(String, UnityEngine.Vector3, UnityEngine.Quaternion)
+  name.vb: BL_SpawnByBarcode(String, Vector3, Quaternion)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(LuaMod.LuaBehaviour,System.String,System.String,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.GameObject,System.Boolean)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(LuaMod.LuaBehaviour,System.String,System.String,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.GameObject,System.Boolean)
+  id: BL_SpawnByBarcode(LuaMod.LuaBehaviour,System.String,System.String,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.GameObject,System.Boolean)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_SpawnByBarcode(LuaBehaviour, string, string, Vector3, Quaternion, GameObject, bool)
+  nameWithType: API_GameObject.BL_SpawnByBarcode(LuaBehaviour, string, string, Vector3, Quaternion, GameObject, bool)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(LuaMod.LuaBehaviour, string, string, UnityEngine.Vector3, UnityEngine.Quaternion, UnityEngine.GameObject, bool)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SpawnByBarcode
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 319
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: >-
+    Spawns a crate by barcode and assigns it to a LuaBehaviour script variable.
+
+    Note: Crate spawning is asyncronous, so the variable won't be valid immediently
+  example: []
+  syntax:
+    content: public static void BL_SpawnByBarcode(LuaBehaviour LB, string VariableName, string SpawnBCode, Vector3 pos, Quaternion rotation, GameObject NewParent, bool Active = true)
+    parameters:
+    - id: LB
+      type: LuaMod.LuaBehaviour
+    - id: VariableName
+      type: System.String
+    - id: SpawnBCode
+      type: System.String
+    - id: pos
+      type: UnityEngine.Vector3
+    - id: rotation
+      type: UnityEngine.Quaternion
+    - id: NewParent
+      type: UnityEngine.GameObject
+    - id: Active
+      type: System.Boolean
+    content.vb: Public Shared Sub BL_SpawnByBarcode(LB As LuaBehaviour, VariableName As String, SpawnBCode As String, pos As Vector3, rotation As Quaternion, NewParent As GameObject, Active As Boolean = True)
+  overload: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode*
+  nameWithType.vb: API_GameObject.BL_SpawnByBarcode(LuaBehaviour, String, String, Vector3, Quaternion, GameObject, Boolean)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode(LuaMod.LuaBehaviour, String, String, UnityEngine.Vector3, UnityEngine.Quaternion, UnityEngine.GameObject, Boolean)
+  name.vb: BL_SpawnByBarcode(LuaBehaviour, String, String, Vector3, Quaternion, GameObject, Boolean)
+- uid: LuaMod.LuaAPI.API_GameObject.BL_EntityPose(System.String)
+  commentId: M:LuaMod.LuaAPI.API_GameObject.BL_EntityPose(System.String)
+  id: BL_EntityPose(System.String)
+  parent: LuaMod.LuaAPI.API_GameObject
+  langs:
+  - csharp
+  - vb
+  name: BL_EntityPose(string)
+  nameWithType: API_GameObject.BL_EntityPose(string)
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_EntityPose(string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_GameObject.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_EntityPose
+    path: LuaMod/LuaAPI/API_GameObject.cs
+    startLine: 356
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Creates a DataCardReference for the given EntityPose barcode.
+  example: []
+  syntax:
+    content: public DataCardReference<EntityPose> BL_EntityPose(string barcode)
+    parameters:
+    - id: barcode
+      type: System.String
+    return:
+      type: Il2CppSLZ.Marrow.Warehouse.DataCardReference{Il2CppSLZ.Marrow.Warehouse.EntityPose}
+    content.vb: Public Function BL_EntityPose(barcode As String) As DataCardReference(Of EntityPose)
+  overload: LuaMod.LuaAPI.API_GameObject.BL_EntityPose*
+  nameWithType.vb: API_GameObject.BL_EntityPose(String)
+  fullName.vb: LuaMod.LuaAPI.API_GameObject.BL_EntityPose(String)
+  name.vb: BL_EntityPose(String)
+references:
+- uid: LuaMod.LuaAPI
+  commentId: N:LuaMod.LuaAPI
+  href: LuaMod.html
+  name: LuaMod.LuaAPI
+  nameWithType: LuaMod.LuaAPI
+  fullName: LuaMod.LuaAPI
+  spec.csharp:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+  spec.vb:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: LuaMod.LuaAPI.API_GameObject
+  commentId: T:LuaMod.LuaAPI.API_GameObject
+  parent: LuaMod.LuaAPI
+  href: LuaMod.LuaAPI.API_GameObject.html
+  name: API_GameObject
+  nameWithType: API_GameObject
+  fullName: LuaMod.LuaAPI.API_GameObject
+- uid: LuaMod.LuaAPI.API_GameObject.BL_CreateEmptyGameObject*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_CreateEmptyGameObject
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_CreateEmptyGameObject
+  name: BL_CreateEmptyGameObject
+  nameWithType: API_GameObject.BL_CreateEmptyGameObject
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_CreateEmptyGameObject
+- uid: UnityEngine.GameObject
+  commentId: T:UnityEngine.GameObject
+  parent: UnityEngine
+  isExternal: true
+  name: GameObject
+  nameWithType: GameObject
+  fullName: UnityEngine.GameObject
+- uid: UnityEngine
+  commentId: N:UnityEngine
+  isExternal: true
+  name: UnityEngine
+  nameWithType: UnityEngine
+  fullName: UnityEngine
+- uid: LuaMod.LuaAPI.API_GameObject.BL_IsValid*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_IsValid
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_IsValid_UnityEngine_Object_
+  name: BL_IsValid
+  nameWithType: API_GameObject.BL_IsValid
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_IsValid
+- uid: UnityEngine.Object
+  commentId: T:UnityEngine.Object
+  parent: UnityEngine
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: UnityEngine.Object
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: LuaMod.LuaAPI.API_GameObject.BL_InstantiateGameObject*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_InstantiateGameObject
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_InstantiateGameObject_UnityEngine_GameObject_
+  name: BL_InstantiateGameObject
+  nameWithType: API_GameObject.BL_InstantiateGameObject
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_InstantiateGameObject
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindInChildren*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_FindInChildren
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_FindInChildren_UnityEngine_GameObject_System_String_
+  name: BL_FindInChildren
+  nameWithType: API_GameObject.BL_FindInChildren
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindInChildren
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: MoonSharp.Interpreter.DynValue
+  commentId: T:MoonSharp.Interpreter.DynValue
+  parent: MoonSharp.Interpreter
+  isExternal: true
+  name: DynValue
+  nameWithType: DynValue
+  fullName: MoonSharp.Interpreter.DynValue
+- uid: MoonSharp.Interpreter
+  commentId: N:MoonSharp.Interpreter
+  isExternal: true
+  name: MoonSharp.Interpreter
+  nameWithType: MoonSharp.Interpreter
+  fullName: MoonSharp.Interpreter
+  spec.csharp:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+  spec.vb:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindInWorld*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_FindInWorld
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_FindInWorld_System_String_
+  name: BL_FindInWorld
+  nameWithType: API_GameObject.BL_FindInWorld
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindInWorld
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_FindAllInWorld_System_String_
+  name: BL_FindAllInWorld
+  nameWithType: API_GameObject.BL_FindAllInWorld
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindAllInWorld
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_FindAllInChildren_UnityEngine_GameObject_System_String_
+  name: BL_FindAllInChildren
+  nameWithType: API_GameObject.BL_FindAllInChildren
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindAllInChildren
+- uid: LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_GetComponentsInChildren_UnityEngine_GameObject_System_String_System_Boolean_
+  name: BL_GetComponentsInChildren
+  nameWithType: API_GameObject.BL_GetComponentsInChildren
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_GetComponentsInChildren
+- uid: System.Collections.Generic.List{MoonSharp.Interpreter.DynValue}
+  commentId: T:System.Collections.Generic.List{MoonSharp.Interpreter.DynValue}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.List`1
+  name: List<DynValue>
+  nameWithType: List<DynValue>
+  fullName: System.Collections.Generic.List<MoonSharp.Interpreter.DynValue>
+  nameWithType.vb: List(Of DynValue)
+  fullName.vb: System.Collections.Generic.List(Of MoonSharp.Interpreter.DynValue)
+  name.vb: List(Of DynValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: <
+  - uid: MoonSharp.Interpreter.DynValue
+    name: DynValue
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: MoonSharp.Interpreter.DynValue
+    name: DynValue
+    isExternal: true
+  - name: )
+- uid: System.Collections.Generic.List`1
+  commentId: T:System.Collections.Generic.List`1
+  isExternal: true
+  name: List<T>
+  nameWithType: List<T>
+  fullName: System.Collections.Generic.List<T>
+  nameWithType.vb: List(Of T)
+  fullName.vb: System.Collections.Generic.List(Of T)
+  name.vb: List(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_FindComponentsInWorld_System_String_System_Boolean_
+  name: BL_FindComponentsInWorld
+  nameWithType: API_GameObject.BL_FindComponentsInWorld
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_FindComponentsInWorld
+- uid: LuaMod.LuaAPI.API_GameObject.BL_GetComponent*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_GetComponent
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_GetComponent_UnityEngine_GameObject_System_String_
+  name: BL_GetComponent
+  nameWithType: API_GameObject.BL_GetComponent
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_GetComponent
+- uid: LuaMod.LuaAPI.API_GameObject.BL_GetComponents*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_GetComponents
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_GetComponents_UnityEngine_GameObject_System_String_
+  name: BL_GetComponents
+  nameWithType: API_GameObject.BL_GetComponents
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_GetComponents
+- uid: LuaMod.LuaAPI.API_GameObject.BL_AddComponent*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_AddComponent
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_AddComponent_UnityEngine_GameObject_System_String_
+  name: BL_AddComponent
+  nameWithType: API_GameObject.BL_AddComponent
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_AddComponent
+- uid: LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_GetComponentInChildren_UnityEngine_GameObject_System_String_
+  name: BL_GetComponentInChildren
+  nameWithType: API_GameObject.BL_GetComponentInChildren
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_GetComponentInChildren
+- uid: LuaMod.LuaAPI.API_GameObject.BL_Destroy*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_Destroy
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_Destroy_UnityEngine_Object_
+  name: BL_Destroy
+  nameWithType: API_GameObject.BL_Destroy
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_Destroy
+- uid: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_SpawnByBarcode_System_String_UnityEngine_Vector3_UnityEngine_Quaternion_
+  name: BL_SpawnByBarcode
+  nameWithType: API_GameObject.BL_SpawnByBarcode
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_SpawnByBarcode
+- uid: UnityEngine.Vector3
+  commentId: T:UnityEngine.Vector3
+  parent: UnityEngine
+  isExternal: true
+  name: Vector3
+  nameWithType: Vector3
+  fullName: UnityEngine.Vector3
+- uid: UnityEngine.Quaternion
+  commentId: T:UnityEngine.Quaternion
+  parent: UnityEngine
+  isExternal: true
+  name: Quaternion
+  nameWithType: Quaternion
+  fullName: UnityEngine.Quaternion
+- uid: LuaMod.LuaBehaviour
+  commentId: T:LuaMod.LuaBehaviour
+  parent: LuaMod
+  href: LuaMod.LuaBehaviour.html
+  name: LuaBehaviour
+  nameWithType: LuaBehaviour
+  fullName: LuaMod.LuaBehaviour
+- uid: LuaMod
+  commentId: N:LuaMod
+  href: LuaMod.html
+  name: LuaMod
+  nameWithType: LuaMod
+  fullName: LuaMod
+- uid: LuaMod.LuaAPI.API_GameObject.BL_EntityPose*
+  commentId: Overload:LuaMod.LuaAPI.API_GameObject.BL_EntityPose
+  href: LuaMod.LuaAPI.API_GameObject.html#LuaMod_LuaAPI_API_GameObject_BL_EntityPose_System_String_
+  name: BL_EntityPose
+  nameWithType: API_GameObject.BL_EntityPose
+  fullName: LuaMod.LuaAPI.API_GameObject.BL_EntityPose
+- uid: Il2CppSLZ.Marrow.Warehouse.DataCardReference{Il2CppSLZ.Marrow.Warehouse.EntityPose}
+  commentId: T:Il2CppSLZ.Marrow.Warehouse.DataCardReference{Il2CppSLZ.Marrow.Warehouse.EntityPose}
+  parent: Il2CppSLZ.Marrow.Warehouse
+  definition: Il2CppSLZ.Marrow.Warehouse.DataCardReference`1
+  name: DataCardReference<EntityPose>
+  nameWithType: DataCardReference<EntityPose>
+  fullName: Il2CppSLZ.Marrow.Warehouse.DataCardReference<Il2CppSLZ.Marrow.Warehouse.EntityPose>
+  nameWithType.vb: DataCardReference(Of EntityPose)
+  fullName.vb: Il2CppSLZ.Marrow.Warehouse.DataCardReference(Of Il2CppSLZ.Marrow.Warehouse.EntityPose)
+  name.vb: DataCardReference(Of EntityPose)
+  spec.csharp:
+  - uid: Il2CppSLZ.Marrow.Warehouse.DataCardReference`1
+    name: DataCardReference
+    isExternal: true
+  - name: <
+  - uid: Il2CppSLZ.Marrow.Warehouse.EntityPose
+    name: EntityPose
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: Il2CppSLZ.Marrow.Warehouse.DataCardReference`1
+    name: DataCardReference
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Il2CppSLZ.Marrow.Warehouse.EntityPose
+    name: EntityPose
+    isExternal: true
+  - name: )
+- uid: Il2CppSLZ.Marrow.Warehouse.DataCardReference`1
+  commentId: T:Il2CppSLZ.Marrow.Warehouse.DataCardReference`1
+  isExternal: true
+  name: DataCardReference<T>
+  nameWithType: DataCardReference<T>
+  fullName: Il2CppSLZ.Marrow.Warehouse.DataCardReference<T>
+  nameWithType.vb: DataCardReference(Of T)
+  fullName.vb: Il2CppSLZ.Marrow.Warehouse.DataCardReference(Of T)
+  name.vb: DataCardReference(Of T)
+  spec.csharp:
+  - uid: Il2CppSLZ.Marrow.Warehouse.DataCardReference`1
+    name: DataCardReference
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Il2CppSLZ.Marrow.Warehouse.DataCardReference`1
+    name: DataCardReference
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Il2CppSLZ.Marrow.Warehouse
+  commentId: N:Il2CppSLZ.Marrow.Warehouse
+  isExternal: true
+  name: Il2CppSLZ.Marrow.Warehouse
+  nameWithType: Il2CppSLZ.Marrow.Warehouse
+  fullName: Il2CppSLZ.Marrow.Warehouse
+  spec.csharp:
+  - uid: Il2CppSLZ
+    name: Il2CppSLZ
+    isExternal: true
+  - name: .
+  - uid: Il2CppSLZ.Marrow
+    name: Marrow
+    isExternal: true
+  - name: .
+  - uid: Il2CppSLZ.Marrow.Warehouse
+    name: Warehouse
+    isExternal: true
+  spec.vb:
+  - uid: Il2CppSLZ
+    name: Il2CppSLZ
+    isExternal: true
+  - name: .
+  - uid: Il2CppSLZ.Marrow
+    name: Marrow
+    isExternal: true
+  - name: .
+  - uid: Il2CppSLZ.Marrow.Warehouse
+    name: Warehouse
+    isExternal: true

@@ -2,6 +2,7 @@
 using Il2CppSLZ.Marrow;
 using Il2CppSLZ.Marrow.AI;
 using Il2CppSLZ.Marrow.PuppetMasta;
+using Il2CppSLZ.Marrow.Warehouse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,28 +23,20 @@ namespace LuaMod
         new public void Start()
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
-            MelonLoader.MelonLogger.Msg("LUA AI start function called");
-            
-            
-            if (ScriptName == "" || ScriptName == null)
-            {
-                ScriptName = "Manhack.lua";
-            }
             this.AttachedNPCBrain = this.gameObject.GetComponent<AIBrain>();
             this.AttachedNPCBehaviour = AttachedNPCBrain.behaviour;
             this.AttachedPuppetMaster = AttachedNPCBrain.puppetMaster;
-            //AttachedNPCBehaviour.navTarget
-            //AttachedNPCBehaviour.SetAgro(TriggerRefProxy)
 
-                        
             AttachedNPCBrain.onDeathDelegate += new Action<AIBrain>(OnAIBrainDeath);
             AttachedNPCBrain.onResurrectDelegate += new Action<AIBrain>(OnAIBrainResurrect);
-            //AttachedPuppetMaster.muscles[0].sta
 
-               
+
+
             base.Start();
 #endif
         }
+
+
 
         private void OnAIBrainDeath(AIBrain aIBrain)
         {
@@ -67,8 +60,8 @@ namespace LuaMod
 
             if (BehaviourScript != null)
             {
-                OnDeathFunction = BehaviourScript.LuaScript.Globals.Get("OnDeath");
-                OnResurrectionFunction = BehaviourScript.LuaScript.Globals.Get("OnResurrection");
+                OnDeathFunction = BehaviourScript.GetGlobal("OnDeath");
+                OnResurrectionFunction = BehaviourScript.GetGlobal("OnResurrection");
              
                 return true;
             }

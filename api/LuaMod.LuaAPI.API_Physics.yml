@@ -1,0 +1,633 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaAPI.API_Physics
+  commentId: T:LuaMod.LuaAPI.API_Physics
+  id: API_Physics
+  parent: LuaMod.LuaAPI
+  children:
+  - LuaMod.LuaAPI.API_Physics.BL_BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Single,System.Int32)
+  - LuaMod.LuaAPI.API_Physics.BL_BoxCastAll(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Single,System.Int32)
+  - LuaMod.LuaAPI.API_Physics.BL_CapsuleCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  - LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  - LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3,UnityEngine.Vector3)
+  - LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)
+  - LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)
+  - LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Single)
+  - LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  - LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Int32)
+  - LuaMod.LuaAPI.API_Physics.Instance
+  langs:
+  - csharp
+  - vb
+  name: API_Physics
+  nameWithType: API_Physics
+  fullName: LuaMod.LuaAPI.API_Physics
+  type: Class
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: API_Physics
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 12
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public class API_Physics
+    content.vb: Public Class API_Physics
+  inheritance:
+  - System.Object
+- uid: LuaMod.LuaAPI.API_Physics.Instance
+  commentId: F:LuaMod.LuaAPI.API_Physics.Instance
+  id: Instance
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: Instance
+  nameWithType: API_Physics.Instance
+  fullName: LuaMod.LuaAPI.API_Physics.Instance
+  type: Field
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: Instance
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 15
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static readonly API_Physics Instance
+    return:
+      type: LuaMod.LuaAPI.API_Physics
+    content.vb: Public Shared ReadOnly Instance As API_Physics
+- uid: LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Single)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Single)
+  id: BL_SphereCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Single)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_SphereCast(Vector3, Vector3, float, float)
+  nameWithType: API_Physics.BL_SphereCast(Vector3, Vector3, float, float)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3, UnityEngine.Vector3, float, float)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SphereCast
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 17
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_SphereCast(Vector3 origin, Vector3 direction, float radius, float maxdistance)
+    parameters:
+    - id: origin
+      type: UnityEngine.Vector3
+    - id: direction
+      type: UnityEngine.Vector3
+    - id: radius
+      type: System.Single
+    - id: maxdistance
+      type: System.Single
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_SphereCast(origin As Vector3, direction As Vector3, radius As Single, maxdistance As Single) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_SphereCast*
+  nameWithType.vb: API_Physics.BL_SphereCast(Vector3, Vector3, Single, Single)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3, UnityEngine.Vector3, Single, Single)
+  name.vb: BL_SphereCast(Vector3, Vector3, Single, Single)
+- uid: LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)
+  id: BL_SphereCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_SphereCast(Vector3, Vector3, float)
+  nameWithType: API_Physics.BL_SphereCast(Vector3, Vector3, float)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3, UnityEngine.Vector3, float)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SphereCast
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 30
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_SphereCast(Vector3 start_pos, Vector3 end_pos, float radius)
+    parameters:
+    - id: start_pos
+      type: UnityEngine.Vector3
+    - id: end_pos
+      type: UnityEngine.Vector3
+    - id: radius
+      type: System.Single
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_SphereCast(start_pos As Vector3, end_pos As Vector3, radius As Single) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_SphereCast*
+  nameWithType.vb: API_Physics.BL_SphereCast(Vector3, Vector3, Single)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_SphereCast(UnityEngine.Vector3, UnityEngine.Vector3, Single)
+  name.vb: BL_SphereCast(Vector3, Vector3, Single)
+- uid: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  id: BL_SphereCastAll(UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_SphereCastAll(Vector3, float, Vector3, float, int)
+  nameWithType: API_Physics.BL_SphereCastAll(Vector3, float, Vector3, float, int)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3, float, UnityEngine.Vector3, float, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SphereCastAll
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 46
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_SphereCastAll(Vector3 origin, float radius, Vector3 direction, float maxDistance, int layerMask = -5)
+    parameters:
+    - id: origin
+      type: UnityEngine.Vector3
+    - id: radius
+      type: System.Single
+    - id: direction
+      type: UnityEngine.Vector3
+    - id: maxDistance
+      type: System.Single
+    - id: layerMask
+      type: System.Int32
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_SphereCastAll(origin As Vector3, radius As Single, direction As Vector3, maxDistance As Single, layerMask As Integer = -5) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll*
+  nameWithType.vb: API_Physics.BL_SphereCastAll(Vector3, Single, Vector3, Single, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3, Single, UnityEngine.Vector3, Single, Integer)
+  name.vb: BL_SphereCastAll(Vector3, Single, Vector3, Single, Integer)
+- uid: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Int32)
+  id: BL_SphereCastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Int32)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_SphereCastAll(Vector3, Vector3, float, int)
+  nameWithType: API_Physics.BL_SphereCastAll(Vector3, Vector3, float, int)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3, UnityEngine.Vector3, float, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SphereCastAll
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 62
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_SphereCastAll(Vector3 start_pos, Vector3 end_pos, float radius, int layerMask = -5)
+    parameters:
+    - id: start_pos
+      type: UnityEngine.Vector3
+    - id: end_pos
+      type: UnityEngine.Vector3
+    - id: radius
+      type: System.Single
+    - id: layerMask
+      type: System.Int32
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_SphereCastAll(start_pos As Vector3, end_pos As Vector3, radius As Single, layerMask As Integer = -5) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll*
+  nameWithType.vb: API_Physics.BL_SphereCastAll(Vector3, Vector3, Single, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll(UnityEngine.Vector3, UnityEngine.Vector3, Single, Integer)
+  name.vb: BL_SphereCastAll(Vector3, Vector3, Single, Integer)
+- uid: LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3,UnityEngine.Vector3)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3,UnityEngine.Vector3)
+  id: BL_RayCast(UnityEngine.Vector3,UnityEngine.Vector3)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_RayCast(Vector3, Vector3)
+  nameWithType: API_Physics.BL_RayCast(Vector3, Vector3)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3, UnityEngine.Vector3)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_RayCast
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 82
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_RayCast(Vector3 start_pos, Vector3 end_pos)
+    parameters:
+    - id: start_pos
+      type: UnityEngine.Vector3
+    - id: end_pos
+      type: UnityEngine.Vector3
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_RayCast(start_pos As Vector3, end_pos As Vector3) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_RayCast*
+- uid: LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)
+  id: BL_RayCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_RayCast(Vector3, Vector3, float)
+  nameWithType: API_Physics.BL_RayCast(Vector3, Vector3, float)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3, UnityEngine.Vector3, float)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_RayCast
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 98
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_RayCast(Vector3 origin, Vector3 direction, float maxdistance = Infinity)
+    parameters:
+    - id: origin
+      type: UnityEngine.Vector3
+    - id: direction
+      type: UnityEngine.Vector3
+    - id: maxdistance
+      type: System.Single
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_RayCast(origin As Vector3, direction As Vector3, maxdistance As Single = Infinity) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_RayCast*
+  nameWithType.vb: API_Physics.BL_RayCast(Vector3, Vector3, Single)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_RayCast(UnityEngine.Vector3, UnityEngine.Vector3, Single)
+  name.vb: BL_RayCast(Vector3, Vector3, Single)
+- uid: LuaMod.LuaAPI.API_Physics.BL_BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Single,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Single,System.Int32)
+  id: BL_BoxCast(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Single,System.Int32)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_BoxCast(Vector3, Vector3, Vector3, Quaternion, float, int)
+  nameWithType: API_Physics.BL_BoxCast(Vector3, Vector3, Vector3, Quaternion, float, int)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_BoxCast(UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Quaternion, float, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_BoxCast
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 111
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int layerMask = -5)
+    parameters:
+    - id: center
+      type: UnityEngine.Vector3
+    - id: halfExtents
+      type: UnityEngine.Vector3
+    - id: direction
+      type: UnityEngine.Vector3
+    - id: orientation
+      type: UnityEngine.Quaternion
+    - id: maxDistance
+      type: System.Single
+    - id: layerMask
+      type: System.Int32
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_BoxCast(center As Vector3, halfExtents As Vector3, direction As Vector3, orientation As Quaternion, maxDistance As Single, layerMask As Integer = -5) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_BoxCast*
+  nameWithType.vb: API_Physics.BL_BoxCast(Vector3, Vector3, Vector3, Quaternion, Single, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_BoxCast(UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Quaternion, Single, Integer)
+  name.vb: BL_BoxCast(Vector3, Vector3, Vector3, Quaternion, Single, Integer)
+- uid: LuaMod.LuaAPI.API_Physics.BL_BoxCastAll(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Single,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_BoxCastAll(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Single,System.Int32)
+  id: BL_BoxCastAll(UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Quaternion,System.Single,System.Int32)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_BoxCastAll(Vector3, Vector3, Vector3, Quaternion, float, int)
+  nameWithType: API_Physics.BL_BoxCastAll(Vector3, Vector3, Vector3, Quaternion, float, int)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_BoxCastAll(UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Quaternion, float, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_BoxCastAll
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 122
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_BoxCastAll(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int layerMask = -5)
+    parameters:
+    - id: center
+      type: UnityEngine.Vector3
+    - id: halfExtents
+      type: UnityEngine.Vector3
+    - id: direction
+      type: UnityEngine.Vector3
+    - id: orientation
+      type: UnityEngine.Quaternion
+    - id: maxDistance
+      type: System.Single
+    - id: layerMask
+      type: System.Int32
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_BoxCastAll(center As Vector3, halfExtents As Vector3, direction As Vector3, orientation As Quaternion, maxDistance As Single, layerMask As Integer = -5) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_BoxCastAll*
+  nameWithType.vb: API_Physics.BL_BoxCastAll(Vector3, Vector3, Vector3, Quaternion, Single, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_BoxCastAll(UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Vector3, UnityEngine.Quaternion, Single, Integer)
+  name.vb: BL_BoxCastAll(Vector3, Vector3, Vector3, Quaternion, Single, Integer)
+- uid: LuaMod.LuaAPI.API_Physics.BL_CapsuleCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_CapsuleCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  id: BL_CapsuleCast(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_CapsuleCast(Vector3, Vector3, float, Vector3, float, int)
+  nameWithType: API_Physics.BL_CapsuleCast(Vector3, Vector3, float, Vector3, float, int)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_CapsuleCast(UnityEngine.Vector3, UnityEngine.Vector3, float, UnityEngine.Vector3, float, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_CapsuleCast
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 138
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_CapsuleCast(Vector3 point1, Vector3 point2, float radius, Vector3 direction, float maxDistance, int layerMask = -5)
+    parameters:
+    - id: point1
+      type: UnityEngine.Vector3
+    - id: point2
+      type: UnityEngine.Vector3
+    - id: radius
+      type: System.Single
+    - id: direction
+      type: UnityEngine.Vector3
+    - id: maxDistance
+      type: System.Single
+    - id: layerMask
+      type: System.Int32
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_CapsuleCast(point1 As Vector3, point2 As Vector3, radius As Single, direction As Vector3, maxDistance As Single, layerMask As Integer = -5) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_CapsuleCast*
+  nameWithType.vb: API_Physics.BL_CapsuleCast(Vector3, Vector3, Single, Vector3, Single, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_CapsuleCast(UnityEngine.Vector3, UnityEngine.Vector3, Single, UnityEngine.Vector3, Single, Integer)
+  name.vb: BL_CapsuleCast(Vector3, Vector3, Single, Vector3, Single, Integer)
+- uid: LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  id: BL_CapsuleCastAll(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,UnityEngine.Vector3,System.Single,System.Int32)
+  parent: LuaMod.LuaAPI.API_Physics
+  langs:
+  - csharp
+  - vb
+  name: BL_CapsuleCastAll(Vector3, Vector3, float, Vector3, float, int)
+  nameWithType: API_Physics.BL_CapsuleCastAll(Vector3, Vector3, float, Vector3, float, int)
+  fullName: LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll(UnityEngine.Vector3, UnityEngine.Vector3, float, UnityEngine.Vector3, float, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Physics.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_CapsuleCastAll
+    path: LuaMod/LuaAPI/API_Physics.cs
+    startLine: 149
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_CapsuleCastAll(Vector3 point1, Vector3 point2, float radius, Vector3 direction, float maxDistance, int layerMask = -5)
+    parameters:
+    - id: point1
+      type: UnityEngine.Vector3
+    - id: point2
+      type: UnityEngine.Vector3
+    - id: radius
+      type: System.Single
+    - id: direction
+      type: UnityEngine.Vector3
+    - id: maxDistance
+      type: System.Single
+    - id: layerMask
+      type: System.Int32
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_CapsuleCastAll(point1 As Vector3, point2 As Vector3, radius As Single, direction As Vector3, maxDistance As Single, layerMask As Integer = -5) As DynValue
+  overload: LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll*
+  nameWithType.vb: API_Physics.BL_CapsuleCastAll(Vector3, Vector3, Single, Vector3, Single, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll(UnityEngine.Vector3, UnityEngine.Vector3, Single, UnityEngine.Vector3, Single, Integer)
+  name.vb: BL_CapsuleCastAll(Vector3, Vector3, Single, Vector3, Single, Integer)
+references:
+- uid: LuaMod.LuaAPI
+  commentId: N:LuaMod.LuaAPI
+  href: LuaMod.html
+  name: LuaMod.LuaAPI
+  nameWithType: LuaMod.LuaAPI
+  fullName: LuaMod.LuaAPI
+  spec.csharp:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+  spec.vb:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: LuaMod.LuaAPI.API_Physics
+  commentId: T:LuaMod.LuaAPI.API_Physics
+  parent: LuaMod.LuaAPI
+  href: LuaMod.LuaAPI.API_Physics.html
+  name: API_Physics
+  nameWithType: API_Physics
+  fullName: LuaMod.LuaAPI.API_Physics
+- uid: LuaMod.LuaAPI.API_Physics.BL_SphereCast*
+  commentId: Overload:LuaMod.LuaAPI.API_Physics.BL_SphereCast
+  href: LuaMod.LuaAPI.API_Physics.html#LuaMod_LuaAPI_API_Physics_BL_SphereCast_UnityEngine_Vector3_UnityEngine_Vector3_System_Single_System_Single_
+  name: BL_SphereCast
+  nameWithType: API_Physics.BL_SphereCast
+  fullName: LuaMod.LuaAPI.API_Physics.BL_SphereCast
+- uid: UnityEngine.Vector3
+  commentId: T:UnityEngine.Vector3
+  parent: UnityEngine
+  isExternal: true
+  name: Vector3
+  nameWithType: Vector3
+  fullName: UnityEngine.Vector3
+- uid: System.Single
+  commentId: T:System.Single
+  parent: System
+  isExternal: true
+  name: float
+  nameWithType: float
+  fullName: float
+  nameWithType.vb: Single
+  fullName.vb: Single
+  name.vb: Single
+- uid: MoonSharp.Interpreter.DynValue
+  commentId: T:MoonSharp.Interpreter.DynValue
+  parent: MoonSharp.Interpreter
+  isExternal: true
+  name: DynValue
+  nameWithType: DynValue
+  fullName: MoonSharp.Interpreter.DynValue
+- uid: UnityEngine
+  commentId: N:UnityEngine
+  isExternal: true
+  name: UnityEngine
+  nameWithType: UnityEngine
+  fullName: UnityEngine
+- uid: MoonSharp.Interpreter
+  commentId: N:MoonSharp.Interpreter
+  isExternal: true
+  name: MoonSharp.Interpreter
+  nameWithType: MoonSharp.Interpreter
+  fullName: MoonSharp.Interpreter
+  spec.csharp:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+  spec.vb:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+- uid: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll*
+  commentId: Overload:LuaMod.LuaAPI.API_Physics.BL_SphereCastAll
+  href: LuaMod.LuaAPI.API_Physics.html#LuaMod_LuaAPI_API_Physics_BL_SphereCastAll_UnityEngine_Vector3_System_Single_UnityEngine_Vector3_System_Single_System_Int32_
+  name: BL_SphereCastAll
+  nameWithType: API_Physics.BL_SphereCastAll
+  fullName: LuaMod.LuaAPI.API_Physics.BL_SphereCastAll
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: LuaMod.LuaAPI.API_Physics.BL_RayCast*
+  commentId: Overload:LuaMod.LuaAPI.API_Physics.BL_RayCast
+  href: LuaMod.LuaAPI.API_Physics.html#LuaMod_LuaAPI_API_Physics_BL_RayCast_UnityEngine_Vector3_UnityEngine_Vector3_
+  name: BL_RayCast
+  nameWithType: API_Physics.BL_RayCast
+  fullName: LuaMod.LuaAPI.API_Physics.BL_RayCast
+- uid: LuaMod.LuaAPI.API_Physics.BL_BoxCast*
+  commentId: Overload:LuaMod.LuaAPI.API_Physics.BL_BoxCast
+  href: LuaMod.LuaAPI.API_Physics.html#LuaMod_LuaAPI_API_Physics_BL_BoxCast_UnityEngine_Vector3_UnityEngine_Vector3_UnityEngine_Vector3_UnityEngine_Quaternion_System_Single_System_Int32_
+  name: BL_BoxCast
+  nameWithType: API_Physics.BL_BoxCast
+  fullName: LuaMod.LuaAPI.API_Physics.BL_BoxCast
+- uid: UnityEngine.Quaternion
+  commentId: T:UnityEngine.Quaternion
+  parent: UnityEngine
+  isExternal: true
+  name: Quaternion
+  nameWithType: Quaternion
+  fullName: UnityEngine.Quaternion
+- uid: LuaMod.LuaAPI.API_Physics.BL_BoxCastAll*
+  commentId: Overload:LuaMod.LuaAPI.API_Physics.BL_BoxCastAll
+  href: LuaMod.LuaAPI.API_Physics.html#LuaMod_LuaAPI_API_Physics_BL_BoxCastAll_UnityEngine_Vector3_UnityEngine_Vector3_UnityEngine_Vector3_UnityEngine_Quaternion_System_Single_System_Int32_
+  name: BL_BoxCastAll
+  nameWithType: API_Physics.BL_BoxCastAll
+  fullName: LuaMod.LuaAPI.API_Physics.BL_BoxCastAll
+- uid: LuaMod.LuaAPI.API_Physics.BL_CapsuleCast*
+  commentId: Overload:LuaMod.LuaAPI.API_Physics.BL_CapsuleCast
+  href: LuaMod.LuaAPI.API_Physics.html#LuaMod_LuaAPI_API_Physics_BL_CapsuleCast_UnityEngine_Vector3_UnityEngine_Vector3_System_Single_UnityEngine_Vector3_System_Single_System_Int32_
+  name: BL_CapsuleCast
+  nameWithType: API_Physics.BL_CapsuleCast
+  fullName: LuaMod.LuaAPI.API_Physics.BL_CapsuleCast
+- uid: LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll*
+  commentId: Overload:LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll
+  href: LuaMod.LuaAPI.API_Physics.html#LuaMod_LuaAPI_API_Physics_BL_CapsuleCastAll_UnityEngine_Vector3_UnityEngine_Vector3_System_Single_UnityEngine_Vector3_System_Single_System_Int32_
+  name: BL_CapsuleCastAll
+  nameWithType: API_Physics.BL_CapsuleCastAll
+  fullName: LuaMod.LuaAPI.API_Physics.BL_CapsuleCastAll

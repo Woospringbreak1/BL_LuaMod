@@ -1,0 +1,137 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaAPI.EventListner
+  commentId: T:LuaMod.LuaAPI.EventListner
+  id: EventListner
+  parent: LuaMod.LuaAPI
+  children:
+  - LuaMod.LuaAPI.EventListner.function
+  - LuaMod.LuaAPI.EventListner.owner
+  langs:
+  - csharp
+  - vb
+  name: EventListner
+  nameWithType: EventListner
+  fullName: LuaMod.LuaAPI.EventListner
+  type: Struct
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Events.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: EventListner
+    path: LuaMod/LuaAPI/API_Events.cs
+    startLine: 15
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public struct EventListner
+    content.vb: Public Structure EventListner
+- uid: LuaMod.LuaAPI.EventListner.function
+  commentId: F:LuaMod.LuaAPI.EventListner.function
+  id: function
+  parent: LuaMod.LuaAPI.EventListner
+  langs:
+  - csharp
+  - vb
+  name: function
+  nameWithType: EventListner.function
+  fullName: LuaMod.LuaAPI.EventListner.function
+  type: Field
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Events.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: function
+    path: LuaMod/LuaAPI/API_Events.cs
+    startLine: 17
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public string function
+    return:
+      type: System.String
+    content.vb: Public [function] As String
+- uid: LuaMod.LuaAPI.EventListner.owner
+  commentId: F:LuaMod.LuaAPI.EventListner.owner
+  id: owner
+  parent: LuaMod.LuaAPI.EventListner
+  langs:
+  - csharp
+  - vb
+  name: owner
+  nameWithType: EventListner.owner
+  fullName: LuaMod.LuaAPI.EventListner.owner
+  type: Field
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Events.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: owner
+    path: LuaMod/LuaAPI/API_Events.cs
+    startLine: 18
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public LuaBehaviour owner
+    return:
+      type: LuaMod.LuaBehaviour
+    content.vb: Public owner As LuaBehaviour
+references:
+- uid: LuaMod.LuaAPI
+  commentId: N:LuaMod.LuaAPI
+  href: LuaMod.html
+  name: LuaMod.LuaAPI
+  nameWithType: LuaMod.LuaAPI
+  fullName: LuaMod.LuaAPI
+  spec.csharp:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+  spec.vb:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: LuaMod.LuaBehaviour
+  commentId: T:LuaMod.LuaBehaviour
+  parent: LuaMod
+  href: LuaMod.LuaBehaviour.html
+  name: LuaBehaviour
+  nameWithType: LuaBehaviour
+  fullName: LuaMod.LuaBehaviour
+- uid: LuaMod
+  commentId: N:LuaMod
+  href: LuaMod.html
+  name: LuaMod
+  nameWithType: LuaMod
+  fullName: LuaMod

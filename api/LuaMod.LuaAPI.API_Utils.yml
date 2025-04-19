@@ -1,0 +1,536 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaAPI.API_Utils
+  commentId: T:LuaMod.LuaAPI.API_Utils
+  id: API_Utils
+  parent: LuaMod.LuaAPI
+  children:
+  - LuaMod.LuaAPI.API_Utils.BL_AppendToArray(System.Object,System.String,System.Object)
+  - LuaMod.LuaAPI.API_Utils.BL_CollectionLength(System.Collections.ICollection)
+  - LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType(UnityEngine.Object,System.String)
+  - LuaMod.LuaAPI.API_Utils.BL_GetArrayElement(System.Object,System.String,System.Int32)
+  - LuaMod.LuaAPI.API_Utils.BL_GetBarcode(UnityEngine.GameObject)
+  - LuaMod.LuaAPI.API_Utils.BL_GetSceneName
+  - LuaMod.LuaAPI.API_Utils.BL_SetArrayElement(System.Object,System.String,System.Int32,System.Object)
+  - LuaMod.LuaAPI.API_Utils.Instance
+  - LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes(System.String)
+  langs:
+  - csharp
+  - vb
+  name: API_Utils
+  nameWithType: API_Utils
+  fullName: LuaMod.LuaAPI.API_Utils
+  type: Class
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: API_Utils
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 21
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public class API_Utils
+    content.vb: Public Class API_Utils
+  inheritance:
+  - System.Object
+- uid: LuaMod.LuaAPI.API_Utils.Instance
+  commentId: F:LuaMod.LuaAPI.API_Utils.Instance
+  id: Instance
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: Instance
+  nameWithType: API_Utils.Instance
+  fullName: LuaMod.LuaAPI.API_Utils.Instance
+  type: Field
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: Instance
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 23
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static readonly API_Utils Instance
+    return:
+      type: LuaMod.LuaAPI.API_Utils
+    content.vb: Public Shared ReadOnly Instance As API_Utils
+- uid: LuaMod.LuaAPI.API_Utils.BL_CollectionLength(System.Collections.ICollection)
+  commentId: M:LuaMod.LuaAPI.API_Utils.BL_CollectionLength(System.Collections.ICollection)
+  id: BL_CollectionLength(System.Collections.ICollection)
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: BL_CollectionLength(ICollection)
+  nameWithType: API_Utils.BL_CollectionLength(ICollection)
+  fullName: LuaMod.LuaAPI.API_Utils.BL_CollectionLength(System.Collections.ICollection)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_CollectionLength
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 26
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static int BL_CollectionLength(ICollection collection)
+    parameters:
+    - id: collection
+      type: System.Collections.ICollection
+    return:
+      type: System.Int32
+    content.vb: Public Shared Function BL_CollectionLength(collection As ICollection) As Integer
+  overload: LuaMod.LuaAPI.API_Utils.BL_CollectionLength*
+- uid: LuaMod.LuaAPI.API_Utils.BL_GetSceneName
+  commentId: M:LuaMod.LuaAPI.API_Utils.BL_GetSceneName
+  id: BL_GetSceneName
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: BL_GetSceneName()
+  nameWithType: API_Utils.BL_GetSceneName()
+  fullName: LuaMod.LuaAPI.API_Utils.BL_GetSceneName()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetSceneName
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 38
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static string BL_GetSceneName()
+    return:
+      type: System.String
+    content.vb: Public Shared Function BL_GetSceneName() As String
+  overload: LuaMod.LuaAPI.API_Utils.BL_GetSceneName*
+- uid: LuaMod.LuaAPI.API_Utils.BL_GetBarcode(UnityEngine.GameObject)
+  commentId: M:LuaMod.LuaAPI.API_Utils.BL_GetBarcode(UnityEngine.GameObject)
+  id: BL_GetBarcode(UnityEngine.GameObject)
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: BL_GetBarcode(GameObject)
+  nameWithType: API_Utils.BL_GetBarcode(GameObject)
+  fullName: LuaMod.LuaAPI.API_Utils.BL_GetBarcode(UnityEngine.GameObject)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetBarcode
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 42
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static string BL_GetBarcode(GameObject gameObject)
+    parameters:
+    - id: gameObject
+      type: UnityEngine.GameObject
+    return:
+      type: System.String
+    content.vb: Public Shared Function BL_GetBarcode(gameObject As GameObject) As String
+  overload: LuaMod.LuaAPI.API_Utils.BL_GetBarcode*
+- uid: LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType(UnityEngine.Object,System.String)
+  commentId: M:LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType(UnityEngine.Object,System.String)
+  id: BL_ConvertObjectToType(UnityEngine.Object,System.String)
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: BL_ConvertObjectToType(Object, string)
+  nameWithType: API_Utils.BL_ConvertObjectToType(Object, string)
+  fullName: LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType(UnityEngine.Object, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_ConvertObjectToType
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 62
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_ConvertObjectToType(Object obj, string CompType)
+    parameters:
+    - id: obj
+      type: UnityEngine.Object
+    - id: CompType
+      type: System.String
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_ConvertObjectToType(obj As [Object], CompType As String) As DynValue
+  overload: LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType*
+  nameWithType.vb: API_Utils.BL_ConvertObjectToType(Object, String)
+  fullName.vb: LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType(UnityEngine.Object, String)
+  name.vb: BL_ConvertObjectToType(Object, String)
+- uid: LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes(System.String)
+  commentId: M:LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes(System.String)
+  id: RemoveDoubleSlashes(System.String)
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: RemoveDoubleSlashes(string)
+  nameWithType: API_Utils.RemoveDoubleSlashes(string)
+  fullName: LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes(string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: RemoveDoubleSlashes
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 112
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static string RemoveDoubleSlashes(string input)
+    parameters:
+    - id: input
+      type: System.String
+    return:
+      type: System.String
+    content.vb: Public Shared Function RemoveDoubleSlashes(input As String) As String
+  overload: LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes*
+  nameWithType.vb: API_Utils.RemoveDoubleSlashes(String)
+  fullName.vb: LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes(String)
+  name.vb: RemoveDoubleSlashes(String)
+- uid: LuaMod.LuaAPI.API_Utils.BL_GetArrayElement(System.Object,System.String,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Utils.BL_GetArrayElement(System.Object,System.String,System.Int32)
+  id: BL_GetArrayElement(System.Object,System.String,System.Int32)
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: BL_GetArrayElement(object, string, int)
+  nameWithType: API_Utils.BL_GetArrayElement(object, string, int)
+  fullName: LuaMod.LuaAPI.API_Utils.BL_GetArrayElement(object, string, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetArrayElement
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 121
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static DynValue BL_GetArrayElement(object target, string fieldName, int index)
+    parameters:
+    - id: target
+      type: System.Object
+    - id: fieldName
+      type: System.String
+    - id: index
+      type: System.Int32
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_GetArrayElement(target As Object, fieldName As String, index As Integer) As DynValue
+  overload: LuaMod.LuaAPI.API_Utils.BL_GetArrayElement*
+  nameWithType.vb: API_Utils.BL_GetArrayElement(Object, String, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Utils.BL_GetArrayElement(Object, String, Integer)
+  name.vb: BL_GetArrayElement(Object, String, Integer)
+- uid: LuaMod.LuaAPI.API_Utils.BL_AppendToArray(System.Object,System.String,System.Object)
+  commentId: M:LuaMod.LuaAPI.API_Utils.BL_AppendToArray(System.Object,System.String,System.Object)
+  id: BL_AppendToArray(System.Object,System.String,System.Object)
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: BL_AppendToArray(object, string, object)
+  nameWithType: API_Utils.BL_AppendToArray(object, string, object)
+  fullName: LuaMod.LuaAPI.API_Utils.BL_AppendToArray(object, string, object)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_AppendToArray
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 183
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static void BL_AppendToArray(object target, string fieldName, object value)
+    parameters:
+    - id: target
+      type: System.Object
+    - id: fieldName
+      type: System.String
+    - id: value
+      type: System.Object
+    content.vb: Public Shared Sub BL_AppendToArray(target As Object, fieldName As String, value As Object)
+  overload: LuaMod.LuaAPI.API_Utils.BL_AppendToArray*
+  nameWithType.vb: API_Utils.BL_AppendToArray(Object, String, Object)
+  fullName.vb: LuaMod.LuaAPI.API_Utils.BL_AppendToArray(Object, String, Object)
+  name.vb: BL_AppendToArray(Object, String, Object)
+- uid: LuaMod.LuaAPI.API_Utils.BL_SetArrayElement(System.Object,System.String,System.Int32,System.Object)
+  commentId: M:LuaMod.LuaAPI.API_Utils.BL_SetArrayElement(System.Object,System.String,System.Int32,System.Object)
+  id: BL_SetArrayElement(System.Object,System.String,System.Int32,System.Object)
+  parent: LuaMod.LuaAPI.API_Utils
+  langs:
+  - csharp
+  - vb
+  name: BL_SetArrayElement(object, string, int, object)
+  nameWithType: API_Utils.BL_SetArrayElement(object, string, int, object)
+  fullName: LuaMod.LuaAPI.API_Utils.BL_SetArrayElement(object, string, int, object)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Utils.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SetArrayElement
+    path: LuaMod/LuaAPI/API_Utils.cs
+    startLine: 296
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static void BL_SetArrayElement(object target, string fieldName, int index, object value)
+    parameters:
+    - id: target
+      type: System.Object
+    - id: fieldName
+      type: System.String
+    - id: index
+      type: System.Int32
+    - id: value
+      type: System.Object
+    content.vb: Public Shared Sub BL_SetArrayElement(target As Object, fieldName As String, index As Integer, value As Object)
+  overload: LuaMod.LuaAPI.API_Utils.BL_SetArrayElement*
+  nameWithType.vb: API_Utils.BL_SetArrayElement(Object, String, Integer, Object)
+  fullName.vb: LuaMod.LuaAPI.API_Utils.BL_SetArrayElement(Object, String, Integer, Object)
+  name.vb: BL_SetArrayElement(Object, String, Integer, Object)
+references:
+- uid: LuaMod.LuaAPI
+  commentId: N:LuaMod.LuaAPI
+  href: LuaMod.html
+  name: LuaMod.LuaAPI
+  nameWithType: LuaMod.LuaAPI
+  fullName: LuaMod.LuaAPI
+  spec.csharp:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+  spec.vb:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: LuaMod.LuaAPI.API_Utils
+  commentId: T:LuaMod.LuaAPI.API_Utils
+  parent: LuaMod.LuaAPI
+  href: LuaMod.LuaAPI.API_Utils.html
+  name: API_Utils
+  nameWithType: API_Utils
+  fullName: LuaMod.LuaAPI.API_Utils
+- uid: LuaMod.LuaAPI.API_Utils.BL_CollectionLength*
+  commentId: Overload:LuaMod.LuaAPI.API_Utils.BL_CollectionLength
+  href: LuaMod.LuaAPI.API_Utils.html#LuaMod_LuaAPI_API_Utils_BL_CollectionLength_System_Collections_ICollection_
+  name: BL_CollectionLength
+  nameWithType: API_Utils.BL_CollectionLength
+  fullName: LuaMod.LuaAPI.API_Utils.BL_CollectionLength
+- uid: System.Collections.ICollection
+  commentId: T:System.Collections.ICollection
+  parent: System.Collections
+  isExternal: true
+  name: ICollection
+  nameWithType: ICollection
+  fullName: System.Collections.ICollection
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+- uid: LuaMod.LuaAPI.API_Utils.BL_GetSceneName*
+  commentId: Overload:LuaMod.LuaAPI.API_Utils.BL_GetSceneName
+  href: LuaMod.LuaAPI.API_Utils.html#LuaMod_LuaAPI_API_Utils_BL_GetSceneName
+  name: BL_GetSceneName
+  nameWithType: API_Utils.BL_GetSceneName
+  fullName: LuaMod.LuaAPI.API_Utils.BL_GetSceneName
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: LuaMod.LuaAPI.API_Utils.BL_GetBarcode*
+  commentId: Overload:LuaMod.LuaAPI.API_Utils.BL_GetBarcode
+  href: LuaMod.LuaAPI.API_Utils.html#LuaMod_LuaAPI_API_Utils_BL_GetBarcode_UnityEngine_GameObject_
+  name: BL_GetBarcode
+  nameWithType: API_Utils.BL_GetBarcode
+  fullName: LuaMod.LuaAPI.API_Utils.BL_GetBarcode
+- uid: UnityEngine.GameObject
+  commentId: T:UnityEngine.GameObject
+  parent: UnityEngine
+  isExternal: true
+  name: GameObject
+  nameWithType: GameObject
+  fullName: UnityEngine.GameObject
+- uid: UnityEngine
+  commentId: N:UnityEngine
+  isExternal: true
+  name: UnityEngine
+  nameWithType: UnityEngine
+  fullName: UnityEngine
+- uid: LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType*
+  commentId: Overload:LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType
+  href: LuaMod.LuaAPI.API_Utils.html#LuaMod_LuaAPI_API_Utils_BL_ConvertObjectToType_UnityEngine_Object_System_String_
+  name: BL_ConvertObjectToType
+  nameWithType: API_Utils.BL_ConvertObjectToType
+  fullName: LuaMod.LuaAPI.API_Utils.BL_ConvertObjectToType
+- uid: UnityEngine.Object
+  commentId: T:UnityEngine.Object
+  parent: UnityEngine
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: UnityEngine.Object
+- uid: MoonSharp.Interpreter.DynValue
+  commentId: T:MoonSharp.Interpreter.DynValue
+  parent: MoonSharp.Interpreter
+  isExternal: true
+  name: DynValue
+  nameWithType: DynValue
+  fullName: MoonSharp.Interpreter.DynValue
+- uid: MoonSharp.Interpreter
+  commentId: N:MoonSharp.Interpreter
+  isExternal: true
+  name: MoonSharp.Interpreter
+  nameWithType: MoonSharp.Interpreter
+  fullName: MoonSharp.Interpreter
+  spec.csharp:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+  spec.vb:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+- uid: LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes*
+  commentId: Overload:LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes
+  href: LuaMod.LuaAPI.API_Utils.html#LuaMod_LuaAPI_API_Utils_RemoveDoubleSlashes_System_String_
+  name: RemoveDoubleSlashes
+  nameWithType: API_Utils.RemoveDoubleSlashes
+  fullName: LuaMod.LuaAPI.API_Utils.RemoveDoubleSlashes
+- uid: LuaMod.LuaAPI.API_Utils.BL_GetArrayElement*
+  commentId: Overload:LuaMod.LuaAPI.API_Utils.BL_GetArrayElement
+  href: LuaMod.LuaAPI.API_Utils.html#LuaMod_LuaAPI_API_Utils_BL_GetArrayElement_System_Object_System_String_System_Int32_
+  name: BL_GetArrayElement
+  nameWithType: API_Utils.BL_GetArrayElement
+  fullName: LuaMod.LuaAPI.API_Utils.BL_GetArrayElement
+- uid: LuaMod.LuaAPI.API_Utils.BL_AppendToArray*
+  commentId: Overload:LuaMod.LuaAPI.API_Utils.BL_AppendToArray
+  href: LuaMod.LuaAPI.API_Utils.html#LuaMod_LuaAPI_API_Utils_BL_AppendToArray_System_Object_System_String_System_Object_
+  name: BL_AppendToArray
+  nameWithType: API_Utils.BL_AppendToArray
+  fullName: LuaMod.LuaAPI.API_Utils.BL_AppendToArray
+- uid: LuaMod.LuaAPI.API_Utils.BL_SetArrayElement*
+  commentId: Overload:LuaMod.LuaAPI.API_Utils.BL_SetArrayElement
+  href: LuaMod.LuaAPI.API_Utils.html#LuaMod_LuaAPI_API_Utils_BL_SetArrayElement_System_Object_System_String_System_Int32_System_Object_
+  name: BL_SetArrayElement
+  nameWithType: API_Utils.BL_SetArrayElement
+  fullName: LuaMod.LuaAPI.API_Utils.BL_SetArrayElement

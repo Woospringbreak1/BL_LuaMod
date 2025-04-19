@@ -1,0 +1,151 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod
+  commentId: N:LuaMod
+  id: LuaMod
+  children:
+  - LuaMod.LuaBehaviour
+  - LuaMod.LuaGun
+  - LuaMod.LuaMemoryProfiler
+  - LuaMod.LuaMod
+  - LuaMod.LuaModScript
+  - LuaMod.LuaModScript.ScriptStrikeRecord
+  - LuaMod.LuaModScript.StrikeReason
+  - LuaMod.LuaModScript.del_postreload
+  - LuaMod.LuaResources
+  - LuaMod.LuaSafeCall
+  - LuaMod.ScriptManager
+  langs:
+  - csharp
+  - vb
+  name: LuaMod
+  nameWithType: LuaMod
+  fullName: LuaMod
+  type: Namespace
+  assemblies:
+  - LuaMod
+references:
+- uid: LuaMod.LuaMod
+  commentId: T:LuaMod.LuaMod
+  href: LuaMod.LuaMod.html
+  name: LuaMod
+  nameWithType: LuaMod
+  fullName: LuaMod.LuaMod
+- uid: LuaMod.LuaBehaviour
+  commentId: T:LuaMod.LuaBehaviour
+  parent: LuaMod
+  href: LuaMod.LuaBehaviour.html
+  name: LuaBehaviour
+  nameWithType: LuaBehaviour
+  fullName: LuaMod.LuaBehaviour
+- uid: LuaMod.LuaGun
+  commentId: T:LuaMod.LuaGun
+  href: LuaMod.LuaGun.html
+  name: LuaGun
+  nameWithType: LuaGun
+  fullName: LuaMod.LuaGun
+- uid: LuaMod.LuaResources
+  commentId: T:LuaMod.LuaResources
+  href: LuaMod.LuaResources.html
+  name: LuaResources
+  nameWithType: LuaResources
+  fullName: LuaMod.LuaResources
+- uid: LuaMod.LuaMemoryProfiler
+  commentId: T:LuaMod.LuaMemoryProfiler
+  href: LuaMod.LuaMemoryProfiler.html
+  name: LuaMemoryProfiler
+  nameWithType: LuaMemoryProfiler
+  fullName: LuaMod.LuaMemoryProfiler
+- uid: LuaMod.LuaModScript
+  commentId: T:LuaMod.LuaModScript
+  parent: LuaMod
+  href: LuaMod.LuaModScript.html
+  name: LuaModScript
+  nameWithType: LuaModScript
+  fullName: LuaMod.LuaModScript
+- uid: LuaMod.LuaModScript.del_postreload
+  commentId: T:LuaMod.LuaModScript.del_postreload
+  parent: LuaMod
+  href: LuaMod.LuaModScript.html
+  name: LuaModScript.del_postreload
+  nameWithType: LuaModScript.del_postreload
+  fullName: LuaMod.LuaModScript.del_postreload
+  spec.csharp:
+  - uid: LuaMod.LuaModScript
+    name: LuaModScript
+    href: LuaMod.LuaModScript.html
+  - name: .
+  - uid: LuaMod.LuaModScript.del_postreload
+    name: del_postreload
+    href: LuaMod.LuaModScript.del_postreload.html
+  spec.vb:
+  - uid: LuaMod.LuaModScript
+    name: LuaModScript
+    href: LuaMod.LuaModScript.html
+  - name: .
+  - uid: LuaMod.LuaModScript.del_postreload
+    name: del_postreload
+    href: LuaMod.LuaModScript.del_postreload.html
+- uid: LuaMod.LuaModScript.StrikeReason
+  commentId: T:LuaMod.LuaModScript.StrikeReason
+  parent: LuaMod
+  href: LuaMod.LuaModScript.html
+  name: LuaModScript.StrikeReason
+  nameWithType: LuaModScript.StrikeReason
+  fullName: LuaMod.LuaModScript.StrikeReason
+  spec.csharp:
+  - uid: LuaMod.LuaModScript
+    name: LuaModScript
+    href: LuaMod.LuaModScript.html
+  - name: .
+  - uid: LuaMod.LuaModScript.StrikeReason
+    name: StrikeReason
+    href: LuaMod.LuaModScript.StrikeReason.html
+  spec.vb:
+  - uid: LuaMod.LuaModScript
+    name: LuaModScript
+    href: LuaMod.LuaModScript.html
+  - name: .
+  - uid: LuaMod.LuaModScript.StrikeReason
+    name: StrikeReason
+    href: LuaMod.LuaModScript.StrikeReason.html
+- uid: LuaMod.LuaModScript.ScriptStrikeRecord
+  commentId: T:LuaMod.LuaModScript.ScriptStrikeRecord
+  href: LuaMod.LuaModScript.html
+  name: LuaModScript.ScriptStrikeRecord
+  nameWithType: LuaModScript.ScriptStrikeRecord
+  fullName: LuaMod.LuaModScript.ScriptStrikeRecord
+  spec.csharp:
+  - uid: LuaMod.LuaModScript
+    name: LuaModScript
+    href: LuaMod.LuaModScript.html
+  - name: .
+  - uid: LuaMod.LuaModScript.ScriptStrikeRecord
+    name: ScriptStrikeRecord
+    href: LuaMod.LuaModScript.ScriptStrikeRecord.html
+  spec.vb:
+  - uid: LuaMod.LuaModScript
+    name: LuaModScript
+    href: LuaMod.LuaModScript.html
+  - name: .
+  - uid: LuaMod.LuaModScript.ScriptStrikeRecord
+    name: ScriptStrikeRecord
+    href: LuaMod.LuaModScript.ScriptStrikeRecord.html
+- uid: LuaMod.LuaSafeCall
+  commentId: T:LuaMod.LuaSafeCall
+  href: LuaMod.LuaSafeCall.html
+  name: LuaSafeCall
+  nameWithType: LuaSafeCall
+  fullName: LuaMod.LuaSafeCall
+- uid: LuaMod.ScriptManager
+  commentId: T:LuaMod.ScriptManager
+  href: LuaMod.ScriptManager.html
+  name: ScriptManager
+  nameWithType: ScriptManager
+  fullName: LuaMod.ScriptManager
+- uid: LuaMod
+  commentId: N:LuaMod
+  href: LuaMod.html
+  name: LuaMod
+  nameWithType: LuaMod
+  fullName: LuaMod

@@ -1,0 +1,212 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaSafeCall
+  commentId: T:LuaMod.LuaSafeCall
+  id: LuaSafeCall
+  parent: LuaMod
+  children:
+  - LuaMod.LuaSafeCall.Run(System.Action,System.String)
+  - LuaMod.LuaSafeCall.Run``1(System.Func{``0},System.String)
+  langs:
+  - csharp
+  - vb
+  name: LuaSafeCall
+  nameWithType: LuaSafeCall
+  fullName: LuaMod.LuaSafeCall
+  type: Class
+  source:
+    remote:
+      path: LuaMod/LuaSafeCall.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: LuaSafeCall
+    path: LuaMod/LuaSafeCall.cs
+    startLine: 9
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static class LuaSafeCall
+    content.vb: Public Module LuaSafeCall
+  inheritance:
+  - System.Object
+- uid: LuaMod.LuaSafeCall.Run``1(System.Func{``0},System.String)
+  commentId: M:LuaMod.LuaSafeCall.Run``1(System.Func{``0},System.String)
+  id: Run``1(System.Func{``0},System.String)
+  parent: LuaMod.LuaSafeCall
+  langs:
+  - csharp
+  - vb
+  name: Run<T>(Func<T>, string)
+  nameWithType: LuaSafeCall.Run<T>(Func<T>, string)
+  fullName: LuaMod.LuaSafeCall.Run<T>(System.Func<T>, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaSafeCall.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: Run
+    path: LuaMod/LuaSafeCall.cs
+    startLine: 11
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static T Run<T>(Func<T> func, string context = "Unknown")
+    parameters:
+    - id: func
+      type: System.Func{{T}}
+    - id: context
+      type: System.String
+    typeParameters:
+    - id: T
+    return:
+      type: '{T}'
+    content.vb: Public Shared Function Run(Of T)(func As Func(Of T), context As String = "Unknown") As T
+  overload: LuaMod.LuaSafeCall.Run*
+  nameWithType.vb: LuaSafeCall.Run(Of T)(Func(Of T), String)
+  fullName.vb: LuaMod.LuaSafeCall.Run(Of T)(System.Func(Of T), String)
+  name.vb: Run(Of T)(Func(Of T), String)
+- uid: LuaMod.LuaSafeCall.Run(System.Action,System.String)
+  commentId: M:LuaMod.LuaSafeCall.Run(System.Action,System.String)
+  id: Run(System.Action,System.String)
+  parent: LuaMod.LuaSafeCall
+  langs:
+  - csharp
+  - vb
+  name: Run(Action, string)
+  nameWithType: LuaSafeCall.Run(Action, string)
+  fullName: LuaMod.LuaSafeCall.Run(System.Action, string)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaSafeCall.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: Run
+    path: LuaMod/LuaSafeCall.cs
+    startLine: 30
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static void Run(Action action, string context = "Unknown")
+    parameters:
+    - id: action
+      type: System.Action
+    - id: context
+      type: System.String
+    content.vb: Public Shared Sub Run(action As Action, context As String = "Unknown")
+  overload: LuaMod.LuaSafeCall.Run*
+  nameWithType.vb: LuaSafeCall.Run(Action, String)
+  fullName.vb: LuaMod.LuaSafeCall.Run(System.Action, String)
+  name.vb: Run(Action, String)
+references:
+- uid: LuaMod
+  commentId: N:LuaMod
+  href: LuaMod.html
+  name: LuaMod
+  nameWithType: LuaMod
+  fullName: LuaMod
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: LuaMod.LuaSafeCall.Run*
+  commentId: Overload:LuaMod.LuaSafeCall.Run
+  href: LuaMod.LuaSafeCall.html#LuaMod_LuaSafeCall_Run__1_System_Func___0__System_String_
+  name: Run
+  nameWithType: LuaSafeCall.Run
+  fullName: LuaMod.LuaSafeCall.Run
+- uid: System.Func{{T}}
+  commentId: T:System.Func{``0}
+  parent: System
+  definition: System.Func`1
+  name: Func<T>
+  nameWithType: Func<T>
+  fullName: System.Func<T>
+  nameWithType.vb: Func(Of T)
+  fullName.vb: System.Func(Of T)
+  name.vb: Func(Of T)
+  spec.csharp:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Func`1
+  commentId: T:System.Func`1
+  isExternal: true
+  name: Func<TResult>
+  nameWithType: Func<TResult>
+  fullName: System.Func<TResult>
+  nameWithType.vb: Func(Of TResult)
+  fullName.vb: System.Func(Of TResult)
+  name.vb: Func(Of TResult)
+  spec.csharp:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+  - name: <
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Action
+  commentId: T:System.Action
+  parent: System
+  isExternal: true
+  name: Action
+  nameWithType: Action
+  fullName: System.Action

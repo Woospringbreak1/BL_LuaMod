@@ -6,24 +6,25 @@ using Il2CppSLZ.Marrow.Combat;
 using Il2CppSLZ.Marrow.Utilities;
 using MoonSharp.Interpreter;
 using System.Runtime.CompilerServices;
+
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 namespace LuaMod.LuaAPI
 {
-    internal struct EventListner
+
+    public struct EventListner
     {
         public string function;
         public LuaBehaviour owner;
     }
-        
+
     /// <summary>
     /// NOTE: THIS CLASS PROBABLY A MEMORY LEAK - NEED TO DESTROY SCRIPT REFERENCES WHEN DESTROYED
     /// </summary>
-    internal class API_Events
-    {
 
-      
+    public class API_Events
+    {
 
         [HarmonyPatch(typeof(PlayerDamageReceiver), "ReceiveAttack")]
         private static class Patch_Player_OnReceiveDamage
@@ -36,7 +37,6 @@ namespace LuaMod.LuaAPI
             }
 
         }
-
 
         [HarmonyPatch(typeof(ObjectDestructible), "ReceiveAttack")]
         private static class Patch_ObjectDestructible_OnReceiveDamage
@@ -55,7 +55,6 @@ namespace LuaMod.LuaAPI
         {
             SetUpEvents();
         }
-        
 
 
 
@@ -225,11 +224,6 @@ namespace LuaMod.LuaAPI
         {
             BL_InvokeEvent("OnMarrowGameStarted");
         }
-
-        // private void Event_Hooking_OnLevelLoaded(BoneLib.LevelInfo obj)
-        // {
-        //     BL_InvokeEvent("OnLevelLoaded", UserData.Create(obj));
-        //  }
 
         private static void Event_Hooking_OnGripDetached(Grip arg1, Hand arg2)
         {

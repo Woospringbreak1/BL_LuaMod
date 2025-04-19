@@ -1,6 +1,9 @@
-﻿namespace LuaMod.LuaAPI
+﻿
+
+namespace LuaMod.LuaAPI
 {
-    internal class API_Vector
+
+    public class API_Vector
     {
 
         public static readonly API_Vector Instance = new API_Vector();

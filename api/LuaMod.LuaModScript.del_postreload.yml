@@ -1,0 +1,54 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaModScript.del_postreload
+  commentId: T:LuaMod.LuaModScript.del_postreload
+  id: LuaModScript.del_postreload
+  parent: LuaMod
+  children: []
+  langs:
+  - csharp
+  - vb
+  name: LuaModScript.del_postreload
+  nameWithType: LuaModScript.del_postreload
+  fullName: LuaMod.LuaModScript.del_postreload
+  type: Delegate
+  source:
+    remote:
+      path: LuaMod/LuaModScript.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: del_postreload
+    path: LuaMod/LuaModScript.cs
+    startLine: 16
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public delegate bool LuaModScript.del_postreload()
+    return:
+      type: System.Boolean
+    content.vb: Public Delegate Function LuaModScript.del_postreload() As Boolean
+references:
+- uid: LuaMod
+  commentId: N:LuaMod
+  href: LuaMod.html
+  name: LuaMod
+  nameWithType: LuaMod
+  fullName: LuaMod
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System

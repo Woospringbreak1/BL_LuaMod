@@ -1,6 +1,7 @@
 ﻿using Il2CppCysharp.Threading.Tasks;
 using Il2CppSLZ.Bonelab;
 using Il2CppSLZ.Marrow.AI;
+using Il2CppSLZ.Marrow.Circuits;
 using Il2CppSLZ.Marrow.Data;
 using Il2CppSLZ.Marrow.LateReferences;
 using Il2CppSLZ.Marrow.Pool;
@@ -9,6 +10,7 @@ using Il2CppSLZ.SFX;
 using MelonLoader;
 using MoonSharp.Interpreter;
 using System.Reflection;
+
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UIElements;
@@ -17,541 +19,348 @@ using UnityEngine.UIElements;
 
 namespace LuaMod.LuaAPI
 {
-    internal class API_GameObject
+
+
+    /// <summary>
+    /// Lua-exposed API for GameObject manipulation in Bonelab.
+    /// Provides methods for spawning, destroying, and modifying Unity GameObjects from Lua scripts.
+    /// </summary>
+    public class API_GameObject
     {
+        /// <summary>
+        /// Singleton instance of the API_GameObject class.
+        /// </summary>
         public static readonly API_GameObject Instance = new API_GameObject();
-        private static List<Type> LoadedTypes = new List<Type>();
 
-
-        public static void LoadAllAssemblies()
-        {
-            /// load unity assemblies to allow GetComponent to work
-            LoadAssemblyTypes("UnityEngine.Core");
-            LoadAssemblyTypes("UnityEngine.CoreModule");
-            LoadAssemblyTypes("UnityEngine");
-            LoadAssemblyTypes("UnityEngine.PhysicsModule");
-            LoadAssemblyTypes("UnityEngine.UIModule");
-            LoadAssemblyTypes("UnityEngine.AIModule");
-            LoadAssemblyTypes("UnityEngine.AnimationModule");
-            LoadAssemblyTypes("UnityEngine.RenderingModule");
-            LoadAssemblyTypes("UnityEngine.TextRenderingModule");
-            LoadAssemblyTypes("UnityEngine.ParticleSystemModule");
-            LoadAssemblyTypes("UnityEngine.TerrainModule");
-            LoadAssemblyTypes("UnityEngine.AudioModule");
-            LoadAssemblyTypes("UnityEngine.VideoModule");
-            LoadAssemblyTypes("UnityEngine.InputLegacyModule");
-            LoadAssemblyTypes("UnityEngine.InputSystem");
-            LoadAssemblyTypes("UnityEngine.Core");
-            LoadAssemblyTypes("UnityEngine.CoreModule");
-            LoadAssemblyTypes("UnityEngine");
-            LoadAssemblyTypes("Unity.TextMeshPro");
-            LoadAssemblyTypes("Il2CppSLZ.Algorithms");
-            LoadAssemblyTypes("Il2CppSLZ.Algorithms.Unity");
-            LoadAssemblyTypes("Il2CppSLZ.Marrow");
-            LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
-            LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
-            LoadAssemblyTypes("Il2CppSLZ.SFX");
-            LoadAssemblyTypes("Il2CppSLZ.VFX");
-            LoadAssemblyTypes("SLZ.VFX");
-            LoadAssemblyTypes("Il2CppSLZ.Bonelab");
-            LoadAssemblyTypes("Assembly-CSharp");
-            PrintAssemblyTypes("Il2CppSLZ.SFX");
-            PrintAssemblyTypes("Il2CppSLZ.Algorithms");
-            PrintAssemblyTypes("Il2CppSLZ.Algorithms.Unity");
-            PrintAssemblyTypes("Il2CppSLZ.Marrow");
-            PrintAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
-            PrintAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
-
-            LoadAssemblyTypes();
-            //come back for more later...
-
-        }
-
-        private static void LoadAssemblyTypes()
-        {
-            //load types from this mod
-            var types = Assembly.GetExecutingAssembly().GetTypes();
-            List<System.Type> AcceptedTypes = new List<System.Type>();
-            
-            foreach (System.Type type in types)
-            {
-                if (InheritsFromUnityComponent(type))
-                {
-                    AcceptedTypes.Add(type);
-                    MelonLoader.MelonLogger.Msg(type.Name + " added to reference list");
-                }
-                else
-                {
-                    //MelonLoader.MelonLogger.Warning(type.Name + " Is not a subtype of Component, skipping");
-                }
-            }
-            
-            LoadedTypes.AddRange(AcceptedTypes);
-
-            MelonLoader.MelonLogger.Msg($"Successfully loaded {types.Length} types from local mod assembly");
-        }
-        
-
-        public static bool InheritsFromUnityComponent(System.Type type)
-        {
-            if (type == null)
-                return false;
-           
-            return type.IsSubclassOf(typeof(UnityEngine.Component)) || type == typeof(UnityEngine.Component);
-        }
-
-
-        private static void PrintAssemblyTypes(string assemblyPathOrName)
-        {
-            try
-            {
-                Assembly assembly;
-
-                // Try loading by name first, if that fails, try loading by file path
-                try
-                {
-                    assembly = Assembly.Load(assemblyPathOrName);
-                }
-                catch (Exception)
-                {
-                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY RISK
-                }
-
-                // Get types and append to the static list
-                var types = assembly.GetTypes();
-                List<System.Type> AcceptedTypes = new List<System.Type>();
-
-                foreach (System.Type type in types)
-                {
-                    if (InheritsFromUnityComponent(type))
-                    {
-                        
-                        MelonLoader.MelonLogger.Msg("UserData.RegisterType<" + type.Name + ">();");
-                    }
-                    else
-                    {
-                        //MelonLoader.MelonLogger.Warning(type.Name + " Is not a subtype of Component, skipping");
-                    }
-                }
-
-                LoadedTypes.AddRange(AcceptedTypes);
-
-                MelonLoader.MelonLogger.Msg($"Successfully loaded {AcceptedTypes.Count} types from {assembly.FullName}");
-            }
-            catch (Exception ex)
-            {
-                MelonLoader.MelonLogger.Error($"Error loading assembly: {ex.Message}");
-            }
-        }
-
-        private static void LoadAssemblyTypes(string assemblyPathOrName)
-        {
-            try
-            {
-                Assembly assembly;
-
-                // Try loading by name first, if that fails, try loading by file path
-                try
-                {
-                    assembly = Assembly.Load(assemblyPathOrName);
-                }
-                catch (Exception)
-                {
-                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY 
-                }
-
-                // Get types and append to the static list
-                var types = assembly.GetTypes();
-                List<System.Type> AcceptedTypes = new List<System.Type>();
-
-                foreach (System.Type type in types)
-                {
-                    if (InheritsFromUnityComponent(type))
-                    {
-                        AcceptedTypes.Add(type);
-                        MelonLoader.MelonLogger.Msg(type.Name + " added to reference list");
-                    }
-                    else
-                    {
-                        //MelonLoader.MelonLogger.Warning(type.Name + " Is not a subtype of Component, skipping");
-                    }
-                }
-
-                LoadedTypes.AddRange(AcceptedTypes);
-
-                MelonLoader.MelonLogger.Msg($"Successfully loaded {AcceptedTypes.Count} types from {assembly.FullName}");
-            }
-            catch (Exception ex)
-            {
-                MelonLoader.MelonLogger.Error($"Error loading assembly: {ex.Message}");
-            }
-        }
-
+        /// <summary>
+        /// Creates a new empty GameObject in the scene.
+        /// </summary>
         public GameObject BL_CreateEmptyGameObject()
         {
-            return new GameObject();
+            return LuaSafeCall.Run(() =>
+            {
+                return new GameObject();
+            }, "BL_CreateEmptyGameObject()");
         }
 
-        public bool BL_IsValid(UnityEngine.Object obj)
+        /// <summary>
+        /// Returns true if the given Unity Object is valid (not null).
+        /// </summary>
+        public static bool BL_IsValid(UnityEngine.Object obj)
         {
             return obj != null;
         }
 
+        /// <summary>
+        /// Instantiates a new GameObject based on the provided original.
+        /// </summary>
         public GameObject BL_InstantiateGameObject(GameObject original)
         {
-            return(GameObject.Instantiate(original));
+            return LuaSafeCall.Run(() =>
+            {
+                return GameObject.Instantiate(original);
+            }, "BL_InstantiateGameObject()");
         }
 
-
+        /// <summary>
+        /// Finds a child GameObject by name under the specified parent GameObject.
+        /// </summary>
         public DynValue BL_FindInChildren(GameObject gameObject, string name)
         {
-            Transform[] tfs = gameObject.GetComponentsInChildren<Transform>(true);
-            
-
-            foreach (Transform t in tfs)
+            return LuaSafeCall.Run(() =>
             {
-                //MelonLogger.Msg("Trying to compare provided name: " + name + " and " + t.name);
-                if (t.name == name)
+                Transform[] tfs = gameObject.GetComponentsInChildren<Transform>(true);
+                foreach (Transform t in tfs)
                 {
-                 //   MelonLogger.Msg("It was a match!");
-                   return(UserData.Create(t));
+                    if (t.name == name)
+                        return UserData.Create(t.gameObject);
                 }
-              //  MelonLogger.Msg("no match!");
-            }
-
-            return DynValue.Nil;
-
+                return DynValue.Nil;
+            }, $"BL_FindInChildren('{name}')");
         }
 
-
+        /// <summary>
+        /// Finds a GameObject in the scene by name.
+        /// </summary>
         public DynValue BL_FindInWorld(string name)
         {
-            GameObject gameObject = GameObject.Find(name);
-
-            if(gameObject != null)
+            return LuaSafeCall.Run(() =>
             {
-                return(UserData.Create(gameObject));
-            }
-            return null;
+                GameObject gameObject = GameObject.Find(name);
+                return gameObject != null ? UserData.Create(gameObject) : DynValue.Nil;
+            }, $"BL_FindInWorld('{name}')");
         }
+
+        /// <summary>
+        /// Finds all GameObjects in the scene with the specified name.
+        /// </summary>
+        public DynValue BL_FindAllInWorld(string name)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>(true);
+                List<DynValue> matches = new List<DynValue>();
+
+                foreach (GameObject go in allObjects)
+                {
+                    if (go.name == name)
+                        matches.Add(UserData.Create(go));
+                }
+
+                return matches.Count > 0 ? UserData.Create(matches) : DynValue.Nil;
+            }, $"BL_FindAllInWorld('{name}')");
+        }
+
+
+        /// <summary>
+        /// Finds all child GameObjects with the specified name.
+        /// </summary>
         public DynValue BL_FindAllInChildren(GameObject gameObject, string name)
         {
-           Transform[] tfs = gameObject.GetComponentsInChildren<Transform>();
-            List<DynValue> children = new List<DynValue>();
-
-            foreach (Transform t in tfs) 
+            return LuaSafeCall.Run(() =>
             {
-                if(t.name == name)
-                {  
-                    children.Add(UserData.Create(t));
+                Transform[] tfs = gameObject.GetComponentsInChildren<Transform>();
+                List<DynValue> children = new List<DynValue>();
+
+                foreach (Transform t in tfs)
+                {
+                    if (t.name == name)
+                        children.Add(UserData.Create(t.gameObject));
                 }
-            }
 
-            return UserData.Create(children);  
-
+                return children.Count > 0 ? UserData.Create(children) : DynValue.Nil;
+            }, $"BL_FindAllInChildren('{name}')");
         }
 
-        public static List<DynValue> BL_GetComponentsInChildren(GameObject obj, string CompType, bool includeInactive = false)
-        {
-    
-            if (obj == null)
-            {
-                MelonLogger.Error("[BL_GetComponentsInChildren] GameObject is null!");
-                return null;
-            }
 
-            Type componentType = LoadedTypes.Find(t => t.Name == CompType);
-            if (componentType != null)
+        /// <summary>
+        /// Gets all components of the specified type in the GameObject's children.
+        /// </summary>
+        public List<DynValue> BL_GetComponentsInChildren(GameObject obj, string CompType, bool includeInactive = false)
+        {
+            return LuaSafeCall.Run(() =>
             {
-                // Get the correct generic method
+                if (obj == null) throw new ScriptRuntimeException("GameObject is null");
+
+                Type componentType = LuaMod.LoadedTypes.Find(t => t.Name == CompType);
+                if (componentType == null) throw new ScriptRuntimeException($"Component type '{CompType}' not found");
+
                 MethodInfo method = typeof(GameObject)
                     .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .First(m => m.Name == "GetComponentsInChildren" && m.IsGenericMethod);
 
                 MethodInfo genericMethod = method.MakeGenericMethod(componentType);
+                dynamic components = genericMethod.Invoke(obj, new object[] { includeInactive });
 
-                // Invoke the method with 'includeInactive' parameter
-                object[] parameters = new object[] { includeInactive };
-                dynamic components = genericMethod.Invoke(obj, parameters);
+                List<DynValue> luaArray = new List<DynValue>();
+                foreach (object comp in components)
+                    luaArray.Add(UserData.Create(comp));
 
-               // if (components is Array componentArray)
-               // {
-                    // Convert C# array to Lua-compatible table (array)
-                    List<DynValue> luaArray = new List<DynValue>();
-                    foreach (object comp in components)
-                    {
-                        luaArray.Add(UserData.Create(comp));
-                    }
-
-                    return luaArray;
-               // }
-               // else
-               // {
-               //     MelonLogger.Error($"[BL_GetComponentsInChildren] returned array invalid");
-              //  }
-            }
-            else
-            {
-                MelonLogger.Error($"[BL_GetComponentsInChildren] Component type '{CompType}' not found!");
-            }
-
-            return null;
+                return luaArray.Count > 0 ? luaArray : null;
+            }, $"BL_GetComponentsInChildren('{CompType}')");
         }
 
-        public static DynValue BL_GetComponent2(GameObject obj, string CompType)
+        /// <summary>
+        /// Gets all components of the specified type in the world. Don't overuse this function.
+        /// </summary>
+        public DynValue BL_FindComponentsInWorld(string compType, bool includeInactive = false)
         {
-            //  MeshFilter Test1 = obj.GetComponent<MeshFilter>();
-            //   object Test2 = obj.GetComponent<MeshFilter>();
-            
-            
-            if (obj == null)
+            return LuaSafeCall.Run(() =>
             {
-                MelonLoader.MelonLogger.Error("provided GameObject is nil");
-                return null;
-            }
+                Type componentType = LuaMod.LoadedTypes.Find(t => t.Name == compType);
+                if (componentType == null)
+                    throw new ScriptRuntimeException($"Component type '{compType}' not found");
+
+                // Use Unity's generic FindObjectsOfType<T>(bool includeInactive)
+                MethodInfo method = typeof(UnityEngine.Object)
+                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .FirstOrDefault(m =>
+                        m.Name == "FindObjectsOfType" &&
+                        m.IsGenericMethod &&
+                        m.GetParameters().Length == 1 &&
+                        m.GetParameters()[0].ParameterType == typeof(bool));
+
+                MethodInfo genericMethod = method.MakeGenericMethod(componentType);
+                object results = genericMethod.Invoke(null, new object[] { includeInactive });
+
+                List<DynValue> luaArray = new List<DynValue>();
+                foreach (object comp in (IEnumerable<object>)results)
+                    luaArray.Add(UserData.Create(comp));
+
+                return luaArray.Count > 0 ? UserData.Create(luaArray) : DynValue.Nil;
+            }, $"BL_FindComponentsInWorld('{compType}')");
+        }
 
 
-                System.Type Monoconversiontype = LoadedTypes.Find(t => t.Name == CompType);
-            if (Monoconversiontype != null)
+        /// <summary>
+        /// Gets a component of the specified type on the GameObject.
+        /// </summary>
+        public DynValue BL_GetComponent(GameObject obj, string CompType)
+        {
+            return LuaSafeCall.Run(() =>
             {
-                
-                System.Reflection.MethodInfo method = typeof(GameObject)
-                    .GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                if (obj == null) throw new ScriptRuntimeException("GameObject is null");
+
+                Type type = LuaMod.LoadedTypes.Find(t => t.Name == CompType);
+                if (type == null) throw new ScriptRuntimeException($"Component type '{CompType}' not found");
+
+                MethodInfo method = typeof(GameObject)
+                    .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .First(m => m.Name == "GetComponent" && m.IsGenericMethod);
 
-                System.Reflection.MethodInfo genericMethod = method.MakeGenericMethod(Monoconversiontype);
-                object ConvertedOutComp = genericMethod.Invoke(obj, null);
+                MethodInfo genericMethod = method.MakeGenericMethod(type);
+                object component = genericMethod.Invoke(obj, null);
 
-                return ConvertedOutComp != null ? UserData.Create(ConvertedOutComp) : DynValue.Nil;
-            }
-            else
-            {
-                MelonLoader.MelonLogger.Error("Monoconversiontype is nil - " + CompType);
-            }
-               
-
-            return DynValue.Nil; // Ensure function always returns a value
+                return component != null ? UserData.Create(component) : DynValue.Nil;
+            }, $"BL_GetComponent('{CompType}')");
         }
 
-        public static List<DynValue> BL_GetComponents(GameObject obj, string CompType)
+
+        /// <summary>
+        /// Gets all components of the specified type on the GameObject.
+        /// </summary>
+        public List<DynValue> BL_GetComponents(GameObject obj, string CompType)
         {
-
-            if (obj == null)
+            return LuaSafeCall.Run(() =>
             {
-                MelonLogger.Error("[BL_GetComponentsInChildren] GameObject is null!");
-                return null;
-            }
+                if (obj == null) throw new ScriptRuntimeException("GameObject is null");
 
-            Type componentType = LoadedTypes.Find(t => t.Name == CompType);
-            if (componentType != null)
-            {
-                // Get the correct generic method
+                Type componentType = LuaMod.LoadedTypes.Find(t => t.Name == CompType);
+                if (componentType == null) throw new ScriptRuntimeException($"Component type '{CompType}' not found");
+
                 MethodInfo method = typeof(GameObject)
                     .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .First(m => m.Name == "GetComponents" && m.IsGenericMethod);
 
                 MethodInfo genericMethod = method.MakeGenericMethod(componentType);
+                dynamic components = genericMethod.Invoke(obj, new object[] { });
 
-                // Invoke the method with 'includeInactive' parameter
-                object[] parameters = new object[] {};
-                dynamic components = genericMethod.Invoke(obj, parameters);
-
-                // if (components is Array componentArray)
-                // {
-                // Convert C# array to Lua-compatible table (array)
                 List<DynValue> luaArray = new List<DynValue>();
                 foreach (object comp in components)
-                {
                     luaArray.Add(UserData.Create(comp));
-                }
 
-                return luaArray;
-                // }
-                // else
-                // {
-                //     MelonLogger.Error($"[BL_GetComponentsInChildren] returned array invalid");
-                //  }
-            }
-            else
-            {
-                MelonLogger.Error($"[BL_GetComponents] Component type '{CompType}' not found!");
-            }
-
-            return null;
+                return luaArray.Count > 0 ? luaArray : null;
+            }, $"BL_GetComponents('{CompType}')");
         }
 
-        public static DynValue BL_AddComponent(GameObject obj, string CompType)
+        /// <summary>
+        /// Adds a component of the specified type to the GameObject.
+        /// </summary>
+        public DynValue BL_AddComponent(GameObject obj, string CompType)
         {
-
-            if (obj == null)
+            return LuaSafeCall.Run(() =>
             {
-                MelonLoader.MelonLogger.Error("provided GameObject is nil");
-                return null;
-            }
+                if (obj == null) throw new ScriptRuntimeException("GameObject is null");
 
+                Type type = LuaMod.LoadedTypes.Find(t => t.Name == CompType);
+                if (type == null) throw new ScriptRuntimeException($"Component type '{CompType}' not found");
 
-            System.Type Monoconversiontype = LoadedTypes.Find(t => t.Name == CompType);
-            if (Monoconversiontype != null)
-            {
-
-                System.Reflection.MethodInfo method = typeof(GameObject)
-                    .GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                MethodInfo method = typeof(GameObject)
+                    .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .First(m => m.Name == "AddComponent" && m.IsGenericMethod);
 
-                System.Reflection.MethodInfo genericMethod = method.MakeGenericMethod(Monoconversiontype);
-                object ConvertedOutComp = genericMethod.Invoke(obj, null);
+                MethodInfo genericMethod = method.MakeGenericMethod(type);
+                object component = genericMethod.Invoke(obj, null);
 
-                return ConvertedOutComp != null ? UserData.Create(ConvertedOutComp) : DynValue.Nil;
-            }
-            else
-            {
-                MelonLoader.MelonLogger.Error("Monoconversiontype is nil");
-            }
-
-
-            return DynValue.Nil; // Ensure function always returns a value
+                return component != null ? UserData.Create(component) : DynValue.Nil;
+            }, $"BL_AddComponent('{CompType}')");
         }
 
-        public static DynValue BL_GetComponentInChildren(GameObject obj, string CompType)
+        /// <summary>
+        /// Gets a component of the specified type from the GameObject's children.
+        /// </summary>
+        public DynValue BL_GetComponentInChildren(GameObject obj, string CompType)
         {
-            if (obj == null)
+            
+            return LuaSafeCall.Run(() =>
             {
-                MelonLogger.Error("[BL_GetComponentInChildren] GameObject is null!");
-                return DynValue.Nil;
-            }
+                if (obj == null) throw new ScriptRuntimeException("GameObject is null");
 
-            Type componentType = LoadedTypes.Find(t => t.Name == CompType);
-            if (componentType != null)
-            {   
-                // Find the correct method
+                Type componentType = LuaMod.LoadedTypes.Find(t => t.Name == CompType);
+                if (componentType == null) throw new ScriptRuntimeException($"Component type '{CompType}' not found");
+
                 MethodInfo method = typeof(GameObject)
                     .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .First(m => m.Name == "GetComponentInChildren" && m.IsGenericMethod);
-                
-                MethodInfo genericMethod = method.MakeGenericMethod(componentType);
 
-                // Invoke with the bool parameter
-                object[] parameters = new object[] { };
-                object component = genericMethod.Invoke(obj, parameters);
+                MethodInfo genericMethod = method.MakeGenericMethod(componentType);
+                object component = genericMethod.Invoke(obj, new object[] { });
 
                 return component != null ? UserData.Create(component) : DynValue.Nil;
-            }
-            else
-            {
-                MelonLogger.Error($"[BL_GetComponentInChildren] Component type '{CompType}' not found!");
-            }
-
-            return DynValue.Nil;
-    }
-     
-
-        public static float TimeSinceOpen()
-        {
-            return(Time.realtimeSinceStartup);
+            }, $"BL_GetComponentInChildren('{CompType}')");
         }
 
-       
-        public static void BL_DestroyGameObject(GameObject obj)
+
+        /// <summary>
+        /// Destroys the specified Unity Object.
+        /// </summary>
+        public static void BL_Destroy(UnityEngine.Object obj)
         {
-            if (obj != null) 
+            if (obj != null)
             {
-                GameObject.Destroy(obj);
+                UnityEngine.Object.Destroy(obj);
             }
         }
 
-        public static void DestroyRoot(GameObject obj)
+        /// <summary>
+        /// Spawns a crate by barcode at the specified position and rotation.
+        /// </summary>
+        public static void BL_SpawnByBarcode(string SpawnBCode, Vector3 pos, UnityEngine.Quaternion rotation)
         {
-            GameObject.Destroy(obj.transform.root.gameObject);
+            LuaSafeCall.Run(() =>
+            {
+                BoneLib.HelperMethods.SpawnCrate(SpawnBCode, pos, rotation, Vector3.one, true, null);
+            }, $"BL_SpawnByBarcode('{SpawnBCode}')");
+        }
+
+        /// <summary>
+        /// Spawns a crate by barcode and assigns it to a LuaBehaviour script variable.
+        /// Note: Crate spawning is asyncronous, so the variable won't be valid immediently
+        /// </summary>
+        public static void BL_SpawnByBarcode(LuaBehaviour LB, string VariableName, string SpawnBCode, Vector3 pos, UnityEngine.Quaternion rotation, GameObject NewParent, bool Active = true)
+        {
+            LuaSafeCall.Run(() =>
+            {
+                if (LB == null)
+                    throw new Exception("LuaBehaviour is null");
+
+                Action<Poolee> captureSpawnedCrate = (Poolee obj) =>
+                {
+                    if (obj == null || obj.gameObject == null)
+                        throw new ScriptRuntimeException("Spawned crate is null or missing GameObject");
+
+                    LB.SetScriptVariable(VariableName, UserData.Create(obj.gameObject));
+                };
+
+                var crateReference = new SpawnableCrateReference(SpawnBCode);
+                var spawnable = new Spawnable() { crateRef = crateReference };
+
+                AssetSpawner.Register(spawnable);
+
+                UniTask<Poolee> task = AssetSpawner.SpawnAsync(
+                    spawnable,
+                    pos,
+                    rotation,
+                    new Il2CppSystem.Nullable<Vector3>(Vector3.one),
+                    NewParent != null ? NewParent.transform : null,
+                    Active,
+                    new Il2CppSystem.Nullable<int>()
+                );
+
+                task.ContinueWith(captureSpawnedCrate);
+            }, $"BL_SpawnByBarcode_LuaVar('{SpawnBCode}', var: '{VariableName}')");
+        }
+
+        /// <summary>
+        /// Creates a DataCardReference for the given EntityPose barcode.
+        /// </summary>
+        public DataCardReference<EntityPose> BL_EntityPose(string barcode)
+        {
+            return new DataCardReference<EntityPose>(barcode);
         }
 
 
-        
-        
-        public static SpawnableCrate BL_GetCrateReference(string SpawnBCode)
-        {
-            return null;
-          //  AssetSpawner.
-           // SpawnableCrateReference crateReference = new SpawnableCrateReference(SpawnBCode);
-           // (GameObject)crateReference.Crate.MainAsset.Asset;
-           // MelonLoader.MelonLogger.Msg("Crate gameobject name " + crateReference.Crate.MainGameObject.Asset.name);
-           // return crateReference.Crate;            
-        }
-        
-        public static GameObject BL_SpawnByBarcode(string SpawnBCode, Vector3 pos, UnityEngine.Quaternion rotation)
-        {
-            GameObject spawnedCrate = null;
-
-            Action<GameObject> captureSpawnedCrate = (GameObject obj) =>
-            {
-                spawnedCrate = obj;
-            };
-            BoneLib.HelperMethods.SpawnCrate(SpawnBCode, pos, rotation, Vector3.one, true, captureSpawnedCrate);
-            if (spawnedCrate != null)
-            {
-
-                return spawnedCrate;
-            }
-            else
-            {
-                MelonLoader.MelonLogger.Error("Spawned crate was null");
-                return null;
-            }
-
-            return null;
-
-        }
-
-        public static void BL_SpawnByBarcode_LuaVar(LuaBehaviour LB,string VariableName,string SpawnBCode, Vector3 pos, UnityEngine.Quaternion rotation, GameObject NewParent, bool Active = true)
-        {
-            
-            Action<Poolee> captureSpawnedCrate = (Poolee obj) =>
-            {
-                // spawnedCrate = obj;
-                MelonLogger.Msg("WORKING " + obj.name);
-                LB.SetScriptVariable(VariableName, UserData.Create(obj.gameObject));
-
-               // outobj =  obj.gameObject;
-            };
-
-            SpawnableCrateReference crateReference = new SpawnableCrateReference(SpawnBCode);
-            Spawnable spawnable = new Spawnable()
-            {
-                crateRef = crateReference
-            };
-
-            AssetSpawner.Register(spawnable);
-            UniTask<Poolee> task = AssetSpawner.SpawnAsync(spawnable, pos, rotation, new Il2CppSystem.Nullable<Vector3>(Vector3.one),NewParent != null ? NewParent.transform : null, true, new Il2CppSystem.Nullable<int>());
-            task.ContinueWith(captureSpawnedCrate);
-      
-        }
-
-     
 
 
-        public static GameObject BL_GetPrefabReference(string PrefabName)
-        {
-
-            throw new NotImplementedException();
-            /*
-            IEnumerable<AssetBundle> bundles = (IEnumerable<AssetBundle>)AssetBundle.GetAllLoadedAssetBundles();
-            AssetBundle Bundle = AssetBundle.LoadFromFile( "33.33.Level.LevelTest.bundle");
-            GameObject prefab = HelperMethods.LoadPersistentAsset<GameObject>(Bundle, PrefabName);
-            //LuaBundle = HelperMethods.LoadEmbeddedAssetBundle(Assembly.GetExecutingAssembly(), "WeatherElectric.LabCam.Resources.LabCamWindows.bundle");
-            // HelperMethods.LoadPersistentAsset<RenderTexture>(LuaBundle, "Assets/LabCam/LowQuality.renderTexture");
-
-            ///Uses Resources.Load to load a prefab. Don't use this for spawning
-           // GameObject prefab = (Resources.Load(PrefabName, Il2CppType.Of<GameObject>())) as GameObject;
-            if (prefab != null)
-            {
-                return prefab;
-            }
-            */
-            return null;
-        }
-
-        public static GameObject InstantiatePrefab(string PrefabName)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

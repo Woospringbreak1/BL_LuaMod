@@ -30,783 +30,3954 @@ using LuaMod.BoneMenu;
 using LuaMod.LuaAPI;
 using MelonLoader;
 using MoonSharp.Interpreter;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Video;
 using static Il2CppSLZ.Bonelab.SceneAmmoUI;
+using static LuaMod.LuaAPI.API_FileAccess;
 using static UnityEngine.ParticleSystem;
-[assembly: MelonInfo(typeof(LuaMod.Core), "LuaMod", "1.0.0", "pc", null)]
+[assembly: MelonInfo(typeof(LuaMod.LuaMod), "LuaMod", "1.0.0", "pc", null)]
 [assembly: MelonGame("Stress Level Zero", "BONELAB")]
 
 namespace LuaMod
 {
 
 
-    public class Core : MelonMod
+    public class LuaMod : MelonMod
     {
+        [MoonSharpHidden]
+        public static List<Type> LoadedTypes = new List<Type>();
+        [MoonSharpHidden]
+        public static List<Type> RegisteredTypes = new List<Type>();
+        [MoonSharpHidden]
+        public static void LoadAllAssemblies()
+        {
+            /// load unity assemblies to allow GetComponent to work
+            LoadAssemblyTypes("UnityEngine.Core");
+            LoadAssemblyTypes("UnityEngine.CoreModule");
+            //LoadAssemblyTypes("UnityEngine");
+            LoadAssemblyTypes("UnityEngine.PhysicsModule");
+            LoadAssemblyTypes("UnityEngine.UIModule");
+            LoadAssemblyTypes("UnityEngine.AIModule");
+            LoadAssemblyTypes("UnityEngine.AnimationModule");
+            LoadAssemblyTypes("UnityEngine.RenderingModule");
+            LoadAssemblyTypes("UnityEngine.TextRenderingModule");
+            LoadAssemblyTypes("UnityEngine.ParticleSystemModule");
+            LoadAssemblyTypes("UnityEngine.TerrainModule");
+            LoadAssemblyTypes("UnityEngine.AudioModule");
+            LoadAssemblyTypes("UnityEngine.VideoModule");
+            LoadAssemblyTypes("UnityEngine.InputLegacyModule");
+            LoadAssemblyTypes("UnityEngine.InputSystem");
+            LoadAssemblyTypes("UnityEngine.Core");
+            LoadAssemblyTypes("UnityEngine.CoreModule");
+            LoadAssemblyTypes("UnityEngine");
+            LoadAssemblyTypes("Unity.TextMeshPro");
+            LoadAssemblyTypes("Il2CppSLZ.Algorithms");
+            LoadAssemblyTypes("Il2CppSLZ.Algorithms.Unity");
+            LoadAssemblyTypes("Il2CppSLZ.Marrow");
+            LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
+            LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
+            LoadAssemblyTypes("Il2CppSLZ.SFX");
+            LoadAssemblyTypes("Il2CppSLZ.VFX");
+            LoadAssemblyTypes("SLZ.VFX");
+            LoadAssemblyTypes("Il2CppSLZ.Bonelab");
+            LoadAssemblyTypes("Assembly-CSharp");
+            //PrintAssemblyTypes("Il2CppSLZ.SFX");
+            //PrintAssemblyTypes("Il2CppSLZ.Algorithms");
+            //PrintAssemblyTypes("Il2CppSLZ.Algorithms.Unity");
+            //PrintAssemblyTypes("Il2CppSLZ.Marrow");
+            //PrintAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
+            //PrintAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
+            LoadAssemblyTypes();
+            //come back for more later...
 
-        AssetBundle LuaBundle;
+        }
+        [MoonSharpHidden]
+        private static void LoadAssemblyTypes()
+        {
+            //load types from this mod
+            var types = Assembly.GetExecutingAssembly().GetTypes();
+            List<System.Type> AcceptedTypes = new List<System.Type>();
+
+            foreach (System.Type type in types)
+            {
+                if (InheritsFromUnityComponent(type))
+                {
+                    AcceptedTypes.Add(type);
+                    MelonLoader.MelonLogger.Msg(type.Name + " added to reference list");
+                }
+                else
+                {
+                    //MelonLoader.MelonLogger.Warning(type.Name + " Is not a subtype of Component, skipping");
+                }
+            }
+
+            LoadedTypes.AddRange(AcceptedTypes);
+
+            MelonLoader.MelonLogger.Msg($"Successfully loaded {types.Length} types from local mod assembly");
+        }
+        [MoonSharpHidden]
+        private static void PrintEnums(string assemblyPathOrName)
+        {
+            try
+            {
+                Assembly assembly;
+
+                try
+                {
+                    assembly = Assembly.Load(assemblyPathOrName);
+                }
+                catch (Exception)
+                {
+                    assembly = Assembly.LoadFrom(assemblyPathOrName);
+                }
+
+                var types = assembly.GetTypes();
+                int enumCount = 0;
+                int skippedCount = 0;
+                var outputLines = new List<string>();
+
+                string[] blacklist = new[]
+                {
+            "io", "network", "lowlevel", "low level", "unsafe", "file", "directory", "webcam",
+            "microphone", "location", "windows", "security", "diagnostic", "net", "process",
+            "thread", "systeminfo", "reflection", "garbagecollector", "garbage", "collector"
+        };
+
+                outputLines.Add($"// Enums from assembly: {assembly.FullName}");
+                outputLines.Add("");
+
+                foreach (Type type in types)
+                {
+                    if (!type.IsEnum)
+                        continue;
+
+                    string fullNameLower = type.FullName.ToLowerInvariant();
+                    if (blacklist.Any(b => fullNameLower.Contains(b)))
+                    {
+                        skippedCount++;
+                        continue;
+                    }
+
+                    enumCount++;
+
+                    string fullName = type.FullName.Replace('+', '.'); // Use dot notation for nested types
+
+                    // Build global name: use nested type name for uniqueness
+                    string globalName;
+                    if (type.DeclaringType != null)
+                    {
+                        globalName = type.DeclaringType.Name + "." + type.Name;
+                    }
+                    else
+                    {
+                        globalName = type.Name;
+                    }
+
+                    string line = $"LuaScript.Globals[\"{globalName}\"] = UserData.CreateStatic<{fullName}>();";
+                    outputLines.Add(line);
+                    MelonLoader.MelonLogger.Msg(line);
+                }
+
+                outputLines.Add("");
+
+                using (var writer = new StreamWriter("Enums.txt", append: true))
+                {
+                    foreach (var line in outputLines)
+                        writer.WriteLine(line);
+                }
+
+                MelonLoader.MelonLogger.Msg($"Finished scanning assembly: {assembly.FullName}");
+                MelonLoader.MelonLogger.Msg($"Registered {enumCount} enums (skipped {skippedCount} due to blacklist). Output appended to Enums.txt.");
+            }
+            catch (Exception ex)
+            {
+                MelonLoader.MelonLogger.Error($"Error loading assembly: {ex.Message}");
+            }
+        }
+
+        [MoonSharpHidden]
+        private static void PrintComponents(string assemblyPathOrName)
+        {
+            try
+            {
+                Assembly assembly;
+
+                try
+                {
+                    assembly = Assembly.Load(assemblyPathOrName);
+                }
+                catch (Exception)
+                {
+                    assembly = Assembly.LoadFrom(assemblyPathOrName); // Note: potential security risk
+                }
+
+                var types = assembly.GetTypes();
+                int typeCount = 0;
+                int skippedCount = 0;
+                var outputLines = new List<string>();
+
+                string[] blacklist = new[]
+                {
+            "io", "network", "lowlevel", "low level", "unsafe", "file", "directory", "webcam",
+            "microphone", "location", "windows", "security", "diagnostic", "net", "process",
+            "thread", "systeminfo", "reflection", "garbagecollector", "garbage", "collector",
+            "delegate", "graphicsbuffer", "graphics", "internal", "debug", "experimental",
+            "qualitysettings", "display", "buffer", "gizmos", "rendering", "execute",
+            "unityengineinternal", "microsoft", "embedded", "command", "apple", "testtools"
+        };
+
+                outputLines.Add($"// Types from assembly: {assembly.FullName}");
+                outputLines.Add("");
+
+                foreach (Type type in types)
+                {
+                    if (type.IsAbstract || type.IsGenericTypeDefinition)
+                        continue;
+
+                    string fullNameLower = type.FullName.ToLowerInvariant();
+
+                    // Skip methods, delegates, and blacklisted strings
+                    if (blacklist.Any(b => fullNameLower.Contains(b)) ||
+                        type.IsSubclassOf(typeof(MulticastDelegate)) ||
+                        type.IsSubclassOf(typeof(Delegate)))
+                    {
+                        skippedCount++;
+                        continue;
+                    }
+
+                    typeCount++;
+                    string fullName = type.FullName.Replace('+', '.');
+                    string line = $"LuaRegisterType<{fullName}>();";
+                    outputLines.Add(line);
+                    MelonLoader.MelonLogger.Msg(line);
+                }
+
+                outputLines.Add("");
+
+                using (var writer = new StreamWriter("Components.txt", append: true))
+                {
+                    foreach (var line in outputLines)
+                        writer.WriteLine(line);
+                }
+
+                MelonLoader.MelonLogger.Msg($"Finished scanning assembly: {assembly.FullName}");
+                MelonLoader.MelonLogger.Msg($"Registered {typeCount} types (skipped {skippedCount} due to blacklist). Output appended to Components.txt.");
+            }
+            catch (Exception ex)
+            {
+                MelonLoader.MelonLogger.Error($"Error loading assembly: {ex.Message}");
+
+            }
+        }
+
+
+        [MoonSharpHidden]
+        public static bool InheritsFromUnityComponent(System.Type type)
+        {
+            if (type == null)
+                return false;
+
+            return type.IsSubclassOf(typeof(UnityEngine.Object)) || type == typeof(UnityEngine.Object);
+        }
+
+
+        [MoonSharpHidden]
+        private static void PrintAssemblyTypes(string assemblyPathOrName)
+        {
+            try
+            {
+                Assembly assembly;
+
+                // Try loading by name first, if that fails, try loading by file path
+                try
+                {
+                    assembly = Assembly.Load(assemblyPathOrName);
+                }
+                catch (Exception)
+                {
+                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY RISK
+                }
+
+                // Get types and append to the static list
+                var types = assembly.GetTypes();
+                List<System.Type> AcceptedTypes = new List<System.Type>();
+
+                foreach (System.Type type in types)
+                {
+                    if (InheritsFromUnityComponent(type))
+                    {
+
+                        MelonLoader.MelonLogger.Msg("LuaRegisterType<" + type.Name + ">();");
+                    }
+                    else
+                    {
+                        //MelonLoader.MelonLogger.Warning(type.Name + " Is not a subtype of Component, skipping");
+                    }
+                }
+
+                LoadedTypes.AddRange(AcceptedTypes);
+
+                MelonLoader.MelonLogger.Msg($"Successfully loaded {AcceptedTypes.Count} types from {assembly.FullName}");
+            }
+            catch (Exception ex)
+            {
+                MelonLoader.MelonLogger.Error($"Error loading assembly: {ex.Message}");
+            }
+        }
+        [MoonSharpHidden]
+        private static void LoadAssemblyTypes(string assemblyPathOrName)
+        {
+            try
+            {
+                Assembly assembly;
+                PrintComponents(assemblyPathOrName);
+                PrintEnums(assemblyPathOrName);
+                // Try loading by name first, if that fails, try loading by file path
+                try
+                {
+                    assembly = Assembly.Load(assemblyPathOrName);
+                }
+                catch (Exception)
+                {
+                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY 
+                }
+
+                // Get types and append to the static list
+                var types = assembly.GetTypes();
+                List<System.Type> AcceptedTypes = new List<System.Type>();
+
+                foreach (System.Type type in types)
+                {
+                    if (InheritsFromUnityComponent(type))
+                    {
+                        AcceptedTypes.Add(type);
+                        //MelonLoader.MelonLogger.Msg(type.Name + " added to reference list");
+                    }
+                    else
+                    {
+                        //MelonLoader.MelonLogger.Warning(type.Name + " Is not a subtype of Component, skipping");
+                    }
+                }
+
+                LoadedTypes.AddRange(AcceptedTypes);
+
+                // MelonLoader.MelonLogger.Msg($"Successfully loaded {AcceptedTypes.Count} types from {assembly.FullName}");
+            }
+            catch (Exception ex)
+            {
+                MelonLoader.MelonLogger.Error($"Error loading assembly: {ex.Message}");
+            }
+        }
+
+        [MoonSharpHidden]
+        public static void LuaRegisterType<T>(bool includeCollections=false)
+        {
+            UserData.RegisterType<T>();
+            RegisteredTypes.Add(typeof(T));
+            if (includeCollections)
+            {
+                UserData.RegisterType<T[]>();
+                UserData.RegisterType<List<T>>();
+            }
+
+        }
+        [MoonSharpHidden]
         public void LoadTypes()
         {
-            // LuaBundle = HelperMethods.LoadEmbeddedAssetBundle(Assembly.GetExecutingAssembly(), "WeatherElectric.LabCam.Resources.LabCamWindows.bundle");
-            // HelperMethods.LoadPersistentAsset<RenderTexture>(LuaBundle, "Assets/LabCam/LowQuality.renderTexture");
-
             //Moonsharp
 
-            UserData.RegisterType<List<DynValue>>();
-            UserData.RegisterType<List<string>>();
-            UserData.RegisterType<Particle[]>();
             //lua API
-            UserData.RegisterType<API_GameObject>();
-            UserData.RegisterType<API_Input>();
-            UserData.RegisterType<API_Player>();
-            UserData.RegisterType<API_Vector>();
-            UserData.RegisterType<API_Events>();
-            UserData.RegisterType<API_SLZ_Combat>();
-            UserData.RegisterType<API_SLZ_NPC>();
-            UserData.RegisterType<API_SLZ_VoidLogic>();
-            UserData.RegisterType<API_Physics>();
-            UserData.RegisterType<API_Random>();
-            UserData.RegisterType<API_Utils>();
-            UserData.RegisterType<API_BoneMenu>();
-            UserData.RegisterType<API_Audio>();
-            UserData.RegisterType<API_Particles>();
+            LuaRegisterType<API_GameObject>();
+            LuaRegisterType<API_Input>();
+            LuaRegisterType<API_Player>();
+            LuaRegisterType<API_Vector>();
+            LuaRegisterType<API_Events>();
+            LuaRegisterType<API_SLZ_Combat>();
+            LuaRegisterType<API_SLZ_NPC>();
+            LuaRegisterType<API_SLZ_VoidLogic>();
+            LuaRegisterType<API_Physics>();
+            LuaRegisterType<API_Utils>();
+            LuaRegisterType<API_BoneMenu>();
+            LuaRegisterType<API_Audio>();
+            LuaRegisterType<API_Particles>();
+            LuaRegisterType<API_FileAccess>();
+            LuaRegisterType<API_Random>();
+            LuaRegisterType<API_Renderer>();
+
             
-
-            UserData.RegisterType<LuaBehaviour>();
-            UserData.RegisterType<LuaGun>();
-            UserData.RegisterType<LuaNPC>();
-
-            RegisterUnityTypes();
-            RegisterSLZTypes();
-
+           LuaRegisterType<LuaBehaviour>();
+           LuaRegisterType<LuaGun>();
+           LuaRegisterType<LuaNPC>();
+           LuaRegisterType<BLFileAccess>();
+           LuaRegisterType<LuaResources>();
             //unity
-            //UserData.RegisterType<UnityEngine.Object>();
-            UserData.RegisterType<UnityEngine.Vector3>();
-            UserData.RegisterType<Transform>();
-            UserData.RegisterType<Quaternion>();
-            UserData.RegisterType<GameObject>();
-            UserData.RegisterType<Component>();
-            UserData.RegisterType<MonoBehaviour>();
-            UserData.RegisterType<Time>();
-            UserData.RegisterType<UnityEngine.Color>();
-            UserData.RegisterType<Renderer>();
-            UserData.RegisterType<Bounds>();
-            UserData.RegisterType<Vector2>();
-            UserData.RegisterType<Matrix4x4>();
-            UserData.RegisterType<UnityEngine.Time>();
-            UserData.RegisterType<Camera>();
-           
-            //unity physics
-            UserData.RegisterType<Physics>();
-            UserData.RegisterType<Rigidbody>();
-            UserData.RegisterType<SphereCollider>();
-            UserData.RegisterType<BoxCollider>();
-            UserData.RegisterType<CapsuleCollider>();
-            UserData.RegisterType<Collision>();
-            UserData.RegisterType<ContactPoint>();
-            UserData.RegisterType<RaycastHit>();
-            UserData.RegisterType<HingeJoint>();
-            UserData.RegisterType<Joint>();
-            UserData.RegisterType<JointMover>();
-            UserData.RegisterType<JointMotor>();
-            UserData.RegisterType<JointLimits>();
-            UserData.RegisterType<JointDrive>();
-            UserData.RegisterType<JointSpring>();
-            UserData.RegisterType<JointVisual>();
-            UserData.RegisterType<ConfigurableJoint>();
-            UserData.RegisterType<Collider[]>();
-            UserData.RegisterType<Collider>();
-            UserData.RegisterType<QueryTriggerInteraction>();
+            //LuaRegisterType<UnityEngine.Object>();
+            LuaRegisterType<UnityEngine.Vector2>(true);
+            LuaRegisterType<UnityEngine.Vector3>(true);
+            LuaRegisterType<UnityEngine.Vector4>(true);
+            LuaRegisterType<GameObject>(true);
+            LuaRegisterType<string>(true);
+            LuaRegisterType<String>(true);
+            LuaRegisterType<int>(true);
+            LuaRegisterType<float>(true);
+            LuaRegisterType<double>(true);
+            LuaRegisterType<UnityEngine.Object>(true);
+            LuaRegisterType<Matrix4x4>(true);
+            LuaRegisterType<Material>(true);
+            LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneLink>(true);
+            LuaRegisterType<Transform>(true);
 
-            
+           LuaRegisterType<Quaternion>();
+           LuaRegisterType<Component>();
+           LuaRegisterType<MonoBehaviour>();
+           LuaRegisterType<Time>();
+           LuaRegisterType<Mathf>();
+           LuaRegisterType<UnityEngine.Color>();
+           LuaRegisterType<Renderer>();
+           LuaRegisterType<Bounds>();
+           LuaRegisterType<Matrix4x4>();
+           LuaRegisterType<UnityEngine.Time>();
+           LuaRegisterType<Camera>();
+           LuaRegisterType<AudioSource>();
+           UserData.RegisterType(typeof(UnityEngine.Random));
+            //unity physics
+            LuaRegisterType<Physics>();
+           LuaRegisterType<Rigidbody>();
+           LuaRegisterType<SphereCollider>();
+           LuaRegisterType<BoxCollider>();
+           LuaRegisterType<CapsuleCollider>();
+           LuaRegisterType<Collision>();
+           LuaRegisterType<ContactPoint>();
+           LuaRegisterType<RaycastHit>();
+           LuaRegisterType<HingeJoint>();
+           LuaRegisterType<Joint>();
+           LuaRegisterType<JointMover>();
+           LuaRegisterType<JointMotor>();
+           LuaRegisterType<JointLimits>();
+           LuaRegisterType<JointDrive>();
+           LuaRegisterType<JointSpring>();
+           LuaRegisterType<JointVisual>();
+           LuaRegisterType<ConfigurableJoint>();
+           LuaRegisterType<Collider[]>();
+           LuaRegisterType<Collider>();
+           LuaRegisterType<QueryTriggerInteraction>();
+
+
             //TextMeshPro
 
-            UserData.RegisterType<TextMeshPro>();
+           LuaRegisterType<TextMeshPro>();
 
             //BoneMenu
-            UserData.RegisterType<BoneLib.BoneMenu.Page>();
-            UserData.RegisterType<BoneLib.BoneMenu.BoolElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.Dialog>();
-            UserData.RegisterType<BoneLib.BoneMenu.Element>();
-            UserData.RegisterType<BoneLib.BoneMenu.ElementProperties>();
-            UserData.RegisterType<BoneLib.BoneMenu.EnumElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.FloatElement>();
-            //UserData.RegisterType<BoneLib.BoneMenu.FunctionElement>(); //naughty
-            UserData.RegisterType<LuaFunctionElement>(); //use this instead
-            UserData.RegisterType<BoneLib.BoneMenu.PageLinkElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.StringElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.SubPage>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.BackspaceKey>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.DoubleZeroKey>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.EnterKey>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIBoolElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIDialog>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIElementDrawer>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIEnumElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIFloatElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIFunctionElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIInfoBox>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIIntElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIMenu>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIPool>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIPoolee>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.GUIStringElement>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.Key>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.Keyboard>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.ShiftKey>();
-            UserData.RegisterType<BoneLib.BoneMenu.UI.SpaceKey>();
-            /*
+           LuaRegisterType<BoneLib.BoneMenu.Page>();
+           LuaRegisterType<BoneLib.BoneMenu.BoolElement>();
+           LuaRegisterType<BoneLib.BoneMenu.Dialog>();
+           LuaRegisterType<BoneLib.BoneMenu.Element>();
+           LuaRegisterType<BoneLib.BoneMenu.ElementProperties>();
+           LuaRegisterType<BoneLib.BoneMenu.EnumElement>();
+           LuaRegisterType<BoneLib.BoneMenu.FloatElement>();
+            //LuaRegisterType<BoneLib.BoneMenu.FunctionElement>(); //naughty
+           LuaRegisterType<LuaFunctionElement>(); //use this instead
+           LuaRegisterType<BoneLib.BoneMenu.PageLinkElement>();
+           LuaRegisterType<BoneLib.BoneMenu.StringElement>();
+           LuaRegisterType<BoneLib.BoneMenu.SubPage>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.BackspaceKey>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.DoubleZeroKey>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.EnterKey>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIBoolElement>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIDialog>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIElement>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIElementDrawer>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIEnumElement>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIFloatElement>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIFunctionElement>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIInfoBox>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIIntElement>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIMenu>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIPool>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIPoolee>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.GUIStringElement>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.Key>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.Keyboard>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.ShiftKey>();
+           LuaRegisterType<BoneLib.BoneMenu.UI.SpaceKey>();
+            
             //SLZ
-            UserData.RegisterType<EnemyDamageReceiver>();
-            UserData.RegisterType<AIBrain>();
-            UserData.RegisterType<AIManager>();
-            UserData.RegisterType<BehaviourCrablet>();
-            UserData.RegisterType<BehaviourGrabbableBaseNav>();
-            UserData.RegisterType<PuppetMaster>();
-            UserData.RegisterType<BehaviourBase>();
-            UserData.RegisterType<BehaviourBaseNav>();
-            UserData.RegisterType<BehaviourPowerLegs>();
-            UserData.RegisterType<BehaviourAnimatedStagger>();
-            UserData.RegisterType<BehaviourBaseTurret>();
-            UserData.RegisterType<BehaviourFall>();
-            UserData.RegisterType<BehaviourGrabbableBaseNav>();
-            UserData.RegisterType<BehaviourHead>();
-            UserData.RegisterType<BehaviourTemplate>();
-            UserData.RegisterType<BehaviourFall>();
-            UserData.RegisterType<Il2CppSLZ.Bonelab.AccordionSliderDoor>();
-            UserData.RegisterType<Il2CppSLZ.Bonelab.ActionDirector>();
-            //UserData.RegisterType<Il2CppSLZ.Marrow.>();
+           LuaRegisterType<EnemyDamageReceiver>();
+           LuaRegisterType<AIBrain>();
+           LuaRegisterType<AIManager>();
+           LuaRegisterType<BehaviourCrablet>();
+           LuaRegisterType<BehaviourGrabbableBaseNav>();
+           LuaRegisterType<PuppetMaster>();
+           LuaRegisterType<BehaviourBase>();
+           LuaRegisterType<BehaviourBaseNav>();
+           LuaRegisterType<BehaviourPowerLegs>();
+           LuaRegisterType<BehaviourAnimatedStagger>();
+           LuaRegisterType<BehaviourBaseTurret>();
+           LuaRegisterType<BehaviourFall>();
+           LuaRegisterType<BehaviourGrabbableBaseNav>();
+           LuaRegisterType<BehaviourHead>();
+           LuaRegisterType<BehaviourTemplate>();
+           LuaRegisterType<BehaviourFall>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AccordionSliderDoor>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ActionDirector>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.>();
 
-            UserData.RegisterType<Attack>();
-            UserData.RegisterType<Gun>();
-            UserData.RegisterType<Magazine>();
-            UserData.RegisterType<MagazineState>();
+           LuaRegisterType<Attack>();
+           LuaRegisterType<Gun>();
+           LuaRegisterType<Magazine>();
+           LuaRegisterType<MagazineState>();
 
-            UserData.RegisterType<MarrowBody>();
-            UserData.RegisterType<MarrowEntity>();
-            UserData.RegisterType<MarrowJoint>();
+           LuaRegisterType<MarrowBody>();
+           LuaRegisterType<MarrowEntity>();
+           LuaRegisterType<MarrowJoint>();
 
             
-            UserData.RegisterType<SpawnableCrate>();
+           LuaRegisterType<SpawnableCrate>();
 
-            UserData.RegisterType<Hand>();
-            UserData.RegisterType<Grip>();
+           LuaRegisterType<Hand>();
+           LuaRegisterType<Grip>();
 
             //void logic
-            UserData.RegisterType<BaseNode>();
-            UserData.RegisterType<LeverNode>();
-            UserData.RegisterType<IVoidLogicActuator>();
-            UserData.RegisterType<IVoidLogicNode>();
-            UserData.RegisterType<IVoidLogicSensor>();
+           LuaRegisterType<BaseNode>();
+           LuaRegisterType<LeverNode>();
+           LuaRegisterType<IVoidLogicActuator>();
+           LuaRegisterType<IVoidLogicNode>();
+           LuaRegisterType<IVoidLogicSensor>();
 
             //circuits
-            UserData.RegisterType<Circuit>();
-            UserData.RegisterType<CircuitSocket>();
-            UserData.RegisterType<AddCircuit>();
-            UserData.RegisterType<ExternalCircuit>();
-            UserData.RegisterType<FlipflopCircuit>();
-            UserData.RegisterType<MultiplyCircuit>();
-            UserData.RegisterType<RemapCircuit>();
-            UserData.RegisterType<ValueCircuit>();
-            UserData.RegisterType<XorCircuit>();
-            UserData.RegisterType<ZoneCircuit>();
+           LuaRegisterType<Circuit>();
+           LuaRegisterType<CircuitSocket>();
+           LuaRegisterType<AddCircuit>();
+           LuaRegisterType<ExternalCircuit>();
+           LuaRegisterType<FlipflopCircuit>();
+           LuaRegisterType<MultiplyCircuit>();
+           LuaRegisterType<RemapCircuit>();
+           LuaRegisterType<ValueCircuit>();
+           LuaRegisterType<XorCircuit>();
+           LuaRegisterType<ZoneCircuit>();
+            
+
+            RegisterBulkTypes();
+        }
+
+        [MoonSharpHidden]
+        public void RegisterBulkTypes()
+        {
+            // Types from assembly: UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("UnityEngine.CoreModule");
+           LuaRegisterType<Unity.Jobs.IJob>();
+           LuaRegisterType<Unity.Jobs.IJobFor>();
+           LuaRegisterType<Unity.Jobs.IJobParallelFor>();
+           LuaRegisterType<Unity.Jobs.JobHandle>();
+           LuaRegisterType<Unity.Burst.BurstDiscardAttribute>();
+           LuaRegisterType<UnityEngine.PrimitiveType>();
+           LuaRegisterType<UnityEngine.Space>();
+           LuaRegisterType<UnityEngine.RuntimePlatform>();
+           LuaRegisterType<UnityEngine.SystemLanguage>();
+           LuaRegisterType<UnityEngine.LogType>();
+           LuaRegisterType<UnityEngine.SortingLayer>();
+           LuaRegisterType<UnityEngine.Keyframe>();
+           LuaRegisterType<UnityEngine.WrapMode>();
+           LuaRegisterType<UnityEngine.StackTraceLogType>();
+           LuaRegisterType<UnityEngine.BootConfigData>();
+           LuaRegisterType<UnityEngine.CachedAssetBundle>();
+           LuaRegisterType<UnityEngine.Cache>();
+           LuaRegisterType<UnityEngine.Caching>();
+           LuaRegisterType<UnityEngine.Camera>();
+           LuaRegisterType<UnityEngine.BoundingSphere>();
+           LuaRegisterType<UnityEngine.CullingGroupEvent>();
+           LuaRegisterType<UnityEngine.CullingGroup>();
+           LuaRegisterType<UnityEngine.IExposedPropertyTable>();
+           LuaRegisterType<UnityEngine.Bounds>();
+           LuaRegisterType<UnityEngine.BoundsInt>();
+           LuaRegisterType<UnityEngine.GeometryUtility>();
+           LuaRegisterType<UnityEngine.Plane>();
+           LuaRegisterType<UnityEngine.Ray>();
+           LuaRegisterType<UnityEngine.Rect>();
+           LuaRegisterType<UnityEngine.RectInt>();
+           LuaRegisterType<UnityEngine.RectOffset>();
+           LuaRegisterType<UnityEngine.DynamicGI>();
+           LuaRegisterType<UnityEngine.LightingSettings>();
+           LuaRegisterType<UnityEngine.BeforeRenderOrderAttribute>();
+           LuaRegisterType<UnityEngine.FullScreenMode>();
+           LuaRegisterType<UnityEngine.Screen>();
+           LuaRegisterType<UnityEngine.GL>();
+           LuaRegisterType<UnityEngine.LightmapData>();
+           LuaRegisterType<UnityEngine.LightmapSettings>();
+           LuaRegisterType<UnityEngine.LightProbes>();
+           LuaRegisterType<UnityEngine.RenderTargetSetup>();
+           LuaRegisterType<UnityEngine.ImageEffectAllowedInSceneView>();
+           LuaRegisterType<UnityEngine.LightmapsModeLegacy>();
+           LuaRegisterType<UnityEngine.TrailRenderer>();
+           LuaRegisterType<UnityEngine.LineRenderer>();
+           LuaRegisterType<UnityEngine.MaterialPropertyBlock>();
+           LuaRegisterType<UnityEngine.Renderer>();
+           LuaRegisterType<UnityEngine.RenderSettings>();
+           LuaRegisterType<UnityEngine.Shader>();
+           LuaRegisterType<UnityEngine.Material>();
+           LuaRegisterType<UnityEngine.Flare>();
+           LuaRegisterType<UnityEngine.LightBakingOutput>();
+           LuaRegisterType<UnityEngine.LightShadowCasterMode>();
+           LuaRegisterType<UnityEngine.Light>();
+           LuaRegisterType<UnityEngine.Skybox>();
+           LuaRegisterType<UnityEngine.MeshFilter>();
+           LuaRegisterType<UnityEngine.TransparencySortMode>();
+           LuaRegisterType<UnityEngine.StereoTargetEyeMask>();
+           LuaRegisterType<UnityEngine.CameraType>();
+           LuaRegisterType<UnityEngine.LightType>();
+           LuaRegisterType<UnityEngine.LightShape>();
+           LuaRegisterType<UnityEngine.LightRenderMode>();
+           LuaRegisterType<UnityEngine.LightShadows>();
+           LuaRegisterType<UnityEngine.FogMode>();
+           LuaRegisterType<UnityEngine.LightmapBakeType>();
+           LuaRegisterType<UnityEngine.MixedLightingMode>();
+           LuaRegisterType<UnityEngine.ShadowmaskMode>();
+           LuaRegisterType<UnityEngine.ShadowObjectsFilter>();
+           LuaRegisterType<UnityEngine.CameraClearFlags>();
+           LuaRegisterType<UnityEngine.DepthTextureMode>();
+           LuaRegisterType<UnityEngine.AnisotropicFiltering>();
+           LuaRegisterType<UnityEngine.MeshTopology>();
+           LuaRegisterType<UnityEngine.SkinQuality>();
+           LuaRegisterType<UnityEngine.ColorSpace>();
+           LuaRegisterType<UnityEngine.FilterMode>();
+           LuaRegisterType<UnityEngine.TextureWrapMode>();
+           LuaRegisterType<UnityEngine.TextureFormat>();
+           LuaRegisterType<UnityEngine.CubemapFace>();
+           LuaRegisterType<UnityEngine.RenderTextureFormat>();
+           LuaRegisterType<UnityEngine.VRTextureUsage>();
+           LuaRegisterType<UnityEngine.RenderTextureReadWrite>();
+           LuaRegisterType<UnityEngine.RenderTextureMemoryless>();
+           LuaRegisterType<UnityEngine.LightmapsMode>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume>();
+           LuaRegisterType<UnityEngine.LineAlignment>();
+           LuaRegisterType<UnityEngine.SkinnedMeshRenderer>();
+           LuaRegisterType<UnityEngine.MeshRenderer>();
+           LuaRegisterType<UnityEngine.LightProbeGroup>();
+           LuaRegisterType<UnityEngine.LODFadeMode>();
+           LuaRegisterType<UnityEngine.LOD>();
+           LuaRegisterType<UnityEngine.LODGroup>();
+           LuaRegisterType<UnityEngine.Mesh>();
+           LuaRegisterType<UnityEngine.BoneWeight>();
+           LuaRegisterType<UnityEngine.BoneWeight1>();
+           LuaRegisterType<UnityEngine.CombineInstance>();
+           LuaRegisterType<UnityEngine.Texture>();
+           LuaRegisterType<UnityEngine.Texture2D>();
+           LuaRegisterType<UnityEngine.Cubemap>();
+           LuaRegisterType<UnityEngine.Texture3D>();
+           LuaRegisterType<UnityEngine.Texture2DArray>();
+           LuaRegisterType<UnityEngine.CubemapArray>();
+           LuaRegisterType<UnityEngine.RenderTexture>();
+           LuaRegisterType<UnityEngine.CustomRenderTexture>();
+           LuaRegisterType<UnityEngine.RenderTextureDescriptor>();
+           LuaRegisterType<UnityEngine.Hash128>();
+           LuaRegisterType<UnityEngine.CursorMode>();
+           LuaRegisterType<UnityEngine.CursorLockMode>();
+           LuaRegisterType<UnityEngine.Cursor>();
+           LuaRegisterType<UnityEngine.KeyCode>();
+           LuaRegisterType<UnityEngine.ILogger>();
+           LuaRegisterType<UnityEngine.ILogHandler>();
+           LuaRegisterType<UnityEngine.Logger>();
+           LuaRegisterType<UnityEngine.UnityLogWriter>();
+           LuaRegisterType<UnityEngine.Color>();
+           LuaRegisterType<UnityEngine.Color32>();
+           LuaRegisterType<UnityEngine.ColorUtility>();
+           LuaRegisterType<UnityEngine.GradientColorKey>();
+           LuaRegisterType<UnityEngine.GradientAlphaKey>();
+           LuaRegisterType<UnityEngine.Gradient>();
+           LuaRegisterType<UnityEngine.FrustumPlanes>();
+           LuaRegisterType<UnityEngine.Matrix4x4>();
+           LuaRegisterType<UnityEngine.Vector3>();
+           LuaRegisterType<UnityEngine.Mathf>();
+           LuaRegisterType<UnityEngine.Vector2>();
+           LuaRegisterType<UnityEngine.Vector2Int>();
+           LuaRegisterType<UnityEngine.Vector3Int>();
+           LuaRegisterType<UnityEngine.Vector4>();
+           LuaRegisterType<UnityEngine.PlayerPrefs>();
+           LuaRegisterType<UnityEngine.PropertyAttribute>();
+           LuaRegisterType<UnityEngine.ContextMenuItemAttribute>();
+           LuaRegisterType<UnityEngine.InspectorNameAttribute>();
+           LuaRegisterType<UnityEngine.TooltipAttribute>();
+           LuaRegisterType<UnityEngine.SpaceAttribute>();
+           LuaRegisterType<UnityEngine.HeaderAttribute>();
+           LuaRegisterType<UnityEngine.RangeAttribute>();
+           LuaRegisterType<UnityEngine.MinAttribute>();
+           LuaRegisterType<UnityEngine.MultilineAttribute>();
+           LuaRegisterType<UnityEngine.TextAreaAttribute>();
+           LuaRegisterType<UnityEngine.ColorUsageAttribute>();
+           LuaRegisterType<UnityEngine.GradientUsageAttribute>();
+           LuaRegisterType<UnityEngine.DelayedAttribute>();
+           LuaRegisterType<UnityEngine.NonReorderableAttribute>();
+           LuaRegisterType<UnityEngine.PropertyNameUtils>();
+           LuaRegisterType<UnityEngine.PropertyName>();
+           LuaRegisterType<UnityEngine.ResourceRequest>();
+           LuaRegisterType<UnityEngine.ResourcesAPI>();
+           LuaRegisterType<UnityEngine.Resources>();
+           LuaRegisterType<UnityEngine.AttributeHelperEngine>();
+           LuaRegisterType<UnityEngine.DisallowMultipleComponent>();
+           LuaRegisterType<UnityEngine.RequireComponent>();
+           LuaRegisterType<UnityEngine.AddComponentMenu>();
+           LuaRegisterType<UnityEngine.CreateAssetMenuAttribute>();
+           LuaRegisterType<UnityEngine.ContextMenu>();
+           LuaRegisterType<UnityEngine.HideInInspector>();
+           LuaRegisterType<UnityEngine.HelpURLAttribute>();
+           LuaRegisterType<UnityEngine.AssemblyIsEditorAssembly>();
+           LuaRegisterType<UnityEngine.ExcludeFromPresetAttribute>();
+           LuaRegisterType<UnityEngine.Component>();
+           LuaRegisterType<UnityEngine.Coroutine>();
+           LuaRegisterType<UnityEngine.SetupCoroutine>();
+           LuaRegisterType<UnityEngine.ExcludeFromObjectFactoryAttribute>();
+           LuaRegisterType<UnityEngine.FailedToLoadScriptObject>();
+           LuaRegisterType<UnityEngine.GameObject>();
+           LuaRegisterType<UnityEngine.LayerMask>();
+           LuaRegisterType<UnityEngine.NoAllocHelpers>();
+           LuaRegisterType<UnityEngine.RangeInt>();
+           LuaRegisterType<UnityEngine.RuntimeInitializeLoadType>();
+           LuaRegisterType<UnityEngine.RuntimeInitializeOnLoadMethodAttribute>();
+           LuaRegisterType<UnityEngine.ScriptableObject>();
+           LuaRegisterType<UnityEngine.ScriptingRuntime>();
+           LuaRegisterType<UnityEngine.ScriptingUtility>();
+           LuaRegisterType<UnityEngine.TextAsset>();
+           LuaRegisterType<UnityEngine.TrackedReference>();
+           LuaRegisterType<UnityEngine.HideFlags>();
+           LuaRegisterType<UnityEngine.Object>();
+           LuaRegisterType<UnityEngine.WaitForEndOfFrame>();
+           LuaRegisterType<UnityEngine.WaitForFixedUpdate>();
+           LuaRegisterType<UnityEngine.WaitForSeconds>();
+           LuaRegisterType<UnityEngine.WaitForSecondsRealtime>();
+           LuaRegisterType<UnityEngine.WaitUntil>();
+           LuaRegisterType<UnityEngine.WaitWhile>();
+           LuaRegisterType<UnityEngine.SerializeField>();
+           LuaRegisterType<UnityEngine.SerializeReference>();
+           LuaRegisterType<UnityEngine.ComputeShader>();
+           LuaRegisterType<UnityEngine.DisableBatchingType>();
+           LuaRegisterType<UnityEngine.LowerResBlitTexture>();
+           LuaRegisterType<UnityEngine.PreloadData>();
+           LuaRegisterType<UnityEngine.OperatingSystemFamily>();
+           LuaRegisterType<UnityEngine.DeviceType>();
+           LuaRegisterType<UnityEngine.SystemClock>();
+           LuaRegisterType<UnityEngine.Time>();
+           LuaRegisterType<UnityEngine.TouchScreenKeyboard>();
+           LuaRegisterType<UnityEngine.TouchScreenKeyboardType>();
+           LuaRegisterType<UnityEngine.Pose>();
+           LuaRegisterType<UnityEngine.DrivenTransformProperties>();
+           LuaRegisterType<UnityEngine.DrivenRectTransformTracker>();
+           LuaRegisterType<UnityEngine.RectTransform>();
+           LuaRegisterType<UnityEngine.Transform>();
+           LuaRegisterType<UnityEngine.SpriteDrawMode>();
+           LuaRegisterType<UnityEngine.SpriteTileMode>();
+           LuaRegisterType<UnityEngine.SpriteRenderer>();
+           LuaRegisterType<UnityEngine.SpriteMeshType>();
+           LuaRegisterType<UnityEngine.SpritePackingMode>();
+           LuaRegisterType<UnityEngine.SpriteSortPoint>();
+           LuaRegisterType<UnityEngine.Sprite>();
+           LuaRegisterType<UnityEngine._Scripting.APIUpdating.APIUpdaterRuntimeHelpers>();
+           LuaRegisterType<UnityEngine.Sprites.DataUtility>();
+           LuaRegisterType<UnityEngine.U2D.Light2DBase>();
+           LuaRegisterType<UnityEngine.U2D.SpriteBone>();
+           LuaRegisterType<UnityEngine.U2D.SpriteChannelInfo>();
+           LuaRegisterType<UnityEngine.U2D.SpriteAtlasManager>();
+           LuaRegisterType<UnityEngine.U2D.SpriteAtlas>();
+           LuaRegisterType<UnityEngine.Profiling.Recorder>();
+           LuaRegisterType<UnityEngine.Profiling.Sampler>();
+           LuaRegisterType<UnityEngine.Profiling.CustomSampler>();
+           LuaRegisterType<UnityEngine.Jobs.IJobParallelForTransform>();
+           LuaRegisterType<UnityEngine.Jobs.TransformAccess>();
+           LuaRegisterType<UnityEngine.Jobs.TransformAccessArray>();
+           LuaRegisterType<UnityEngine.Events.PersistentListenerMode>();
+           LuaRegisterType<UnityEngine.Events.UnityEventTools>();
+           LuaRegisterType<UnityEngine.Events.ArgumentCache>();
+           LuaRegisterType<UnityEngine.Events.BaseInvokableCall>();
+           LuaRegisterType<UnityEngine.Events.InvokableCall>();
+           LuaRegisterType<UnityEngine.Events.UnityEventCallState>();
+           LuaRegisterType<UnityEngine.Events.PersistentCall>();
+           LuaRegisterType<UnityEngine.Events.PersistentCallGroup>();
+           LuaRegisterType<UnityEngine.Events.InvokableCallList>();
+           LuaRegisterType<UnityEngine.Events.UnityEventBase>();
+           LuaRegisterType<UnityEngine.Events.UnityEvent>();
+           LuaRegisterType<UnityEngine.Scripting.AlwaysLinkAssemblyAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.PreserveAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.RequireAttributeUsagesAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.APIUpdating.MovedFromAttributeData>();
+           LuaRegisterType<UnityEngine.Scripting.APIUpdating.MovedFromAttribute>();
+           LuaRegisterType<UnityEngine.SceneManagement.Scene>();
+           LuaRegisterType<UnityEngine.SceneManagement.SceneManagerAPI>();
+           LuaRegisterType<UnityEngine.SceneManagement.SceneManager>();
+           LuaRegisterType<UnityEngine.SceneManagement.LoadSceneMode>();
+           LuaRegisterType<UnityEngine.SceneManagement.LocalPhysicsMode>();
+           LuaRegisterType<UnityEngine.SceneManagement.LoadSceneParameters>();
+           LuaRegisterType<UnityEngine.SceneManagement.CreateSceneParameters>();
+           LuaRegisterType<UnityEngine.Playables.FrameData>();
+           LuaRegisterType<UnityEngine.Playables.FrameRate>();
+           LuaRegisterType<UnityEngine.Playables.IPlayable>();
+           LuaRegisterType<UnityEngine.Playables.IPlayableOutput>();
+           LuaRegisterType<UnityEngine.Playables.DirectorWrapMode>();
+           LuaRegisterType<UnityEngine.Playables.Playable>();
+           LuaRegisterType<UnityEngine.Playables.IPlayableAsset>();
+           LuaRegisterType<UnityEngine.Playables.PlayableAsset>();
+           LuaRegisterType<UnityEngine.Playables.PlayableBinding>();
+           LuaRegisterType<UnityEngine.Playables.PlayableTraversalMode>();
+           LuaRegisterType<UnityEngine.Playables.DirectorUpdateMode>();
+           LuaRegisterType<UnityEngine.Playables.PlayableGraph>();
+           LuaRegisterType<UnityEngine.Playables.PlayState>();
+           LuaRegisterType<UnityEngine.Playables.PlayableHandle>();
+           LuaRegisterType<UnityEngine.Playables.PlayableOutput>();
+           LuaRegisterType<UnityEngine.Playables.PlayableOutputHandle>();
+           LuaRegisterType<UnityEngine.Playables.ScriptPlayableOutput>();
+           LuaRegisterType<System.Runtime.CompilerServices.IsUnmanagedAttribute>();
+           LuaRegisterType<Unity.Baselib.ErrorState>();
+           LuaRegisterType<Unity.Burst.BurstAuthorizedExternalMethodAttribute>();
+           LuaRegisterType<UnityEngine.WeightedMode>();
+           LuaRegisterType<UnityEngine.UnityEventQueueSystem>();
+           LuaRegisterType<UnityEngine.LineUtility>();
+           LuaRegisterType<UnityEngine.MeshSubsetCombineUtility>();
+           LuaRegisterType<UnityEngine.StaticBatchingUtility>();
+           LuaRegisterType<UnityEngine.Ping>();
+           LuaRegisterType<UnityEngine.SparseTexture>();
+           LuaRegisterType<UnityEngine.LensFlare>();
+           LuaRegisterType<UnityEngine.Projector>();
+           LuaRegisterType<UnityEngine.Halo>();
+           LuaRegisterType<UnityEngine.ImageEffectTransformsToLDR>();
+           LuaRegisterType<UnityEngine.ImageEffectOpaque>();
+           LuaRegisterType<UnityEngine.ImageEffectAfterScale>();
+           LuaRegisterType<UnityEngine.StaticBatchingHelper>();
+           LuaRegisterType<UnityEngine.BillboardAsset>();
+           LuaRegisterType<UnityEngine.BillboardRenderer>();
+           LuaRegisterType<UnityEngine.ReceiveGI>();
+           LuaRegisterType<UnityEngine.QualityLevel>();
+           LuaRegisterType<UnityEngine.ShadowQuality>();
+           LuaRegisterType<UnityEngine.TexGenMode>();
+           LuaRegisterType<UnityEngine.BlendWeights>();
+           LuaRegisterType<UnityEngine.SkinWeights>();
+           LuaRegisterType<UnityEngine.ColorGamut>();
+           LuaRegisterType<UnityEngine.NPOTSupport>();
+           LuaRegisterType<UnityEngine.CustomRenderTextureUpdateMode>();
+           LuaRegisterType<UnityEngine.CustomRenderTextureUpdateZoneSpace>();
+           LuaRegisterType<UnityEngine.SleepTimeout>();
+           LuaRegisterType<UnityEngine.HDROutputSettings>();
+           LuaRegisterType<UnityEngine.BatteryStatus>();
+           LuaRegisterType<UnityEngine.FlareLayer>();
+           LuaRegisterType<UnityEngine.SnapAxis>();
+           LuaRegisterType<UnityEngine.SnapAxisFilter>();
+           LuaRegisterType<UnityEngine.Ray2D>();
+           LuaRegisterType<UnityEngine.DrivenPropertyManager>();
+           LuaRegisterType<UnityEngine.FullScreenMovieControlMode>();
+           LuaRegisterType<UnityEngine.FullScreenMovieScalingMode>();
+           LuaRegisterType<UnityEngine.AndroidActivityIndicatorStyle>();
+           LuaRegisterType<UnityEngine.Handheld>();
+           LuaRegisterType<UnityEngine.EnumInfo>();
+           LuaRegisterType<UnityEngine.GradientMode>();
+           LuaRegisterType<UnityEngine.IconAttribute>();
+           LuaRegisterType<UnityEngine.iPhoneSettings>();
+           LuaRegisterType<UnityEngine.SpriteAlignment>();
+           LuaRegisterType<UnityEngine.U2D.Light2DType>();
+           LuaRegisterType<UnityEngine.Scripting.RequiredMemberAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.RequireDerivedAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.RequireImplementorsAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.RequiredInterfaceAttribute>();
+           LuaRegisterType<UnityEngine.SearchService.ObjectSelectorHandlerWithLabelsAttribute>();
+           LuaRegisterType<UnityEngine.SearchService.ObjectSelectorHandlerWithTagsAttribute>();
+           LuaRegisterType<UnityEngine.Search.SearchViewFlags>();
+           LuaRegisterType<UnityEngine.Search.SearchContextAttribute>();
+           LuaRegisterType<UnityEngine.Playables.DataStreamType>();
+           LuaRegisterType<UnityEngine.Lumin.UsesLuminPrivilegeAttribute>();
+           LuaRegisterType<UnityEngine.Lumin.UsesLuminPlatformLevelAttribute>();
+           LuaRegisterType<UnityEngine.Camera.GateFitMode>();
+           LuaRegisterType<UnityEngine.Camera.GateFitParameters>();
+           LuaRegisterType<UnityEngine.Camera.StereoscopicEye>();
+           LuaRegisterType<UnityEngine.Camera.MonoOrStereoscopicEye>();
+           LuaRegisterType<UnityEngine.Camera.SceneViewFilterMode>();
+           LuaRegisterType<UnityEngine.Camera.RenderRequestMode>();
+           LuaRegisterType<UnityEngine.Camera.RenderRequestOutputSpace>();
+           LuaRegisterType<UnityEngine.Camera.RenderRequest>();
+           LuaRegisterType<UnityEngine.Camera.CameraCallback>();
+           LuaRegisterType<UnityEngine.Camera.FieldOfViewAxis>();
+           LuaRegisterType<UnityEngine.CullingGroup.StateChanged>();
+           LuaRegisterType<UnityEngine.BeforeRenderHelper.OrderBlock>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume.BoundingBoxMode>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume.RefreshMode>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume.QualityMode>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume.DataFormat>();
+           LuaRegisterType<UnityEngine.Mesh.MeshData>();
+           LuaRegisterType<UnityEngine.Mesh.MeshDataArray>();
+           LuaRegisterType<UnityEngine.Texture2D.EXRFlags>();
+           LuaRegisterType<UnityEngine.SpookyHash.U>();
+           LuaRegisterType<UnityEngine.Random.State>();
+           LuaRegisterType<UnityEngine.ScriptingUtility.TestClass>();
+           LuaRegisterType<UnityEngine.TouchScreenKeyboard.Status>();
+           LuaRegisterType<UnityEngine.TouchScreenKeyboard.Android>();
+           LuaRegisterType<UnityEngine.RectTransform.Edge>();
+           LuaRegisterType<UnityEngine.RectTransform.Axis>();
+           LuaRegisterType<UnityEngine.RectTransform.ReapplyDrivenProperties>();
+           LuaRegisterType<UnityEngine.Transform.Enumerator>();
+           LuaRegisterType<UnityEngine.SceneManagement.Scene.LoadingState>();
+
+
+            // Types from assembly: UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("UnityEngine.PhysicsModule");
+            
+           LuaRegisterType<UnityEngine.ConfigurableJointMotion>();
+           LuaRegisterType<UnityEngine.SoftJointLimit>();
+           LuaRegisterType<UnityEngine.RigidbodyConstraints>();
+           LuaRegisterType<UnityEngine.ForceMode>();
+           LuaRegisterType<UnityEngine.SoftJointLimit>();
+           LuaRegisterType<UnityEngine.SoftJointLimitSpring>();
+           LuaRegisterType<UnityEngine.JointDrive>();
+           LuaRegisterType<UnityEngine.JointMotor>();
+           LuaRegisterType<UnityEngine.JointSpring>();
+           LuaRegisterType<UnityEngine.JointLimits>();
+           LuaRegisterType<UnityEngine.ControllerColliderHit>();
+           LuaRegisterType<UnityEngine.PhysicMaterialCombine>();
+           LuaRegisterType<UnityEngine.Physics>();
+           LuaRegisterType<UnityEngine.ModifiableContactPair>();
+           LuaRegisterType<UnityEngine.ModifiableMassProperties>();
+           LuaRegisterType<UnityEngine.ModifiableContact>();
+           LuaRegisterType<UnityEngine.ModifiableContactPatch>();
+           LuaRegisterType<UnityEngine.PhysicMaterial>();
+           LuaRegisterType<UnityEngine.RaycastHit>();
+           LuaRegisterType<UnityEngine.Rigidbody>();
+           LuaRegisterType<UnityEngine.Collider>();
+           LuaRegisterType<UnityEngine.CharacterController>();
+           LuaRegisterType<UnityEngine.MeshCollider>();
+           LuaRegisterType<UnityEngine.CapsuleCollider>();
+           LuaRegisterType<UnityEngine.BoxCollider>();
+           LuaRegisterType<UnityEngine.SphereCollider>();
+           LuaRegisterType<UnityEngine.Joint>();
+           LuaRegisterType<UnityEngine.HingeJoint>();
+           LuaRegisterType<UnityEngine.SpringJoint>();
+           LuaRegisterType<UnityEngine.FixedJoint>();
+           LuaRegisterType<UnityEngine.CharacterJoint>();
+           LuaRegisterType<UnityEngine.ConfigurableJoint>();
+           LuaRegisterType<UnityEngine.ContactPoint>();
+           LuaRegisterType<UnityEngine.PhysicsScene>();
+           LuaRegisterType<UnityEngine.JointDriveMode>();
+           LuaRegisterType<UnityEngine.ConstantForce>();
+           LuaRegisterType<UnityEngine.ModifiableContactPatch.Flags>();
+
+            // Types from assembly: UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("UnityEngine.UIModule");
+           LuaRegisterType<UnityEngine.ICanvasRaycastFilter>();
+           LuaRegisterType<UnityEngine.CanvasGroup>();
+           LuaRegisterType<UnityEngine.CanvasRenderer>();
+           LuaRegisterType<UnityEngine.RectTransformUtility>();
+           LuaRegisterType<UnityEngine.RenderMode>();
+           LuaRegisterType<UnityEngine.Canvas>();
+           LuaRegisterType<UnityEngine.Canvas.WillRenderCanvases>();
+
+            // Types from assembly: UnityEngine.AIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("UnityEngine.AIModule");
+           LuaRegisterType<UnityEngine.AI.NavMeshPathStatus>();
+           LuaRegisterType<UnityEngine.AI.NavMeshPath>();
+           LuaRegisterType<UnityEngine.AI.ObstacleAvoidanceType>();
+           LuaRegisterType<UnityEngine.AI.NavMeshAgent>();
+           LuaRegisterType<UnityEngine.AI.NavMeshObstacleShape>();
+           LuaRegisterType<UnityEngine.AI.NavMeshObstacle>();
+           LuaRegisterType<UnityEngine.AI.OffMeshLinkType>();
+           LuaRegisterType<UnityEngine.AI.OffMeshLinkData>();
+           LuaRegisterType<UnityEngine.AI.NavMeshHit>();
+           LuaRegisterType<UnityEngine.AI.NavMeshData>();
+           LuaRegisterType<UnityEngine.AI.NavMeshDataInstance>();
+           LuaRegisterType<UnityEngine.AI.NavMeshLinkData>();
+           LuaRegisterType<UnityEngine.AI.NavMeshLinkInstance>();
+           LuaRegisterType<UnityEngine.AI.NavMeshBuildSourceShape>();
+           LuaRegisterType<UnityEngine.AI.NavMeshCollectGeometry>();
+           LuaRegisterType<UnityEngine.AI.NavMeshBuildSource>();
+           LuaRegisterType<UnityEngine.AI.NavMeshBuildMarkup>();
+           LuaRegisterType<UnityEngine.AI.NavMeshBuildSettings>();
+           LuaRegisterType<UnityEngine.AI.OffMeshLink>();
+           LuaRegisterType<UnityEngine.AI.NavMesh.OnNavMeshPreUpdate>();
+
+            // Types from assembly: UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg(" UnityEngine.AnimationModule");
+           LuaRegisterType<UnityEngine.SharedBetweenAnimatorsAttribute>();
+           LuaRegisterType<UnityEngine.PlayMode>();
+           LuaRegisterType<UnityEngine.QueueMode>();
+           LuaRegisterType<UnityEngine.AvatarTarget>();
+           LuaRegisterType<UnityEngine.AvatarIKGoal>();
+           LuaRegisterType<UnityEngine.AvatarIKHint>();
+           LuaRegisterType<UnityEngine.AnimatorControllerParameterType>();
+           LuaRegisterType<UnityEngine.StateInfoIndex>();
+           LuaRegisterType<UnityEngine.AnimatorRecorderMode>();
+           LuaRegisterType<UnityEngine.AnimatorCullingMode>();
+           LuaRegisterType<UnityEngine.AnimatorUpdateMode>();
+           LuaRegisterType<UnityEngine.AnimatorClipInfo>();
+           LuaRegisterType<UnityEngine.AnimatorStateInfo>();
+           LuaRegisterType<UnityEngine.MatchTargetWeightMask>();
+           LuaRegisterType<UnityEngine.Animator>();
+           LuaRegisterType<UnityEngine.AnimatorControllerParameter>();
+           LuaRegisterType<UnityEngine.AnimatorOverrideController>();
+           LuaRegisterType<UnityEngine.HumanBodyBones>();
+           LuaRegisterType<UnityEngine.Avatar>();
+           LuaRegisterType<UnityEngine.SkeletonBone>();
+           LuaRegisterType<UnityEngine.HumanLimit>();
+           LuaRegisterType<UnityEngine.HumanBone>();
+           LuaRegisterType<UnityEngine.AvatarMaskBodyPart>();
+           LuaRegisterType<UnityEngine.AvatarMask>();
+           LuaRegisterType<UnityEngine.HumanTrait>();
+           LuaRegisterType<UnityEngine.RuntimeAnimatorController>();
+           LuaRegisterType<UnityEngine.AvatarBuilder>();
+           LuaRegisterType<UnityEngine.BodyDof>();
+           LuaRegisterType<UnityEngine.HeadDof>();
+           LuaRegisterType<UnityEngine.LegDof>();
+           LuaRegisterType<UnityEngine.ArmDof>();
+           LuaRegisterType<UnityEngine.FingerDof>();
+           LuaRegisterType<UnityEngine.HumanPartDof>();
+           LuaRegisterType<UnityEngine.Dof>();
+           LuaRegisterType<UnityEngine.HumanParameter>();
+           LuaRegisterType<UnityEngine.AnimatorUtility>();
+           LuaRegisterType<UnityEngine.HumanPoseHandler>();
+           LuaRegisterType<UnityEngine.AnimatorOverrideController.OnOverrideControllerDirtyCallback>();
+
+            // Types from assembly: UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("UnityEngine.TextRenderingModule");
+           LuaRegisterType<UnityEngine.FontStyle>();
+           LuaRegisterType<UnityEngine.TextGenerator>();
+           LuaRegisterType<UnityEngine.TextAlignment>();
+           LuaRegisterType<UnityEngine.TextAnchor>();
+           LuaRegisterType<UnityEngine.HorizontalWrapMode>();
+           LuaRegisterType<UnityEngine.VerticalWrapMode>();
+           LuaRegisterType<UnityEngine.TextMesh>();
+           LuaRegisterType<UnityEngine.CharacterInfo>();
+           LuaRegisterType<UnityEngine.UICharInfo>();
+           LuaRegisterType<UnityEngine.UILineInfo>();
+           LuaRegisterType<UnityEngine.UIVertex>();
+           LuaRegisterType<UnityEngine.Font>();
+           LuaRegisterType<UnityEngine.GUIText>();
+           LuaRegisterType<UnityEngine.Font.FontTextureRebuildCallback>();
+
+            // Types from assembly: UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("UnityEngine.ParticleSystemModule");
+           LuaRegisterType<UnityEngine.ParticleSystem>();
+           LuaRegisterType<UnityEngine.ParticleSystemRenderMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemSortMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemRenderSpace>();
+           LuaRegisterType<UnityEngine.ParticleSystemCurveMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemGradientMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemShapeType>();
+           LuaRegisterType<UnityEngine.ParticleSystemMeshShapeType>();
+           LuaRegisterType<UnityEngine.ParticleSystemScalingMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemEmitterVelocityMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemInheritVelocityMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemVertexStream>();
+           LuaRegisterType<UnityEngine.ParticleSystemCustomData>();
+           LuaRegisterType<UnityEngine.ParticleSystemNoiseQuality>();
+           LuaRegisterType<UnityEngine.ParticleSystemGameObjectFilter>();
+           LuaRegisterType<UnityEngine.ParticleSystemForceFieldShape>();
+           LuaRegisterType<UnityEngine.ParticleSystemVertexStreams>();
+           LuaRegisterType<UnityEngine.ParticleSystemRenderer>();
+           LuaRegisterType<UnityEngine.ParticleSystemForceField>();
+           LuaRegisterType<UnityEngine.ParticleSystemJobs.ParticleSystemNativeArray3>();
+           LuaRegisterType<UnityEngine.ParticleSystemJobs.ParticleSystemNativeArray4>();
+           LuaRegisterType<UnityEngine.ParticleSystemJobs.ParticleSystemJobData>();
+           LuaRegisterType<UnityEngine.ParticleSystemJobs.NativeParticleData>();
+           LuaRegisterType<UnityEngine.ParticleSystemShapeTextureChannel>();
+           LuaRegisterType<UnityEngine.ParticleSystemColliderQueryMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemCullingMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemTriggerEventType>();
+           LuaRegisterType<UnityEngine.ParticleSystemCustomDataMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemSubEmitterType>();
+           LuaRegisterType<UnityEngine.ParticleSystemSubEmitterProperties>();
+           LuaRegisterType<UnityEngine.ParticleSystemTrailMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemTrailTextureMode>();
+           LuaRegisterType<UnityEngine.ParticleSystemShapeMultiModeValue>();
+           LuaRegisterType<UnityEngine.ParticleSystem.MainModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.ShapeModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.TriggerModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.SubEmittersModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.Particle>();
+           LuaRegisterType<UnityEngine.ParticleSystem.Burst>();
+           LuaRegisterType<UnityEngine.ParticleSystem.MinMaxCurve>();
+           LuaRegisterType<UnityEngine.ParticleSystem.MinMaxGradient>();
+           LuaRegisterType<UnityEngine.ParticleSystem.EmitParams>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState>();
+           LuaRegisterType<UnityEngine.ParticleSystem.Trails>();
+           LuaRegisterType<UnityEngine.ParticleSystem.VelocityOverLifetimeModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.LimitVelocityOverLifetimeModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.InheritVelocityModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.LifetimeByEmitterSpeedModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.ForceOverLifetimeModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.ColorOverLifetimeModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.ColorBySpeedModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.SizeOverLifetimeModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.SizeBySpeedModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.ExternalForcesModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.NoiseModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.LightsModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.TrailModule>();
+           LuaRegisterType<UnityEngine.ParticleSystem.CustomDataModule>();
+           LuaRegisterType<UnityEngine.ParticleSystemJobs.NativeParticleData.Array3>();
+           LuaRegisterType<UnityEngine.ParticleSystemJobs.NativeParticleData.Array4>();
+           LuaRegisterType<UnityEngine.ParticleSystem.Particle.Flags>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Seed>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Seed4>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Initial>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Shape>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Force>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Noise>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Lights>();
+           LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Trail>();
+
+            // Types from assembly: UnityEngine.TerrainModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("UnityEngine.TerrainModule");
+           LuaRegisterType<UnityEngine.TerrainRenderFlags>();
+           LuaRegisterType<UnityEngine.Terrain>();
+           LuaRegisterType<UnityEngine.TreePrototype>();
+           LuaRegisterType<UnityEngine.DetailPrototype>();
+           LuaRegisterType<UnityEngine.SplatPrototype>();
+           LuaRegisterType<UnityEngine.TreeInstance>();
+           LuaRegisterType<UnityEngine.PatchExtents>();
+           LuaRegisterType<UnityEngine.TerrainHeightmapSyncControl>();
+           LuaRegisterType<UnityEngine.DetailInstanceTransform>();
+           LuaRegisterType<UnityEngine.TerrainData>();
+           LuaRegisterType<UnityEngine.TerrainLayer>();
+           LuaRegisterType<UnityEngine.TerrainUtils.TerrainMapStatusCode>();
+           LuaRegisterType<UnityEngine.TerrainUtils.TerrainTileCoord>();
+           LuaRegisterType<UnityEngine.TerrainUtils.TerrainMap>();
+           LuaRegisterType<UnityEngine.DetailRenderMode>();
+           LuaRegisterType<UnityEngine.TerrainChangedFlags>();
+           LuaRegisterType<UnityEngine.Tree>();
+           LuaRegisterType<UnityEngine.SpeedTreeWindAsset>();
+           LuaRegisterType<UnityEngine.TerrainTools.PaintContext>();
+           LuaRegisterType<UnityEngine.TerrainTools.TerrainBuiltinPaintMaterialPasses>();
+           LuaRegisterType<UnityEngine.TerrainTools.BrushTransform>();
+           LuaRegisterType<UnityEngine.Terrain.MaterialType>();
+           LuaRegisterType<UnityEngine.TerrainCallbacks.HeightmapChangedCallback>();
+           LuaRegisterType<UnityEngine.TerrainCallbacks.TextureChangedCallback>();
+           LuaRegisterType<UnityEngine.TerrainData.BoundaryValueType>();
+           LuaRegisterType<UnityEngine.TerrainTools.PaintContext.TerrainTile>();
+           LuaRegisterType<UnityEngine.TerrainTools.PaintContext.SplatmapUserData>();
+           
+
+            // Types from assembly: UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+
+           LuaRegisterType<UnityEngine.FFTWindow>();
+
+            // Types from assembly: UnityEngine.VideoModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+
+           LuaRegisterType<UnityEngine.Video.VideoClip>();
+           LuaRegisterType<UnityEngine.Video.VideoRenderMode>();
+           LuaRegisterType<UnityEngine.Video.Video3DLayout>();
+           LuaRegisterType<UnityEngine.Video.VideoTimeSource>();
+           LuaRegisterType<UnityEngine.Video.VideoTimeReference>();
+           LuaRegisterType<UnityEngine.Video.VideoSource>();
+           LuaRegisterType<UnityEngine.Video.VideoPlayer>();
+           LuaRegisterType<UnityEngine.Video.VideoPlayer.EventHandler>();
+           LuaRegisterType<UnityEngine.Video.VideoPlayer.ErrorEventHandler>();
+           LuaRegisterType<UnityEngine.Video.VideoPlayer.FrameReadyEventHandler>();
+           LuaRegisterType<UnityEngine.Video.VideoPlayer.TimeEventHandler>();
+
+
+            // Types from assembly: UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg(" UnityEngine.CoreModule");
+           LuaRegisterType<Unity.Jobs.IJob>();
+           LuaRegisterType<Unity.Jobs.IJobFor>();
+           LuaRegisterType<Unity.Jobs.IJobParallelFor>();
+           LuaRegisterType<Unity.Jobs.JobHandle>();
+           LuaRegisterType<Unity.Burst.BurstDiscardAttribute>();
+           LuaRegisterType<UnityEngine.PrimitiveType>();
+           LuaRegisterType<UnityEngine.Space>();
+           LuaRegisterType<UnityEngine.RuntimePlatform>();
+           LuaRegisterType<UnityEngine.SystemLanguage>();
+           LuaRegisterType<UnityEngine.LogType>();
+           LuaRegisterType<UnityEngine.SortingLayer>();
+           LuaRegisterType<UnityEngine.Keyframe>();
+           LuaRegisterType<UnityEngine.WrapMode>();
+           LuaRegisterType<UnityEngine.StackTraceLogType>();
+           LuaRegisterType<UnityEngine.BootConfigData>();
+           LuaRegisterType<UnityEngine.CachedAssetBundle>();
+           LuaRegisterType<UnityEngine.Cache>();
+           LuaRegisterType<UnityEngine.Caching>();
+           LuaRegisterType<UnityEngine.Camera>();
+           LuaRegisterType<UnityEngine.BoundingSphere>();
+           LuaRegisterType<UnityEngine.CullingGroupEvent>();
+           LuaRegisterType<UnityEngine.CullingGroup>();
+           LuaRegisterType<UnityEngine.IExposedPropertyTable>();
+           LuaRegisterType<UnityEngine.Bounds>();
+           LuaRegisterType<UnityEngine.BoundsInt>();
+           LuaRegisterType<UnityEngine.GeometryUtility>();
+           LuaRegisterType<UnityEngine.Plane>();
+           LuaRegisterType<UnityEngine.Ray>();
+           LuaRegisterType<UnityEngine.Rect>();
+           LuaRegisterType<UnityEngine.RectInt>();
+           LuaRegisterType<UnityEngine.RectOffset>();
+           LuaRegisterType<UnityEngine.DynamicGI>();
+           LuaRegisterType<UnityEngine.LightingSettings>();
+           LuaRegisterType<UnityEngine.BeforeRenderOrderAttribute>();
+           LuaRegisterType<UnityEngine.FullScreenMode>();
+           LuaRegisterType<UnityEngine.Screen>();
+           LuaRegisterType<UnityEngine.GL>();
+           LuaRegisterType<UnityEngine.LightmapData>();
+           LuaRegisterType<UnityEngine.LightmapSettings>();
+           LuaRegisterType<UnityEngine.LightProbes>();
+           LuaRegisterType<UnityEngine.RenderTargetSetup>();
+           LuaRegisterType<UnityEngine.ImageEffectAllowedInSceneView>();
+           LuaRegisterType<UnityEngine.LightmapsModeLegacy>();
+           LuaRegisterType<UnityEngine.TrailRenderer>();
+           LuaRegisterType<UnityEngine.LineRenderer>();
+           LuaRegisterType<UnityEngine.MaterialPropertyBlock>();
+           LuaRegisterType<UnityEngine.Renderer>();
+           LuaRegisterType<UnityEngine.RenderSettings>();
+           LuaRegisterType<UnityEngine.Shader>();
+           
+           LuaRegisterType<UnityEngine.Flare>();
+           LuaRegisterType<UnityEngine.LightBakingOutput>();
+           LuaRegisterType<UnityEngine.LightShadowCasterMode>();
+           LuaRegisterType<UnityEngine.Light>();
+           LuaRegisterType<UnityEngine.Skybox>();
+           LuaRegisterType<UnityEngine.MeshFilter>();
+           LuaRegisterType<UnityEngine.TransparencySortMode>();
+           LuaRegisterType<UnityEngine.StereoTargetEyeMask>();
+           LuaRegisterType<UnityEngine.CameraType>();
+           LuaRegisterType<UnityEngine.LightType>();
+           LuaRegisterType<UnityEngine.LightShape>();
+           LuaRegisterType<UnityEngine.LightRenderMode>();
+           LuaRegisterType<UnityEngine.LightShadows>();
+           LuaRegisterType<UnityEngine.FogMode>();
+           LuaRegisterType<UnityEngine.LightmapBakeType>();
+           LuaRegisterType<UnityEngine.MixedLightingMode>();
+           LuaRegisterType<UnityEngine.ShadowmaskMode>();
+           LuaRegisterType<UnityEngine.ShadowObjectsFilter>();
+           LuaRegisterType<UnityEngine.CameraClearFlags>();
+           LuaRegisterType<UnityEngine.DepthTextureMode>();
+           LuaRegisterType<UnityEngine.AnisotropicFiltering>();
+           LuaRegisterType<UnityEngine.MeshTopology>();
+           LuaRegisterType<UnityEngine.SkinQuality>();
+           LuaRegisterType<UnityEngine.ColorSpace>();
+           LuaRegisterType<UnityEngine.FilterMode>();
+           LuaRegisterType<UnityEngine.TextureWrapMode>();
+           LuaRegisterType<UnityEngine.TextureFormat>();
+           LuaRegisterType<UnityEngine.CubemapFace>();
+           LuaRegisterType<UnityEngine.RenderTextureFormat>();
+           LuaRegisterType<UnityEngine.VRTextureUsage>();
+           LuaRegisterType<UnityEngine.RenderTextureReadWrite>();
+           LuaRegisterType<UnityEngine.RenderTextureMemoryless>();
+           LuaRegisterType<UnityEngine.LightmapsMode>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume>();
+           LuaRegisterType<UnityEngine.LineAlignment>();
+           LuaRegisterType<UnityEngine.SkinnedMeshRenderer>();
+           LuaRegisterType<UnityEngine.MeshRenderer>();
+           LuaRegisterType<UnityEngine.LightProbeGroup>();
+           LuaRegisterType<UnityEngine.LODFadeMode>();
+           LuaRegisterType<UnityEngine.LOD>();
+           LuaRegisterType<UnityEngine.LODGroup>();
+           LuaRegisterType<UnityEngine.Mesh>();
+           LuaRegisterType<UnityEngine.BoneWeight>();
+           LuaRegisterType<UnityEngine.BoneWeight1>();
+           LuaRegisterType<UnityEngine.CombineInstance>();
+           LuaRegisterType<UnityEngine.Texture>();
+           LuaRegisterType<UnityEngine.Texture2D>();
+           LuaRegisterType<UnityEngine.Cubemap>();
+           LuaRegisterType<UnityEngine.Texture3D>();
+           LuaRegisterType<UnityEngine.Texture2DArray>();
+           LuaRegisterType<UnityEngine.CubemapArray>();
+           LuaRegisterType<UnityEngine.RenderTexture>();
+           LuaRegisterType<UnityEngine.CustomRenderTexture>();
+           LuaRegisterType<UnityEngine.RenderTextureDescriptor>();
+           LuaRegisterType<UnityEngine.Hash128>();
+           LuaRegisterType<UnityEngine.CursorMode>();
+           LuaRegisterType<UnityEngine.CursorLockMode>();
+           LuaRegisterType<UnityEngine.Cursor>();
+           LuaRegisterType<UnityEngine.KeyCode>();
+           LuaRegisterType<UnityEngine.ILogger>();
+           LuaRegisterType<UnityEngine.ILogHandler>();
+           LuaRegisterType<UnityEngine.Logger>();
+           LuaRegisterType<UnityEngine.UnityLogWriter>();
+           LuaRegisterType<UnityEngine.Color>();
+           LuaRegisterType<UnityEngine.Color32>();
+           LuaRegisterType<UnityEngine.ColorUtility>();
+           LuaRegisterType<UnityEngine.GradientColorKey>();
+           LuaRegisterType<UnityEngine.GradientAlphaKey>();
+           LuaRegisterType<UnityEngine.Gradient>();
+           LuaRegisterType<UnityEngine.FrustumPlanes>();
+           LuaRegisterType<UnityEngine.Matrix4x4>();
+           LuaRegisterType<UnityEngine.Vector3>();
+           LuaRegisterType<UnityEngine.Mathf>();
+           LuaRegisterType<UnityEngine.Vector2>();
+           LuaRegisterType<UnityEngine.Vector2Int>();
+           LuaRegisterType<UnityEngine.Vector3Int>();
+           LuaRegisterType<UnityEngine.Vector4>();
+           LuaRegisterType<UnityEngine.PlayerPrefs>();
+           LuaRegisterType<UnityEngine.PropertyAttribute>();
+           LuaRegisterType<UnityEngine.ContextMenuItemAttribute>();
+           LuaRegisterType<UnityEngine.InspectorNameAttribute>();
+           LuaRegisterType<UnityEngine.TooltipAttribute>();
+           LuaRegisterType<UnityEngine.SpaceAttribute>();
+           LuaRegisterType<UnityEngine.HeaderAttribute>();
+           LuaRegisterType<UnityEngine.RangeAttribute>();
+           LuaRegisterType<UnityEngine.MinAttribute>();
+           LuaRegisterType<UnityEngine.MultilineAttribute>();
+           LuaRegisterType<UnityEngine.TextAreaAttribute>();
+           LuaRegisterType<UnityEngine.ColorUsageAttribute>();
+           LuaRegisterType<UnityEngine.GradientUsageAttribute>();
+           LuaRegisterType<UnityEngine.DelayedAttribute>();
+           LuaRegisterType<UnityEngine.NonReorderableAttribute>();
+           LuaRegisterType<UnityEngine.PropertyNameUtils>();
+           LuaRegisterType<UnityEngine.PropertyName>();
+           LuaRegisterType<UnityEngine.ResourceRequest>();
+           LuaRegisterType<UnityEngine.ResourcesAPI>();
+           LuaRegisterType<UnityEngine.Resources>();
+           LuaRegisterType<UnityEngine.AttributeHelperEngine>();
+           LuaRegisterType<UnityEngine.DisallowMultipleComponent>();
+           LuaRegisterType<UnityEngine.RequireComponent>();
+           LuaRegisterType<UnityEngine.AddComponentMenu>();
+           LuaRegisterType<UnityEngine.CreateAssetMenuAttribute>();
+           LuaRegisterType<UnityEngine.ContextMenu>();
+           LuaRegisterType<UnityEngine.HideInInspector>();
+           LuaRegisterType<UnityEngine.HelpURLAttribute>();
+           LuaRegisterType<UnityEngine.AssemblyIsEditorAssembly>();
+           LuaRegisterType<UnityEngine.ExcludeFromPresetAttribute>();
+           LuaRegisterType<UnityEngine.Component>();
+           LuaRegisterType<UnityEngine.Coroutine>();
+           LuaRegisterType<UnityEngine.SetupCoroutine>();
+           LuaRegisterType<UnityEngine.ExcludeFromObjectFactoryAttribute>();
+           LuaRegisterType<UnityEngine.FailedToLoadScriptObject>();
+           LuaRegisterType<UnityEngine.GameObject>();
+           LuaRegisterType<UnityEngine.LayerMask>();
+           LuaRegisterType<UnityEngine.NoAllocHelpers>();
+           LuaRegisterType<UnityEngine.RangeInt>();
+           LuaRegisterType<UnityEngine.RuntimeInitializeLoadType>();
+           LuaRegisterType<UnityEngine.RuntimeInitializeOnLoadMethodAttribute>();
+           LuaRegisterType<UnityEngine.ScriptableObject>();
+           LuaRegisterType<UnityEngine.ScriptingRuntime>();
+           LuaRegisterType<UnityEngine.ScriptingUtility>();
+           LuaRegisterType<UnityEngine.TextAsset>();
+           LuaRegisterType<UnityEngine.TrackedReference>();
+           LuaRegisterType<UnityEngine.HideFlags>();
+           LuaRegisterType<UnityEngine.Object>();
+           LuaRegisterType<UnityEngine.WaitForEndOfFrame>();
+           LuaRegisterType<UnityEngine.WaitForFixedUpdate>();
+           LuaRegisterType<UnityEngine.WaitForSeconds>();
+           LuaRegisterType<UnityEngine.WaitForSecondsRealtime>();
+           LuaRegisterType<UnityEngine.WaitUntil>();
+           LuaRegisterType<UnityEngine.WaitWhile>();
+           LuaRegisterType<UnityEngine.SerializeField>();
+           LuaRegisterType<UnityEngine.SerializeReference>();
+           LuaRegisterType<UnityEngine.ComputeShader>();
+           LuaRegisterType<UnityEngine.DisableBatchingType>();
+           LuaRegisterType<UnityEngine.LowerResBlitTexture>();
+           LuaRegisterType<UnityEngine.PreloadData>();
+           LuaRegisterType<UnityEngine.OperatingSystemFamily>();
+           LuaRegisterType<UnityEngine.DeviceType>();
+           LuaRegisterType<UnityEngine.SystemClock>();
+           LuaRegisterType<UnityEngine.Time>();
+           LuaRegisterType<UnityEngine.TouchScreenKeyboard>();
+           LuaRegisterType<UnityEngine.TouchScreenKeyboardType>();
+           LuaRegisterType<UnityEngine.Pose>();
+           LuaRegisterType<UnityEngine.DrivenTransformProperties>();
+           LuaRegisterType<UnityEngine.DrivenRectTransformTracker>();
+           LuaRegisterType<UnityEngine.RectTransform>();
+           LuaRegisterType<UnityEngine.Transform>();
+           LuaRegisterType<UnityEngine.SpriteDrawMode>();
+           LuaRegisterType<UnityEngine.SpriteTileMode>();
+           LuaRegisterType<UnityEngine.SpriteRenderer>();
+           LuaRegisterType<UnityEngine.SpriteMeshType>();
+           LuaRegisterType<UnityEngine.SpritePackingMode>();
+           LuaRegisterType<UnityEngine.SpriteSortPoint>();
+           LuaRegisterType<UnityEngine.Sprite>();
+           LuaRegisterType<UnityEngine._Scripting.APIUpdating.APIUpdaterRuntimeHelpers>();
+           LuaRegisterType<UnityEngine.Sprites.DataUtility>();
+           LuaRegisterType<UnityEngine.U2D.Light2DBase>();
+           LuaRegisterType<UnityEngine.U2D.SpriteBone>();
+           LuaRegisterType<UnityEngine.U2D.SpriteChannelInfo>();
+           LuaRegisterType<UnityEngine.U2D.SpriteAtlasManager>();
+           LuaRegisterType<UnityEngine.U2D.SpriteAtlas>();
+           LuaRegisterType<UnityEngine.Profiling.Recorder>();
+           LuaRegisterType<UnityEngine.Profiling.Sampler>();
+           LuaRegisterType<UnityEngine.Profiling.CustomSampler>();
+           LuaRegisterType<UnityEngine.Jobs.IJobParallelForTransform>();
+           LuaRegisterType<UnityEngine.Jobs.TransformAccess>();
+           LuaRegisterType<UnityEngine.Jobs.TransformAccessArray>();
+           LuaRegisterType<UnityEngine.Events.PersistentListenerMode>();
+           LuaRegisterType<UnityEngine.Events.UnityEventTools>();
+           LuaRegisterType<UnityEngine.Events.ArgumentCache>();
+           LuaRegisterType<UnityEngine.Events.BaseInvokableCall>();
+           LuaRegisterType<UnityEngine.Events.InvokableCall>();
+           LuaRegisterType<UnityEngine.Events.UnityEventCallState>();
+           LuaRegisterType<UnityEngine.Events.PersistentCall>();
+           LuaRegisterType<UnityEngine.Events.PersistentCallGroup>();
+           LuaRegisterType<UnityEngine.Events.InvokableCallList>();
+           LuaRegisterType<UnityEngine.Events.UnityEventBase>();
+           LuaRegisterType<UnityEngine.Events.UnityEvent>();
+           LuaRegisterType<UnityEngine.Scripting.AlwaysLinkAssemblyAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.PreserveAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.RequireAttributeUsagesAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.APIUpdating.MovedFromAttributeData>();
+           LuaRegisterType<UnityEngine.Scripting.APIUpdating.MovedFromAttribute>();
+           LuaRegisterType<UnityEngine.SceneManagement.Scene>();
+           LuaRegisterType<UnityEngine.SceneManagement.SceneManagerAPI>();
+           LuaRegisterType<UnityEngine.SceneManagement.SceneManager>();
+           LuaRegisterType<UnityEngine.SceneManagement.LoadSceneMode>();
+           LuaRegisterType<UnityEngine.SceneManagement.LocalPhysicsMode>();
+           LuaRegisterType<UnityEngine.SceneManagement.LoadSceneParameters>();
+           LuaRegisterType<UnityEngine.SceneManagement.CreateSceneParameters>();
+           LuaRegisterType<UnityEngine.Playables.FrameData>();
+           LuaRegisterType<UnityEngine.Playables.FrameRate>();
+           LuaRegisterType<UnityEngine.Playables.IPlayable>();
+           LuaRegisterType<UnityEngine.Playables.IPlayableOutput>();
+           LuaRegisterType<UnityEngine.Playables.DirectorWrapMode>();
+           LuaRegisterType<UnityEngine.Playables.Playable>();
+           LuaRegisterType<UnityEngine.Playables.IPlayableAsset>();
+           LuaRegisterType<UnityEngine.Playables.PlayableAsset>();
+           LuaRegisterType<UnityEngine.Playables.PlayableBinding>();
+           LuaRegisterType<UnityEngine.Playables.PlayableTraversalMode>();
+           LuaRegisterType<UnityEngine.Playables.DirectorUpdateMode>();
+           LuaRegisterType<UnityEngine.Playables.PlayableGraph>();
+           LuaRegisterType<UnityEngine.Playables.PlayState>();
+           LuaRegisterType<UnityEngine.Playables.PlayableHandle>();
+           LuaRegisterType<UnityEngine.Playables.PlayableOutput>();
+           LuaRegisterType<UnityEngine.Playables.PlayableOutputHandle>();
+           LuaRegisterType<UnityEngine.Playables.ScriptPlayableOutput>();
+           LuaRegisterType<System.Runtime.CompilerServices.IsUnmanagedAttribute>();
+           LuaRegisterType<Unity.Baselib.ErrorState>();
+           LuaRegisterType<Unity.Burst.BurstAuthorizedExternalMethodAttribute>();
+           LuaRegisterType<UnityEngine.WeightedMode>();
+           LuaRegisterType<UnityEngine.UnityEventQueueSystem>();
+           LuaRegisterType<UnityEngine.LineUtility>();
+           LuaRegisterType<UnityEngine.MeshSubsetCombineUtility>();
+           LuaRegisterType<UnityEngine.StaticBatchingUtility>();
+           LuaRegisterType<UnityEngine.Ping>();
+           LuaRegisterType<UnityEngine.SparseTexture>();
+           LuaRegisterType<UnityEngine.LensFlare>();
+           LuaRegisterType<UnityEngine.Projector>();
+           LuaRegisterType<UnityEngine.Halo>();
+           LuaRegisterType<UnityEngine.ImageEffectTransformsToLDR>();
+           LuaRegisterType<UnityEngine.ImageEffectOpaque>();
+           LuaRegisterType<UnityEngine.ImageEffectAfterScale>();
+           LuaRegisterType<UnityEngine.StaticBatchingHelper>();
+           LuaRegisterType<UnityEngine.BillboardAsset>();
+           LuaRegisterType<UnityEngine.BillboardRenderer>();
+           LuaRegisterType<UnityEngine.ReceiveGI>();
+           LuaRegisterType<UnityEngine.QualityLevel>();
+           LuaRegisterType<UnityEngine.ShadowQuality>();
+           LuaRegisterType<UnityEngine.TexGenMode>();
+           LuaRegisterType<UnityEngine.BlendWeights>();
+           LuaRegisterType<UnityEngine.SkinWeights>();
+           LuaRegisterType<UnityEngine.ColorGamut>();
+           LuaRegisterType<UnityEngine.NPOTSupport>();
+           LuaRegisterType<UnityEngine.CustomRenderTextureUpdateMode>();
+           LuaRegisterType<UnityEngine.CustomRenderTextureUpdateZoneSpace>();
+           LuaRegisterType<UnityEngine.SleepTimeout>();
+           LuaRegisterType<UnityEngine.HDROutputSettings>();
+           LuaRegisterType<UnityEngine.BatteryStatus>();
+           LuaRegisterType<UnityEngine.FlareLayer>();
+           LuaRegisterType<UnityEngine.SnapAxis>();
+           LuaRegisterType<UnityEngine.SnapAxisFilter>();
+           LuaRegisterType<UnityEngine.Ray2D>();
+           LuaRegisterType<UnityEngine.DrivenPropertyManager>();
+           LuaRegisterType<UnityEngine.FullScreenMovieControlMode>();
+           LuaRegisterType<UnityEngine.FullScreenMovieScalingMode>();
+           LuaRegisterType<UnityEngine.AndroidActivityIndicatorStyle>();
+           LuaRegisterType<UnityEngine.Handheld>();
+           LuaRegisterType<UnityEngine.EnumInfo>();
+           LuaRegisterType<UnityEngine.GradientMode>();
+           LuaRegisterType<UnityEngine.IconAttribute>();
+           LuaRegisterType<UnityEngine.iPhoneSettings>();
+           LuaRegisterType<UnityEngine.SpriteAlignment>();
+           LuaRegisterType<UnityEngine.U2D.Light2DType>();
+           LuaRegisterType<UnityEngine.Scripting.RequiredMemberAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.RequireDerivedAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.RequireImplementorsAttribute>();
+           LuaRegisterType<UnityEngine.Scripting.RequiredInterfaceAttribute>();
+           LuaRegisterType<UnityEngine.SearchService.ObjectSelectorHandlerWithLabelsAttribute>();
+           LuaRegisterType<UnityEngine.SearchService.ObjectSelectorHandlerWithTagsAttribute>();
+           LuaRegisterType<UnityEngine.Search.SearchViewFlags>();
+           LuaRegisterType<UnityEngine.Search.SearchContextAttribute>();
+           LuaRegisterType<UnityEngine.Playables.DataStreamType>();
+           LuaRegisterType<UnityEngine.Lumin.UsesLuminPrivilegeAttribute>();
+           LuaRegisterType<UnityEngine.Lumin.UsesLuminPlatformLevelAttribute>();
+           LuaRegisterType<UnityEngine.Camera.GateFitMode>();
+           LuaRegisterType<UnityEngine.Camera.GateFitParameters>();
+           LuaRegisterType<UnityEngine.Camera.StereoscopicEye>();
+           LuaRegisterType<UnityEngine.Camera.MonoOrStereoscopicEye>();
+           LuaRegisterType<UnityEngine.Camera.SceneViewFilterMode>();
+           LuaRegisterType<UnityEngine.Camera.RenderRequestMode>();
+           LuaRegisterType<UnityEngine.Camera.RenderRequestOutputSpace>();
+           LuaRegisterType<UnityEngine.Camera.RenderRequest>();
+           LuaRegisterType<UnityEngine.Camera.CameraCallback>();
+           LuaRegisterType<UnityEngine.Camera.FieldOfViewAxis>();
+           LuaRegisterType<UnityEngine.CullingGroup.StateChanged>();
+           LuaRegisterType<UnityEngine.BeforeRenderHelper.OrderBlock>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume.BoundingBoxMode>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume.RefreshMode>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume.QualityMode>();
+           LuaRegisterType<UnityEngine.LightProbeProxyVolume.DataFormat>();
+           LuaRegisterType<UnityEngine.Mesh.MeshData>();
+           LuaRegisterType<UnityEngine.Mesh.MeshDataArray>();
+           LuaRegisterType<UnityEngine.Texture2D.EXRFlags>();
+           LuaRegisterType<UnityEngine.SpookyHash.U>();
+           LuaRegisterType<UnityEngine.Random.State>();
+           LuaRegisterType<UnityEngine.ScriptingUtility.TestClass>();
+           LuaRegisterType<UnityEngine.TouchScreenKeyboard.Status>();
+           LuaRegisterType<UnityEngine.TouchScreenKeyboard.Android>();
+           LuaRegisterType<UnityEngine.RectTransform.Edge>();
+           LuaRegisterType<UnityEngine.RectTransform.Axis>();
+           LuaRegisterType<UnityEngine.RectTransform.ReapplyDrivenProperties>();
+           LuaRegisterType<UnityEngine.Transform.Enumerator>();
+           LuaRegisterType<UnityEngine.SceneManagement.Scene.LoadingState>();
+
+
+            // Types from assembly: UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg(" UnityEngine");
+           LuaRegisterType<UnityEngine.BlendWeights>();
+           LuaRegisterType<UnityEngine.GUIText>();
+           LuaRegisterType<UnityEngine.GUITexture>();
+           LuaRegisterType<UnityEngine.GUIElement>();
+           LuaRegisterType<UnityEngine.GUILayer>();
+            //LuaRegisterType<UnityEngine.ProceduralMaterial>();
+            //LuaRegisterType<UnityEngine.ProceduralCacheSize>();
+            //LuaRegisterType<UnityEngine.ProceduralPropertyType>();
+            //LuaRegisterType<UnityEngine.ProceduralOutputType>();
+            //LuaRegisterType<UnityEngine.ProceduralTexture>();
+            //LuaRegisterType<UnityEngine.UIElements.IDataWatchHandle>();
+            //LuaRegisterType<UnityEngine.UIElements.IDataWatchService>();
+
+            // Types from assembly: Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("Unity.TextMeshPro");
+           LuaRegisterType<Il2CppTMPro.MaterialReferenceManager>();
+           LuaRegisterType<Il2CppTMPro.TMP_MaterialReference>();
+           LuaRegisterType<Il2CppTMPro.MaterialReference>();
+           LuaRegisterType<Il2CppTMPro.TextContainerAnchors>();
+           LuaRegisterType<Il2CppTMPro.TextContainer>();
+           LuaRegisterType<Il2CppTMPro.TextMeshPro>();
+           LuaRegisterType<Il2CppTMPro.TextMeshProUGUI>();
+           LuaRegisterType<Il2CppTMPro.Compute_DistanceTransform_EventTypes>();
+           LuaRegisterType<Il2CppTMPro.Compute_DT_EventArgs>();
+           LuaRegisterType<Il2CppTMPro.TMP_VertexDataUpdateFlags>();
+           LuaRegisterType<Il2CppTMPro.VertexGradient>();
+           LuaRegisterType<Il2CppTMPro.TMP_PageInfo>();
+           LuaRegisterType<Il2CppTMPro.TMP_LinkInfo>();
+           LuaRegisterType<Il2CppTMPro.TMP_WordInfo>();
+           LuaRegisterType<Il2CppTMPro.TMP_SpriteInfo>();
+           LuaRegisterType<Il2CppTMPro.Extents>();
+           LuaRegisterType<Il2CppTMPro.Mesh_Extents>();
+           LuaRegisterType<Il2CppTMPro.WordWrapState>();
+           LuaRegisterType<Il2CppTMPro.TagAttribute>();
+           LuaRegisterType<Il2CppTMPro.RichTextTagAttribute>();
+           LuaRegisterType<Il2CppTMPro.TMP_Asset>();
+           LuaRegisterType<Il2CppTMPro.TMP_Character>();
+           LuaRegisterType<Il2CppTMPro.TMP_Vertex>();
+           LuaRegisterType<Il2CppTMPro.TMP_Offset>();
+           LuaRegisterType<Il2CppTMPro.HighlightState>();
+           LuaRegisterType<Il2CppTMPro.TMP_CharacterInfo>();
+           LuaRegisterType<Il2CppTMPro.ColorMode>();
+           LuaRegisterType<Il2CppTMPro.TMP_ColorGradient>();
+           LuaRegisterType<Il2CppTMPro.ITweenValue>();
+           LuaRegisterType<Il2CppTMPro.ColorTween>();
+           LuaRegisterType<Il2CppTMPro.FloatTween>();
+           LuaRegisterType<Il2CppTMPro.TMP_Dropdown>();
+           LuaRegisterType<Il2CppTMPro.TMP_FontAsset>();
+           LuaRegisterType<Il2CppTMPro.FaceInfo_Legacy>();
+           LuaRegisterType<Il2CppTMPro.TMP_Glyph>();
+           LuaRegisterType<Il2CppTMPro.TMP_FontWeightPair>();
+           LuaRegisterType<Il2CppTMPro.KerningPairKey>();
+           LuaRegisterType<Il2CppTMPro.GlyphValueRecord_Legacy>();
+           LuaRegisterType<Il2CppTMPro.KerningPair>();
+           LuaRegisterType<Il2CppTMPro.KerningTable>();
+           LuaRegisterType<Il2CppTMPro.TMP_FontAssetUtilities>();
+           LuaRegisterType<Il2CppTMPro.FontFeatureLookupFlags>();
+           LuaRegisterType<Il2CppTMPro.TMP_GlyphValueRecord>();
+           LuaRegisterType<Il2CppTMPro.TMP_GlyphAdjustmentRecord>();
+           LuaRegisterType<Il2CppTMPro.TMP_GlyphPairAdjustmentRecord>();
+           LuaRegisterType<Il2CppTMPro.GlyphPairKey>();
+           LuaRegisterType<Il2CppTMPro.TMP_FontFeatureTable>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputValidator>();
+           LuaRegisterType<Il2CppTMPro.TMP_LineInfo>();
+           LuaRegisterType<Il2CppTMPro.VertexSortingOrder>();
+           LuaRegisterType<Il2CppTMPro.TMP_MeshInfo>();
+           LuaRegisterType<Il2CppTMPro.TMP_ResourceManager>();
+           LuaRegisterType<Il2CppTMPro.MarkupTag>();
+           LuaRegisterType<Il2CppTMPro.TagValueType>();
+           LuaRegisterType<Il2CppTMPro.TagUnitType>();
+           LuaRegisterType<Il2CppTMPro.TMP_ScrollbarEventHandler>();
+           LuaRegisterType<Il2CppTMPro.TMP_Settings>();
+           LuaRegisterType<Il2CppTMPro.TMP_Sprite>();
+           LuaRegisterType<Il2CppTMPro.TMP_SpriteAnimator>();
+           LuaRegisterType<Il2CppTMPro.TMP_SpriteAsset>();
+           LuaRegisterType<Il2CppTMPro.TMP_SpriteCharacter>();
+           LuaRegisterType<Il2CppTMPro.TMP_SpriteGlyph>();
+           LuaRegisterType<Il2CppTMPro.TMP_Style>();
+           LuaRegisterType<Il2CppTMPro.TMP_StyleSheet>();
+           LuaRegisterType<Il2CppTMPro.TMP_SubMesh>();
+           LuaRegisterType<Il2CppTMPro.TMP_SubMeshUI>();
+           LuaRegisterType<Il2CppTMPro.ITextElement>();
+           LuaRegisterType<Il2CppTMPro.TextRenderFlags>();
+           LuaRegisterType<Il2CppTMPro.TMP_TextElementType>();
+           LuaRegisterType<Il2CppTMPro.MaskingTypes>();
+           LuaRegisterType<Il2CppTMPro.TextOverflowModes>();
+           LuaRegisterType<Il2CppTMPro.MaskingOffsetMode>();
+           LuaRegisterType<Il2CppTMPro.FontStyles>();
+           LuaRegisterType<Il2CppTMPro.FontWeight>();
+           LuaRegisterType<Il2CppTMPro.TMP_Text>();
+           LuaRegisterType<Il2CppTMPro.TextElementType>();
+           LuaRegisterType<Il2CppTMPro.TMP_TextElement>();
+           LuaRegisterType<Il2CppTMPro.TMP_TextElement_Legacy>();
+           LuaRegisterType<Il2CppTMPro.TMP_TextInfo>();
+           LuaRegisterType<Il2CppTMPro.TMP_TextParsingUtilities>();
+           LuaRegisterType<Il2CppTMPro.TMP_FontStyleStack>();
+           LuaRegisterType<Il2CppTMPro.CaretInfo>();
+           LuaRegisterType<Il2CppTMPro.TMP_UpdateManager>();
+           LuaRegisterType<Il2CppTMPro.TMP_UpdateRegistry>();
+           LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.SpriteAssetImportFormats>();
+           LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray>();
+           LuaRegisterType<Il2CppTMPro.TextMeshProUGUI._DelayedGraphicRebuild_d__18>();
+           LuaRegisterType<Il2CppTMPro.TextMeshProUGUI._DelayedMaterialRebuild_d__19>();
+           LuaRegisterType<Il2CppTMPro.ColorTween.ColorTweenMode>();
+           LuaRegisterType<Il2CppTMPro.ColorTween.ColorTweenCallback>();
+           LuaRegisterType<Il2CppTMPro.FloatTween.FloatTweenCallback>();
+           LuaRegisterType<Il2CppTMPro.TMP_DefaultControls.Resources>();
+           LuaRegisterType<Il2CppTMPro.TMP_Dropdown.DropdownItem>();
+           LuaRegisterType<Il2CppTMPro.TMP_Dropdown.DropdownEvent>();
+           LuaRegisterType<Il2CppTMPro.TMP_Dropdown._DelayedDestroyDropdownList_d__81>();
+           LuaRegisterType<Il2CppTMPro.TMP_FontAsset.__c>();
+           LuaRegisterType<Il2CppTMPro.KerningTable.__c>();
+           LuaRegisterType<Il2CppTMPro.TMP_FontFeatureTable.__c>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField.ContentType>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField.InputType>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField.OnValidateInput>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField.SubmitEvent>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField.OnChangeEvent>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField.TouchScreenKeyboardEvent>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField.EditState>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField._CaretBlink_d__276>();
+           LuaRegisterType<Il2CppTMPro.TMP_InputField._MouseDragOutsideRect_d__294>();
+           LuaRegisterType<Il2CppTMPro.TMP_MaterialManager.FallbackMaterial>();
+           LuaRegisterType<Il2CppTMPro.TMP_MaterialManager.MaskingMaterial>();
+           LuaRegisterType<Il2CppTMPro.TMP_Settings.LineBreakingTable>();
+           LuaRegisterType<Il2CppTMPro.TMP_SpriteAsset.__c>();
+           LuaRegisterType<Il2CppTMPro.TMP_Text.TextInputSources>();
+           LuaRegisterType<Il2CppTMPro.TMP_Text.UnicodeChar>();
+           LuaRegisterType<Il2CppTMPro.TMP_Text.SpecialCharacter>();
+           LuaRegisterType<Il2CppTMPro.TMP_Text.TextBackingContainer>();
+           LuaRegisterType<Il2CppTMPro.TMP_Text.__c>();
+           LuaRegisterType<Il2CppTMPro.TMP_TextUtilities.LineSegment>();
+           LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray.SpriteFrame>();
+           LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray.SpriteSize>();
+           LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray.Frame>();
+           LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray.Meta>();
+           LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray.SpriteDataObject>();
+
+            MelonLogger.Msg("SLZ");
+
+            // Types from assembly: Il2CppSLZ.Algorithms, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+
+           LuaRegisterType<Il2CppSLZ.Algorithms.Strings._Tokens_d__5>();
+
+            // Types from assembly: Il2CppSLZ.Algorithms.Unity, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+
+           LuaRegisterType<Il2CppSLZ.Algorithms.Unity.InterfaceAttribute>();
+
+            // Types from assembly: Il2CppSLZ.Marrow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+
+           LuaRegisterType<Il2Cpp.SpawnDeathEvent>();
+           LuaRegisterType<Il2Cpp.SanityTester>();
+           LuaRegisterType<Il2Cpp.TextureStreamingSummary>();
+           LuaRegisterType<Il2Cpp.IRecycleListenable>();
+           LuaRegisterType<Il2CppSteam.VR.Features.RefreshRateFeature>();
+           LuaRegisterType<Il2CppSteam.VR.Features.RefreshRateFeatureExample>();
+           LuaRegisterType<Il2CppSteam.VR.Features.Type_xrGetInstanceProcAddr>();
+           LuaRegisterType<Il2CppSLZ.EnumFlags>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FadeVolume>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerRemappingConfigurator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PolyEllipse>();
+           LuaRegisterType<Il2CppSLZ.MarrowEditor.OrderedContractResolver>();
+           LuaRegisterType<Il2CppSLZ.VFX.DecalProjector>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar>();
+           LuaRegisterType<Il2CppSLZ.Data.SurfaceData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.IResumePoint>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SaveFeatures>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RegisteredSaveableInfo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Saveable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AvatarGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BarrelGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BodyVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BoxGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MarrowEntityPoseDecorator>();
+          // LuaRegisterType<DataCardReference<EntityPose>>();
+           LuaRegisterType<Il2CppSLZ.Marrow.CylinderConstraintJoint>();
+           LuaRegisterType<Il2CppSLZ.Marrow.CylinderGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.DualHingeVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ForcePullGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GenericGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GripFlags>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandToGripState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Grip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Hand>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandgunVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandReciever>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HingeVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.IGrippable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InteractableHost>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InteractableHostManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventoryHand>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventoryHandReceiver>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventorySlot>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventorySlotReceiver>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LadderInfo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LadderPlatform>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LadderVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PumpShotgunVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RifleVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Servo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.IGunSlideable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SlideVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SlotContainer>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SlotType>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SphereGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.StaticSlideVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SwingVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.TargetGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VirtualControlerPayload>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VirtualControllerSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandGripPair>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VirtualController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VirtualControllerOverride>();
+           LuaRegisterType<Il2CppSLZ.Marrow.WeaponSlot>();
+           LuaRegisterType<Il2CppSLZ.Marrow.WorldGrip>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AlignPlug>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AmmoPlug>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AmmoSocket>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plug>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Socket>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MarrowSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LineVertex>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LineMesh>();
+           LuaRegisterType<Il2CppSLZ.Marrow.CameraSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PlayerTriggerProxy>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AmmoInventory>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Constrainer>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ConstraintTracker>();
+           LuaRegisterType<Il2CppSLZ.Marrow.DevManipulatorGun>();
+           LuaRegisterType<Il2CppSLZ.Marrow.FlyingGun>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GravityManipulatorJob>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GunManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventoryAmmoReceiver>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Magazine>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MagazineState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SlideMover>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BallisticPassthrough>();
+           LuaRegisterType<Il2CppSLZ.Marrow.FirearmCartridge>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ImpactProperties>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ImpactPropertiesManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Projectile>();
+           LuaRegisterType<Il2CppSLZ.Marrow.StabSlash>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AmmoGroup>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandPose>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Haptor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Health>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Inventory>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PlayerDamageReceiver>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AnimInputRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ArtRig>();
+            MelonLogger.Msg("CUT 1");
+           LuaRegisterType<Il2CppSLZ.Marrow.BaseController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ControllerRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GameWorldSkeletonRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HeptaRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InterpRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MirrorControllerRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.OpenController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.OpenControllerRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysicsRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysSoftBody>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysTorso>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RemapRig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Rig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RigWeights>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BodyPose>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RigManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SkeletonHand>();
+           LuaRegisterType<Il2CppSLZ.Marrow.TimeManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GravGunSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GunSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HeadSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ImpactSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ImpactSfxManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MotorSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PrismaticSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RollingSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ShellSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.WindBuffetSFX>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utils>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Atv>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Seat>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ObjectDestructible>();
+           LuaRegisterType<Il2CppSLZ.Marrow.DestructableLootSpawnEvent>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ParticleSpread>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ParticleSpreadManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ParticleTint>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SpawnFragment>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SpawnFragmentArray>();
+           LuaRegisterType<Il2CppSLZ.Marrow.TextureArrayApplicator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandPoseAnimator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Mirror>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysGrounder>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysHand>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysLimb>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PlayerAvatarArt>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RealHeptaAvatar>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SLZ_Body>();
+           LuaRegisterType<Il2CppSLZ.Marrow.TestContactMod>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VFX.RBInfo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VFX.VFXPlugin>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ActiveZoneState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.InactiveObjectManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.InactiveStates>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.InactiveStatus>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ISpawnListenable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.IZoneEntityListenable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.IZoneBodyListenable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.IZoneLinkListenable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.IZoneLinkPrimaryListenable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.IZoneLinkSecondaryListenable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.RecycleDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.SpawnDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.Zone>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneCuller>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.CullerData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneCullManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneGunMode>();
+            MelonLogger.Msg("CUT 1.5");
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneGun>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.CrateSpawnSequencer>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.RandomizeCrate>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.SceneChunk>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.SpawnerToggle>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.SpawnForce>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.Zone3dSound>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneAggro>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneAmbience>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneChunkLoader>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneEnabler>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneEvents>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneItem>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneLight>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneLinkEvents>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneLinkItem>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneLoadLevel>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneMusic>();
+           
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneManagerPlugin>();
+            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateSpawner>();
+            //  MelonLogger.Msg("CUT 1.6");
+            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateQuery>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateSpawner>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.OnSpawnEvent>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateSpawnerGrid>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowQuery>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.PalletPacker>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.ICrateReference>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateReference>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.GenericCrateReference>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.GameObjectCrateReference>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.SpawnableCrateReference>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AvatarCrateReference>();
+            // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.LevelCrateReference>();
+            //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.VFXCrateReference>();
+            //   LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.DataCardReference>();
+            //   LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MonoDiscReference>();
+            //   LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.PalletReference>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.ScannableReference>();
+
+            /*
+           //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse>();
+          // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Barcode>();
+          // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.ICrate>();
+          // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Crate>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AvatarCrate>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.GameObjectCrate>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.LevelCrate>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.SpawnableCrate>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.VFXCrate>();
             */
+            //   LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.DataCard>();
+            MelonLogger.Msg("CUT 2");
+          // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CampaignData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.EntityPose>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Fixture>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MonoDisc>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MonoMovie>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.SoundFx>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.SurfaceDataCard>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowGameObject>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowMesh>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowTexture>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowTexture2D>();
+        //   LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowScene>();
+        //   LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowMonoScript>();
+           //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.PackedAsset>();
+           //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.PackedSubAsset>();
+          // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Pallet>();
+          // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.PalletManifest>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.RuntimePallet>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.IReadOnlyScannable>();
+           //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.IScannable>();
+          // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.IPackedAssets>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Scannable>();
+            MelonLogger.Msg("CUT 3");
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.TagList>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.ITaggable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.TagQuery>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.EdgeType>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.ValueType>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.EdgeDetector>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.AddNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.BaseNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.ButtonNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.CounterNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.DivideNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.EqualNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.GreaterThanEqualNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.GreaterThanNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.LessThanEqualNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.LessThanNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.LeverNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.MaxNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.MemoryNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.MinNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.MultiplyNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.PassthroughNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.RatchetNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.RemapNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.SequencerNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.SliderNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.SubtractNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.ToggleButtonNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.ToggleNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.XorNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.DamageVolume>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.EventAdapter>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.LegacySoundPlayer>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.LinearJoint>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.MaterialSwitcher>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.RotatingJoint>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.TextAdapter>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.ToneGenerator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.PowerSource>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.TransformSensor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicSpawnExport>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicSpawnImport>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicSpawnInput>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicSpawnOutput>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicPlugin>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicToolSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicIcon>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.IMarrowPlugin>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.IMarrowPluginRunCallbacks>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.IMarrowPluginEditorCallbacks>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.IMarrowPluginLevelCallbacks>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPluginAttribute>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPluginRegisterMethodAttribute>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPluginWrapper>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPluginInfo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.Tests.MarrowTestMarrowPluginAttribute>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.IChunkLoadable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.PlayerMarker>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneBootstrapper>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.ChunkBatch>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneLoader>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneLoadQueue>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneStreamingManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.StreamStatus>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.BaseEnemyConfig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.BreakJointOnPuppet>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.JointBreakBroadcaster>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.Muscle>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.MuscleHit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PID_Controller>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PressureSensor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMaster>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.MuscleRemoveMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMasterHumanoidConfig>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMasterSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.SkinnedBoneRebind>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.Weight>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.AssetSpawner>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.DespawnDelay>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.IPoolable>();
+            MelonLogger.Msg("CUT 4");
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.Pool>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.Poolee>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.SpawnEvents>();
+           //LuaRegisterType<Il2CppSLZ.Marrow.Pool.SpawnPolicy>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Pool.VFXSpawnPolicy>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Authenticator>();
+            MelonLogger.Msg("CUT 4.1");
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.AuthenticatorDock>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.AuthenticatorDockDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Battery>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.BatteryHolder>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.BatteryHolderDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.IPlugable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.ISocketable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Plug>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Socket>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco>();
+            MelonLogger.Msg("CUT 4.5");
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowPreFixedUpdate>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowPostFixedUpdate>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowEndFrame>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowPlayerLoop>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MeshCroncher>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.ObjectCleanupEvents>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.ObjectCleanupVolume>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.ReadOnlyAttribute>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.SerializableType>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.SimpleTransform>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.TextureStreamManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.UtilitySpawnables>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.SceneExportTable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.ExportTable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.LateReference>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Input.InputSubsystemManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Input.MeshSubsystemManager>();
+         //  LuaRegisterType<Il2CppSLZ.Marrow.Input.OpenXRInputManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Input.XRApi>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Input.FullBodyBone>();
+   
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.AttackType>();
+            MelonLogger.Msg("CUT 5");
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.CartridgeData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.ConfigurableJointInfo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.CurveData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.EnemyPoseData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.HandPoseData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.JointDriveExt>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.LootItem>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.LootTableData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.MagazineData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.Weight>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.VRPlatform>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.ProjectileData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.RigidbodyInfo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.SoftJointLimitExt>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.SoftJointLimitSpringExt>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.Spawnable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.VFXSpawnable>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.SpawnPolicyData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.VFXSpawnPolicyData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.DecalAtlasData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Console.TokenParseContext>();
+            MelonLogger.Msg("CUT 5.1");
+           LuaRegisterType<Il2CppSLZ.Marrow.Combat.Attack>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Combat.IAttackReceiver>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Combat.PosespaceImpactManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Combat.VisualDamageController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.Actuator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AngularVelocityActuator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AngularXDriver>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.EventActuator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.LinearXDriver>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.MaterialSwitchActuator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ActuatorSocket>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.Circuit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ActuatorSocketDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ButtonDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.SwitchDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ExternalActuator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ExternalCircuit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AddCircuit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.FlipflopCircuit>();
+            MelonLogger.Msg("CUT 5.15");
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.MultiplyCircuit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.RemapCircuit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ValueCircuit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.XorCircuit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AngularXSensor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AngularYSensor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AngularZSensor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ButtonController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.CircuitSocket>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.HingeController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.LinearXSensor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.SliderController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ZoneCircuit>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.BillOfMaterials>();
+           //LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.KeyedComponents>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.IBillOfMaterials>();
+           //LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.Blueprint>();
+            MelonLogger.Msg("CUT 5.5");
+           LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.SpawnData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.BlueprintSpawner>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.VoidLogicEdge>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.VoidLogicPort>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.AIBrain>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.AIManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.Encounter>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.EncounterMonitor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.RoamArea>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnAgro>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnAISettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnGroup>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.TriggerRefProxy>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FadeVolume._FadeOverTime_d__9>();
+           LuaRegisterType<Il2CppSLZ.MarrowEditor.OrderedContractResolver.__c>();
+           LuaRegisterType<Il2CppSLZ.VFX.DecalProjector.decalBitField96>();
+           LuaRegisterType<Il2CppSLZ.VFX.DecalProjector.DecalVertex>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.Constants>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.ArtOffsets>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.PoseOffsets>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.HandSchematic>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.ArtTransforms>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.SoftEllipse>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.SoftBulge>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.__c>();
+           LuaRegisterType<Il2CppSLZ.Data.SurfaceData.MaterialLevel>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AvatarGrip.BodyRb>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AvatarGrip.HandToGenericGripState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BarrelGrip.HandToBarrelGripState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BarrelGrip.Caps>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BoxGrip.Faces>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BoxGrip.Edges>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BoxGrip.Corners>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BoxGrip.HandToBoxGripState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ForcePullGrip.GripState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ForcePullGrip._CoPull_d__26>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GenericGrip.HandToGenericGripState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Grip._CoSnatch_d__139>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Hand._CoDelayDestroyJoint_d__75>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Hand._CoJointBreakCooldown_d__101>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InteractableHost._CoCheckForSleep_d__79>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventorySlotReceiver._CoWaitLockMagazine_d__22>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventorySlotReceiver._SpawnInSlotAsync_d__33>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LadderInfo.Source>();
+           LuaRegisterType<Il2CppSLZ.Marrow.WorldGrip.HandToGenericGripState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AmmoSocket._ForceLoadAsync_d__24>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MarrowSettings._LoadSettings_d__80>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MarrowSettings._LoadRuntimeSettings_d__81>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MarrowSettings._PreloadAssets_d__84>();
+           LuaRegisterType<Il2CppSLZ.Marrow.MarrowSettings._Initialize_d__85>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health.PlayerDeathImminent>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health.PlayerDeath>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health.PlayerDamageReceived>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health._CoBrightenDeathSave_d__75>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health._CoRegenHealth_d__78>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health._CoLowPassFilter_d__79>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health._CoWaitAndReloadScene_d__83>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Player_Health._CoWaitAndGoToRespawn_d__84>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Constrainer.ConstraintMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GravityManipulatorJob.CalculateCurveJob>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GravityManipulatorJob.CalculateForwardsJob>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GravityManipulatorJob._CoAutoCollect_d__65>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GravityManipulatorJob._CoCleanupRbMap_d__102>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun.FireMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun.SlideStates>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun.HammerStates>();
+            MelonLogger.Msg("CUT 6");
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun.CartridgeStates>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun._InstantLoadAsync_d__98>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun._UpdateMagazineArt_d__101>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun._CoBlinkHighlight_d__106>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun._SpawnFlareAsync_d__121>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Gun._SpawnCartridge_d__134>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventoryAmmoReceiver._GrabMagAsync_d__20>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventoryAmmoReceiver._SwitchMagazineAsync_d__33>();
+           LuaRegisterType<Il2CppSLZ.Marrow.InventoryAmmoReceiver._SpawnAndPlaceMagazineAsync_d__34>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Magazine._InitializeAsync_d__22>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ImpactProperties.DecalType>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ImpactProperties._SetupSurfaceData_d__20>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ImpactProperties._ReceiveAttackAsync_d__22>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ProjectileEmitter._SpawnAsync_d__2>();
+           LuaRegisterType<Il2CppSLZ.Marrow.StabSlash.StabPoint>();
+           LuaRegisterType<Il2CppSLZ.Marrow.StabSlash.SlashBlade>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandPose.PoseDataGroup>();
+           LuaRegisterType<Il2CppSLZ.Marrow.HandPose.PoseData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Haptor.HapStack>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Haptor._co_HapHit_d__60>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Haptor._co_HapticSine_d__61>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Health.HealthMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Health.UsageSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Health._BleedOverTimer_d__67>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PlayerDamageReceiver.BodyPart>();
+           LuaRegisterType<Il2CppSLZ.Marrow.BaseController.GesturePose>();
+           LuaRegisterType<Il2CppSLZ.Marrow.OpenControllerRig.TrackedState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.OpenControllerRig.CurveMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.OpenControllerRig.VrVertState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysicsRig.BodyMassState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysicsRig.StepState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysicsRig._CoResetHand_d__125>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RemapRig.TraversalState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RemapRig.VertState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RigManager.BodyState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RigManager.LeashType>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RigManager._SwapAvatarCrate_d__66>();
+           LuaRegisterType<Il2CppSLZ.Marrow.TimeManager.SlowTime>();
+           LuaRegisterType<Il2CppSLZ.Marrow.GravGunSFX._UpdateGravHold_d__24>();
+           LuaRegisterType<Il2CppSLZ.Marrow.RollingSFX._UpdateSound_d__18>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Seat.SeatState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Seat.AxisAssignment>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Seat.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ParticleSpread.Alignment>();
+           LuaRegisterType<Il2CppSLZ.Marrow.ParticleSpreadManager.Info>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Mirror.__OnTriggerEnter_b__10_0_d>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PhysHand.HandPhysState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SLZ_Body.Footstep>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SLZ_Body.Gear>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VFX.SpawnEffects._FireSFXAsync_d__2>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VFX.SpawnEffects._FireEffectAsync_d__3>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneCullManager._WaitToSolveCullState_d__18>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.CrateSpawnSequencer._SpawnLoop_d__24>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.RandomizeCrate._SelectAndSpawnRandomCrateAsync_d__5>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.SceneChunk._LoadAsync_d__16>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.Zone3dSound.SoundMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.Zone3dSound._Fade_d__29>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneAmbience._PlayMainAsync_d__12>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneEvents.ZoneEventCallback>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneLinkEvents.ZoneEventCallback>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneLinkItem.EventTypes>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneMusic._PlayMainAsync_d__15>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneMusic._PlayIntroMainAsync_d__16>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateQuery.CrateQueryFilter>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateSpawner._SpawnSpawnableAsync_d__26>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateSpawnerGrid.GridRange>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateSpawnerGrid._Start_d__13>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CrateSpawnerGrid._SpawnGridAsync_d__15>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowQuery.LogicOperator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.PalletPacker.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse.HideLevelCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._InitAsync_d__37>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadInitialPalletsAsync_d__43>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadInitialPalletsAsync_Build_d__44>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadInitialPalletsAsync_Editor_d__45>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadPalletsFromModsFolderAsync_d__105>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadMarrowGame_d__106>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadGamePallets_d__108>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadPalletFromMarrowGame_d__111>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadPalletsFromFolderAsync_d__112>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadPalletFromFolderAsync_d__113>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadPalletAsync_d__114>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.AssetWarehouse._LoadPalletDataCards_d__121>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Crate._LoadAssetAsync_d__23>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.SoundFx._PreloadAssets_d__7>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowAsset._LoadSceneAsync_d__26>();
+            MelonLogger.Msg("CUT 7");
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Pallet.ChangeLog>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Pallet.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.PalletManifest.__c>();
+            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Scannable._PreloadAssets_d__27>();
+           //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Scannable.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins._TriggerOnBeforeLevelLoad_d__44>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins._TriggerOnAfterLevelLoad_d__45>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins._TriggerOnBeforeLevelUnload_d__46>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins._TriggerOnAfterLevelUnload_d__47>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneBootstrapper.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneBootstrapper._Start_d__2>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneLoader._LoadAsync_d__10>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneLoader._LoadChunkBatch_d__11>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneLoader._UnloadScenes_d__13>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneLoader._LoadScenes_d__14>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneLoadQueue._LoadAll_d__13>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneLoadQueue._UnloadAll_d__14>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneStreamer._LoadAsync_d__7>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SceneStreaming.SceneStreamer._ReloadAsync_d__9>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.BaseEnemyConfig.SensorSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.BaseEnemyConfig.HealthSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.BaseEnemyConfig.LocoState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.Muscle.Group>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.Muscle.Props>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.Muscle.State>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMaster.Mode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMaster.State>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMaster.StateSettings>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMaster._DisabledToActive_d__117>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMaster._ActiveToDisabled_d__118>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMaster._ActiveToKinematic_d__119>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMaster._PreKill_d__180>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMasterHumanoidConfig.HumanoidMuscle>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.PuppetMasterSettings.PuppetUpdateLimit>();
+           LuaRegisterType<Il2CppSLZ.Marrow.PuppetMasta.Weight.Mode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.AssetSpawner._RegisterAsync_d__12>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.AssetSpawner._InstantiateForWarmupAsync_d__13>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.AssetSpawner._SpawnAsync_d__15>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.Pool._Spawn_d__10>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.SpawnPolicy._Spawn_d__4>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.SpawnPolicy._SpawnFromPool_d__5>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Pool.VFXSpawnPolicy._Spawn_d__4>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.AuthenticatorDock.AuthenticatorEventCallback>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.AuthenticatorDock._CoAuthenticate_d__29>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.AuthenticatorDock._CoDeauthenticate_d__30>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Socket.PlugEventCallback>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco.StepGroup>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco.Gear>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco.Grounder>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco.Footstep>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowEntitlement._CheckEntitlementAsync_d__0>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowEntitlement._CheckOculusEntitlementAsync_d__2>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowGame._Initialize_d__12>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowGame._TryInitializeXRApi_d__13>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowLogger.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MeshCroncher.PreivewMeshData>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MeshCroncher._CronchMeshAsync_d__1>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MeshCroncher._AutoSimplifyMeshAsync_d__3>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.LateReferenceManager.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Input.XRApi._Initialize_d__54>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Input.XRApi._InitializeXRLoader_d__60>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Input.XRApi._WatchXRChanges_d__61>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModDownloader._LoadModSettings_d__10>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModDownloader._WriteModSettings_d__14>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModDownloader.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModDownloader._DownloadMod_d__17>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModDownloader.ValueTypeCompilerGeneratedNPrivateSealedIAsyncStateMachineInAsZiziStstpaStCacaUnique>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModRepositoryWorkflow.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModRepositoryWorkflow._FetchRepositoriesAsync_d__1>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModRepositoryWorkflow._ReadValidUrlsAsync_d__2>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Forklift.ModRepositoryWorkflow.ValueTypeCompilerGeneratedNPrivateSealedIAsyncStateMachineInAs1MoVa2UrInvaStUnique>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.SpawnPolicyData.PolicyRule>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Data.DecalAtlasData.AtlasInfo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Combat.VisualDamageController._BleedOverTimer_d__25>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AngularXSensor.Output>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AngularYSensor.Output>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AngularZSensor.Output>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ButtonController.ButtonMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Circuits.LinearXSensor.Output>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.BlueprintSpawner.__c>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.BlueprintSpawner._SpawnBlueprintAsync_d__12>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.BlueprintSpawner._DoSpawn_d__13>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.BlueprintSpawner._DoRestore_d__14>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.AIBrain.SpawnGroupEvent>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.AIBrain._CoArenaEntrance_d__29>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.AIManager.AICompareResult>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.AIManager.AICompareInput>();
+            MelonLogger.Msg("CUT 8");
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.AIManager.AICompareJob>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.Encounter.SpawnOrder>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.Encounter._WarmupLoop_d__34>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.Encounter._EncounterLoop_d__35>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnAgro.MentalMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnGroup.MentalMode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnGroup._SpawnAsync_d__59>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnGroup._DespawnBrain_d__63>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnGroup._WaitAndDespawnAllDead_d__64>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnGroup._DespawnAllBrains_d__65>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.SpawnGroup._DespawnToMaxDeadCount_d__67>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.TriggerRefProxy.TriggerType>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.TriggerRefProxy.NpcType>();
+           LuaRegisterType<Il2CppSLZ.VRMK.Avatar.SoftEllipse.Constants>();
+           LuaRegisterType<Il2CppSLZ.Marrow.StabSlash.StabPoint.StabJoint>();
+           LuaRegisterType<Il2CppSLZ.Marrow.StabSlash.SlashBlade.BladeJoint>();
+           LuaRegisterType<Il2CppSLZ.Marrow.SLZ_Body.Footstep.StepState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins.__c.__TriggerOnMarrowPluginLoad_b__33_0_d>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins.__c.__TriggerOnMarrowPluginStart_b__34_0_d>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Plugins.MarrowPlugins.__c.__TriggerOnMarrowPluginStop_b__35_0_d>();
+
+            // Types from assembly: Il2CppSLZ.Marrow.VoidLogic.Core, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.InputPortReference>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.IVoidLogicNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.IVoidLogicSink>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.IVoidLogicSource>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.IVoidLogicSensor>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.IVoidLogicActuator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.NodeState>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.NotUsedInEditModeAttribute>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.OutputPortReference>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.PortMetadata>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.PortInfo>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.SupportFlags>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.SupportAttribute>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicSubgraph>();
+
+            // Types from assembly: Il2CppSLZ.Marrow.VoidLogic.Engine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.GraphUpdate>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicManager>();
+           LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicManager.__c>();
+
+            // Types from assembly: Assembly-CSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+            MelonLogger.Msg("CUT 9");
+           LuaRegisterType<Il2Cpp.MouseLook>();
+           LuaRegisterType<Il2Cpp.PlayerController>();
+           LuaRegisterType<Il2Cpp.ApplyProceduralTextureProperties>();
+           LuaRegisterType<Il2Cpp.ProceduralTexture2D>();
+           LuaRegisterType<Il2Cpp.ColTester>();
+           LuaRegisterType<Il2Cpp.CounterTorque>();
+           LuaRegisterType<Il2Cpp.QuadDroneJoystick>();
+           LuaRegisterType<Il2Cpp.QuadDrone_Moonbase_Controller>();
+           LuaRegisterType<Il2Cpp.BMMAgentConnector>();
+           LuaRegisterType<Il2Cpp.LocoController>();
+           LuaRegisterType<Il2Cpp.TetherController>();
+           LuaRegisterType<Il2Cpp.SwingJointInverter>();
+           LuaRegisterType<Il2Cpp.SwingJointManager>();
+           LuaRegisterType<Il2Cpp.BoostPad>();
+           LuaRegisterType<Il2Cpp.SetGravity>();
+           LuaRegisterType<Il2Cpp.GradType>();
+           LuaRegisterType<Il2Cpp.GradientMaker>();
+           LuaRegisterType<Il2Cpp.LeanSmooth>();
+           LuaRegisterType<Il2Cpp.LeanTester>();
+           LuaRegisterType<Il2Cpp.LeanTest>();
+           LuaRegisterType<Il2Cpp.LeanTweenType>();
+           LuaRegisterType<Il2Cpp.LeanProp>();
+           LuaRegisterType<Il2Cpp.LeanTween>();
+           LuaRegisterType<Il2Cpp.LTUtility>();
+           LuaRegisterType<Il2Cpp.LTBezier>();
+           LuaRegisterType<Il2Cpp.LTBezierPath>();
+           LuaRegisterType<Il2Cpp.LTSpline>();
+           LuaRegisterType<Il2Cpp.LTRect>();
+           LuaRegisterType<Il2Cpp.LTEvent>();
+           LuaRegisterType<Il2Cpp.LTGUI>();
+           LuaRegisterType<Il2Cpp.LTDescr>();
+           LuaRegisterType<Il2Cpp.LTSeq>();
+           LuaRegisterType<Il2Cpp.MeshCombiner>();
+           LuaRegisterType<Il2Cpp.LakePolygon>();
+           LuaRegisterType<Il2Cpp.LakePolygonCarveData>();
+           LuaRegisterType<Il2Cpp.LakePolygonSwitch>();
+           LuaRegisterType<Il2Cpp.RamSwitch>();
+           LuaRegisterType<Il2Cpp.MeshColoringRam>();
+           LuaRegisterType<Il2Cpp.RamSpline>();
+           LuaRegisterType<Il2Cpp.SpecularProbeLight>();
+           LuaRegisterType<Il2Cpp.SpecularProbeRenderer>();
+           LuaRegisterType<Il2Cpp.MG_Obelisk>();
+           LuaRegisterType<Il2Cpp.NPC_Tracker_Data>();
+           LuaRegisterType<Il2Cpp.NPC_Tracker>();
+           LuaRegisterType<Il2Cpp.PointRemover>();
+           LuaRegisterType<Il2Cpp.PlayerTeleport>();
+           LuaRegisterType<Il2Cpp.VFXDecorator>();
+           LuaRegisterType<Il2Cpp.EnemyTool>();
+           LuaRegisterType<Il2Cpp.SpawnerEvents>();
+           LuaRegisterType<Il2Cpp.GenPointsInSpline>();
+           LuaRegisterType<Il2Cpp.HomeAgro>();
+           LuaRegisterType<Il2Cpp.HomeCleanupVolume>();
+           LuaRegisterType<Il2Cpp.ListToggle>();
+           LuaRegisterType<Il2Cpp.NavSurfIgnore>();
+           LuaRegisterType<Il2Cpp.DrainSuck>();
+           LuaRegisterType<Il2Cpp.DrawTrigger>();
+            MelonLogger.Msg("CUT 9.1");
+           LuaRegisterType<Il2Cpp.FindBadImpactProperties>();
+           LuaRegisterType<Il2Cpp.LaserCursorJockey>();
+           LuaRegisterType<Il2Cpp.LightmapSwapper>();
+            //LuaRegisterType<Il2Cpp.PalletTracker>();
+           LuaRegisterType<Il2Cpp.ParticleTintHandler>();
+           LuaRegisterType<Il2Cpp.QuestProbeAnchorOverride>();
+           LuaRegisterType<Il2Cpp.SplineDriverToggle>();
+           LuaRegisterType<Il2Cpp.IntroTorchSetup>();
+           LuaRegisterType<Il2Cpp.PleaseDontStrip>();
+           LuaRegisterType<Il2Cpp.SpawnRecycleTester>();
+           LuaRegisterType<Il2Cpp.ItemReceptacle>();
+           LuaRegisterType<Il2Cpp.KeycardDataScriptableObject>();
+           LuaRegisterType<Il2Cpp.BoxCastTester>();
+            MelonLogger.Msg("CUT 9.1.01");
+            //LuaRegisterType<Il2CppTrees.MinHashHeap>();
+           //LuaRegisterType<Il2CppTrees.MinHeap>();
+           //LuaRegisterType<Il2CppTrees.MinHeapTester>();
+           //LuaRegisterType<Il2CppTrees.SparseVoxelOctree>();
+           //LuaRegisterType<Il2CppTrees.Node>();
+            //LuaRegisterType<Il2CppTrees.Octree>();
+           //LuaRegisterType<Il2CppTrees.SerializedSVODict>();
+           //LuaRegisterType<Il2CppTrees.SVOManager>();
+           //LuaRegisterType<Il2CppTrees.UseOctree>();
+           LuaRegisterType<Il2CppPuppetMasta.Booster>();
+            MelonLogger.Msg("CUT 9.1.1");
+           LuaRegisterType<Il2CppPuppetMasta.PropSpawner>();
+           LuaRegisterType<Il2CppStressLevelZero.HealthPickup>();
+           LuaRegisterType<Il2CppBitOperators.DrawZCurveTester>();
+           LuaRegisterType<Il2CppSplineMesh.CubicBezierCurve>();
+           LuaRegisterType<Il2CppSplineMesh.CurveSample>();
+           LuaRegisterType<Il2CppSplineMesh.Spline>();
+           LuaRegisterType<Il2CppSplineMesh.ListChangeType>();
+           LuaRegisterType<Il2CppSplineMesh.SplineNode>();
+           LuaRegisterType<Il2CppSplineMesh.SplineSmoother>();
+           LuaRegisterType<Il2CppSplineMesh.ExampleContortAlong>();
+           LuaRegisterType<Il2CppSplineMesh.ExampleFollowSpline>();
+           LuaRegisterType<Il2CppSplineMesh.ExampleGrowingRoot>();
+           LuaRegisterType<Il2CppSplineMesh.ExampleSower>();
+           LuaRegisterType<Il2CppSplineMesh.ExampleTentacle>();
+           LuaRegisterType<Il2CppSplineMesh.ExampleTrack>();
+           LuaRegisterType<Il2CppSplineMesh.TrackSegment>();
+           LuaRegisterType<Il2CppSplineMesh.TransformedMesh>();
+           LuaRegisterType<Il2CppSplineMesh.RopeBuilder>();
+           LuaRegisterType<Il2CppSplineMesh.MeshBender>();
+           LuaRegisterType<Il2CppSplineMesh.MeshVertex>();
+           LuaRegisterType<Il2CppSplineMesh.SourceMesh>();
+           LuaRegisterType<Il2CppSplineMesh.SplineMeshTiling>();
+           LuaRegisterType<Il2CppSplineMesh.MeshUtility>();
+            MelonLogger.Msg("CUT 9.2");
+           LuaRegisterType<Il2CppRealisticEyeMovements.ControlData>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.DestroyNotifier>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimatorForExport>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimator>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.LookTargetController>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.SerializableVector3>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.Utils>();
+           LuaRegisterType<Il2CppMK.Glow.CameraData>();
+           LuaRegisterType<Il2CppMK.Glow.Workflow>();
+           LuaRegisterType<Il2CppMK.Glow.AntiFlickerMode>();
+           LuaRegisterType<Il2CppMK.Glow.Quality>();
+           LuaRegisterType<Il2CppMK.Glow.LensFlareStyle>();
+           LuaRegisterType<Il2CppMK.Glow.GlareStyle>();
+           LuaRegisterType<Il2CppMK.Glow.RenderPipeline>();
+           LuaRegisterType<Il2CppMK.Glow.ComputeShaderVariants>();
+           LuaRegisterType<Il2CppMK.Glow.Effect>();
+           LuaRegisterType<Il2CppMK.Glow.ICameraData>();
+           LuaRegisterType<Il2CppMK.Glow.ISettings>();
+           LuaRegisterType<Il2CppMK.Glow.MinMaxRangeAttribute>();
+           LuaRegisterType<Il2CppMK.Glow.MinMaxRange>();
+           LuaRegisterType<Il2CppMK.Glow.Presets>();
+           LuaRegisterType<Il2CppMK.Glow.RenderContext>();
+           LuaRegisterType<Il2CppMK.Glow.RenderTarget>();
+           LuaRegisterType<Il2CppMK.Glow.Resources>();
+           LuaRegisterType<Il2CppMK.Glow.Settings>();
+           LuaRegisterType<Il2CppMK.Glow.URP.CameraDataURP>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlowRendererFeature>();
+           LuaRegisterType<Il2CppMK.Glow.URP.SettingsURP>();
+           LuaRegisterType<Il2CppDentedPixel.LeanDummy>();
+           LuaRegisterType<Il2CppECE.EasyColliderCreator>();
+           LuaRegisterType<Il2CppECE.EasyColliderData>();
+           LuaRegisterType<Il2CppECE.SphereColliderData>();
+           LuaRegisterType<Il2CppECE.CapsuleColliderData>();
+           LuaRegisterType<Il2CppECE.BoxColliderData>();
+           LuaRegisterType<Il2CppECE.MeshColliderData>();
+           LuaRegisterType<Il2CppECE.NORMAL_OFFSET>();
+           LuaRegisterType<Il2CppECE.CAPSULE_COLLIDER_METHOD>();
+           LuaRegisterType<Il2CppECE.CREATE_COLLIDER_TYPE>();
+           LuaRegisterType<Il2CppECE.GIZMO_TYPE>();
+           LuaRegisterType<Il2CppECE.RENDER_POINT_TYPE>();
+           LuaRegisterType<Il2CppECE.SKINNED_MESH_COLLIDER_TYPE>();
+           LuaRegisterType<Il2CppECE.SPHERE_COLLIDER_METHOD>();
+           LuaRegisterType<Il2CppECE.MESH_COLLIDER_METHOD>();
+           LuaRegisterType<Il2CppECE.VERTEX_SNAP_METHOD>();
+           LuaRegisterType<Il2CppECE.VHACD_RESULT_METHOD>();
+           LuaRegisterType<Il2CppECE.ECE_WINDOW_TAB>();
+           LuaRegisterType<Il2CppECE.COLLIDER_HOLDER>();
+           LuaRegisterType<Il2CppECE.CONVEX_HULL_SAVE_METHOD>();
+           LuaRegisterType<Il2CppECE.EasyColliderProperties>();
+           LuaRegisterType<Il2CppECE.EasyColliderQuickHull>();
+           LuaRegisterType<Il2CppECE.EasyColliderRotateDuplicate>();
+           LuaRegisterType<Il2CppAra.AraTrail>();
+           LuaRegisterType<Il2CppAra.BakeTrail>();
+           LuaRegisterType<Il2CppAra.ColorFromSpeed>();
+           LuaRegisterType<Il2CppAra.ElectricalArc>();
+           LuaRegisterType<Il2CppAra.TireTrack>();
+            MelonLogger.Msg("CUT 9.3");
+           LuaRegisterType<Il2CppReachableGames.AutoProbe.AutoProbe>();
+           LuaRegisterType<Il2CppReachableGames.AutoProbe.ForceLightProbeHere>();
+           LuaRegisterType<Il2CppReachableGames.AutoProbe.FlyCamera>();
+           LuaRegisterType<Il2CppReachableGames.AutoProbe.ToggleOnAndOff>();
+           LuaRegisterType<Unity.MLAgents.GroundContact>();
+           LuaRegisterType<Unity.MLAgents.TargetContact>();
+           LuaRegisterType<Unity.MLAgentsExamples.GroundContact>();
+           LuaRegisterType<Unity.MLAgentsExamples.ImpactTargetController>();
+           LuaRegisterType<Unity.MLAgentsExamples.BodyPart>();
+           LuaRegisterType<Unity.MLAgentsExamples.JointDriveController>();
+           LuaRegisterType<Unity.MLAgentsExamples.TargetController>();
+           LuaRegisterType<UnityTemplateProjects.SimpleCameraController>();
+           LuaRegisterType<Il2CppSLZ.VRMK.IKSolverLimbSlz>();
+           LuaRegisterType<Il2CppSLZ.VRMK.IKSolverTrigonometricSlz>();
+           LuaRegisterType<Il2CppSLZ.VRMK.LimbIKSlz>();
+           LuaRegisterType<Il2CppSLZ.VRMK.MirrorFollow>();
+           LuaRegisterType<Il2CppSLZ.VRMK.TestMatrix>();
+           LuaRegisterType<Il2CppSLZ.VFX.DrawLine2Points>();
+           LuaRegisterType<Il2CppSLZ.VFX.DrawLinesFromArray>();
+           LuaRegisterType<Il2CppSLZ.VFX.FadeMaterials>();
+           LuaRegisterType<Il2CppSLZ.VFX.FireFlicker>();
+           LuaRegisterType<Il2CppSLZ.VFX.FractalMaster>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericFrameTimer>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericFrameTimerBase>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericFrameTimerFixedUpdate>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericFrameTimerLateUpdate>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericTimer>();
+           LuaRegisterType<Il2CppSLZ.VFX.LaserVector>();
+           LuaRegisterType<Il2CppSLZ.VFX.ParticleFire>();
+           LuaRegisterType<Il2CppSLZ.VFX.ParticleImpactSpawn>();
+           LuaRegisterType<Il2CppSLZ.VFX.ParticleTimeWarp>();
+           LuaRegisterType<Il2CppSLZ.VFX.NotParticleTint>();
+           LuaRegisterType<Il2CppSLZ.VFX.QuadLine>();
+           LuaRegisterType<Il2CppSLZ.VFX.ScopeManager>();
+           LuaRegisterType<Il2CppSLZ.VFX.VFX_AuraHighlight>();
+           LuaRegisterType<Il2CppSLZ.Vehicle.Atv_WheelColliders>();
+           LuaRegisterType<Il2CppSLZ.Utilities.DespawnOnDisable>();
+           LuaRegisterType<Il2CppSLZ.Utilities.DespawnOnJointBreak>();
+           LuaRegisterType<Il2CppSLZ.Utilities.DisableOnLoad>();
+           LuaRegisterType<Il2CppSLZ.Utilities.ForceDefaults>();
+           LuaRegisterType<Il2CppSLZ.Utilities.GenericOnDisable>();
+           LuaRegisterType<Il2CppSLZ.Utilities.GenericOnEnable>();
+           LuaRegisterType<Il2CppSLZ.Utilities.GenericOnJointBreak>();
+           LuaRegisterType<Il2CppSLZ.Utilities.GenericSpawnDelayEvent>();
+           LuaRegisterType<Il2CppSLZ.Utilities.UnityEventTrigger>();
+           LuaRegisterType<Il2CppSLZ.Utilities.GenericTrigger>();
+           LuaRegisterType<Il2CppSLZ.Utilities.GenericWaitForForwardEvent>();
+           LuaRegisterType<Il2CppSLZ.Utilities.IgnoreColliders>();
+           LuaRegisterType<Il2CppSLZ.Utilities.PrefabDespawner>();
+           LuaRegisterType<Il2CppSLZ.Utilities.PrefabSpawner>();
+           LuaRegisterType<Il2CppSLZ.Utilities.TimedPrefabSpawner>();
+           LuaRegisterType<Il2CppSLZ.Utilities.ToggleObject>();
+           LuaRegisterType<Il2CppSLZ.Utilities.TriggeredJointBreak>();
+           LuaRegisterType<Il2CppSLZ.SFX.AmbientSFX>();
+           LuaRegisterType<Il2CppSLZ.SFX.GenericTurretSFX>();
+           LuaRegisterType<Il2CppSLZ.SFX.ParticleSFX>();
+           LuaRegisterType<Il2CppSLZ.SFX.SimpleSFX>();
+           LuaRegisterType<Il2CppSLZ.SFX.TriggeredMusic>();
+           LuaRegisterType<Il2CppSLZ.Rig.NullController>();
+           LuaRegisterType<Il2CppSLZ.Rig.BasicTrackingRig>();
+           LuaRegisterType<Il2CppSLZ.Rig.PancakeControllerRig>();
+           LuaRegisterType<Il2CppSLZ.Rig.SkeletonRig>();
+           LuaRegisterType<Il2CppSLZ.Rig.WASDCamera>();
+           LuaRegisterType<Il2CppSLZ.Player.NearEvents>();
+           LuaRegisterType<Il2CppSLZ.Player.FarEvents>();
+           LuaRegisterType<Il2CppSLZ.Player.InteractableHighlight>();
+           LuaRegisterType<Il2CppSLZ.UI.AvatarsPanelView>();
+           LuaRegisterType<Il2CppSLZ.UI.SpawnablesPanelView>();
+           LuaRegisterType<Il2CppSLZ.UI.ButtonReferenceHolder>();
+           LuaRegisterType<Il2CppSLZ.Props.GachaCapsule>();
+           LuaRegisterType<Il2CppSLZ.Props.GachaUnlockEvent>();
+           LuaRegisterType<Il2CppSLZ.Data.LightingDataGroup>();
+           LuaRegisterType<Il2CppSLZ.Data.AllianceData>();
+           LuaRegisterType<Il2CppSLZ.Data.BoneLeaderData>();
+           LuaRegisterType<Il2CppSLZ.Data.CategoryFilters>();
+           LuaRegisterType<Il2CppSLZ.Data.GameProgress_Bonelab>();
+           LuaRegisterType<Il2CppSLZ.Data.HandPose2>();
+           LuaRegisterType<Il2CppSLZ.Data.HandPoseViewer>();
+           LuaRegisterType<Il2CppSLZ.Data.SpawnLoader>();
+           LuaRegisterType<Il2CppSLZ.Combat.ColliderAttackReceiver>();
+           LuaRegisterType<Il2CppSLZ.Combat.AimEnhancer>();
+           LuaRegisterType<Il2CppSLZ.Combat.AttackReceiver>();
+           LuaRegisterType<Il2CppSLZ.Combat.UnityEventFloat>();
+           LuaRegisterType<Il2CppSLZ.Combat.GenericAttackReceiver>();
+           LuaRegisterType<Il2CppSLZ.Combat.ICollisonReceiver>();
+           LuaRegisterType<Il2CppSLZ.Combat.MuzzleBreakObject>();
+           LuaRegisterType<Il2CppSLZ.Combat.MuzzleBreakVariables>();
+           LuaRegisterType<Il2CppSLZ.Combat.MuzzleBreakType>();
+           LuaRegisterType<Il2CppSLZ.Combat.ProjectileSpawn>();
+           LuaRegisterType<Il2CppSLZ.Combat.RigidbodyProjectile>();
+           LuaRegisterType<Il2CppSLZ.Combat.SeekingThruster>();
+           LuaRegisterType<Il2CppSLZ.Combat.SpawnLauncher>();
+           LuaRegisterType<Il2CppSLZ.Combat.GibletEllipsoid>();
+           LuaRegisterType<Il2CppSLZ.Combat.VisualDamageReceiver>();
+           LuaRegisterType<Il2CppSLZ.SLZEditorTools.LightBakeSceneGroup>();
+            MelonLogger.Msg("CUT 9.4");
+           LuaRegisterType<Il2CppSLZ.Marrow.TagTree>();
+           LuaRegisterType<Il2CppSLZ.Marrow.TagTreeNode>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Interp>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.IgnoreCollidersCrossRef>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.IgnoreCollidersImportRef>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.IgnoreCollidersSceneObjectLateReference>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.IgnoreCollidersSceneColliders>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.IgnoreCollidersSceneObject>();
+           LuaRegisterType<Il2CppSLZ.Marrow.LateReferences.IgnoreCollidersImportReference>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.PowerConduitDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.PowerReceiver>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Redacted.PowerSender>();
+           LuaRegisterType<Il2CppSLZ.Marrow.AI.EncounterButtonController>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.MobileEncounter>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.FizzleOnRecycleDecorator>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.FilteredDespawn>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.SlowmoSwitch>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.SpawnVFX>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ObjetiveModes>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ObjectiveGun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LightmapCopier>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ToggleObjectOnBake>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AllianceEntry>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AllianceTable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GripSwing>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GripThruster>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.JointMover>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LaunchHelper>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LaunchLinkArtRefs>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Launch_Gun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LeaderboardEntryLabel>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LinkZipStick>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NavDestTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NavMeshDoor>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NPC_Objective>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PartialZipLinkSetup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerLaunchPad>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerZipSetup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShockTrap>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShutterManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SuperSeeker>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipGrip>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipJointMover>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipLinkManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipLinkSetup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipMechData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Achievements>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AIHeadbanger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AmmoPickup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AmmoPickupProxy>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CargoData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaCraneController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaDoorControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaMenuController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaUIButton>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_BellInteractable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_Bomb>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_DataManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_DataPlayer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_Launcher>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_SpawnCapsule>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_Player_Stats>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnablePack>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_Stats>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_TriggeredSpawners>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Bell_Interactable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TrajectoryData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericLauncher>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GripJointMover>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HandCrank>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HealthPickupProxy>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NavMeshHeightGen>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleGripJointMover>();
+            MelonLogger.Msg("CUT 9.5");
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimeBender>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TunnelTipper_Chunker>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WeaponResetVolume>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArmFinale>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BakeAndWeldVerts>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BoardGenerator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BoneLeaderManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChallengeSelectMenu>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CheatTool>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CloneBlendShapes>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CoasterController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ColorMaterialPropertyBlock>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ConfigJointExtendedEvents>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ConfigJointHelper>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WebSocketPlugin>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_UI_ProgressBoard>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Conveyor>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Escalator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MonoFoot>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TankTread>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CraneControlBox>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CraneGravityController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.int2signed>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.int3signed>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AmmoDispenserDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EntityPoseData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EntityPoseDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.KeyDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LoreClipboardProxy>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MagazineDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MatDecReciever>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MatRecieverGroup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MaterialDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MatDecoratorGroup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlacerNail>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerAvatarDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerHealthDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RigidBodySettingsDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DefaultInventoryLoadout>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DescentIntroSequenceCtrl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DespawnerVolume>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DisableDelay>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DontSave>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DoorPortalController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ElevatorDoorTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnableShadow>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperSequenceController_LongRun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DingleTurretController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Enemy_Turret>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyCollisonRelay>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyDamageReceiver>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Enemy_Health>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TurretHeadAimer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TurretHeadController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EntitledChild>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Cart>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CartMultiStop>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DoorControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DoorLightControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GarageDoorRibControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleDoorControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CarDoorController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_Gashapon>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_MonoMatNew>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HubDoorController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PalletJack>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Nail>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ExtendedPrefabSpawner>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FadeAndDisableVolume>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FlightStabilizer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ForceLevels>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ForcePlatform>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BonelabAvatarLevelGameControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BonelabGameControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ResumePoint>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_Player>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Ascent>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_BigAnomalyA>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_BigAnomalyB>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_BlankBox>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_CheatButtons>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Descent>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_EmptyGround>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_HandgunBox>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Holodeck>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_intro>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_KartRace>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_LongRun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_MagmaGate>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_MenuVoidG114>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_MineDive>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_MoonBase>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Outro>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Pillar>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_prototype_A>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_SGDev>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_SprintBridge04>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_startup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_StreetPuncher>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Void>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_VoidG114>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenGameControl_Spawner>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenGameControl_Trigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.IndependentSaver>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LoadMenuScene>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RegisteredSaveableInfo>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Saveable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SceneBootstrapper_Bonelab>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnableSaver>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_NPC_Data>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NPC_Data>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DeadData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Linear_GameController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimeTrial_GameController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GarageDoorActivateMotor>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericKeypressEvent>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GeoManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnableGroup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GeoMover>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GetVelocity>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GrabDisable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HideOnAwake>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HubModule_AvatarSelect>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HubModule_GameSelect>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HubModule_InfoBoard>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.InteractableEvents>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.InteractableInputModule>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnGrip>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.IrisDoorCtrl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.JimmyDoorController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.JointSleeper>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.JointVisual>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.JumpVelocity>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.KiddieRide>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.KillTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarPedestal>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CityBlock>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HubMap>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ModuleHandler>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RendererGroup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_LabModule>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BellBodies>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BellImpactSFX>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LightningStriker>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LinkData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LinkDataManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LookAtCamera>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LookAtCameraContinuous>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LookAtCameraFocus>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LookAtCameraInverted>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LoreClipboard>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MenuProgressControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineDiveTarget>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineDiveTargetManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NarrativeManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TrackData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NarrativeState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NavSurfBakery>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BasicSeatTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BezierRing>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BowlingResetMechanism>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DestructibleDamageForwarder>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FindAutoConfigureJoints>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FindBadAmbientSFX>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FindBadHingeVirtualController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FindBadMixerGroups>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FindBadRigidbodySettings>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FindDuplicateMarrowComponents>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ForceOnTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FunicularController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericAnimatorController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LowpassVolumeManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MirrorCheatCollider>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PinTracker>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlateJointAnimator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RandomEventForwarder>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RbTriggerEventForwarder>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleGripEvents>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpiderChart>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VideoURLSetter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NooseDaggerJoint>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ObjectiveBattery>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OccluderPortalCtrl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OccluderStaticToggle>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AddConfigJoint>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArticulatedArmController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FindBadInteractableHosts>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GauntletElevator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineCartControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineCartLapBar>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineCartLightFlicker>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NooseBonelabIntro>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OutputVelocity>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ReactiveObjects>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ResetLadder>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SeatEvent>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SlideObjectControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SprintBridgeFogWall>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.taxiFare>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TreadmillMovement>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OpenDoor>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AnimData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OutroNarrativeController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ParentToCamera>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ParticleAttractorBhv>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PatchNotesLoader>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PipeLODMap>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PipeLODPlacer>();
+            MelonLogger.Msg("CUT 9.6");
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlatformDiscriminator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlatformEvent>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlatformMaterial>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlatformParticleLight>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlatformTerrain>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BodyVitals>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerAvatarManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerRefs>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Instance>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIRig>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerHealthCanvas>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerRelativeGunSpawns>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Plunger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PoolShatter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarDice>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarGun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Balloon>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BigGachaPlacer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BlueApollo>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Dice>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DiceResults>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Fizzler>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaCapsuleSpawner>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaPlacer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaPopFX>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaSpawnProjectile>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GlassHandler>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ItemDropper>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Light_SmoothTargets>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MiniDisc>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MocapGun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OnlyPlaceIfUnlocked>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PropFlashlight>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HoverEngine>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PropJoystick>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.QuestObjSwitcher>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleTimeDestroy>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SixSidedCrate>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnerGachaCapsule>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AntiGravCup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordDevice>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordForceChange>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordHandle>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordReceiver>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TorquePlate>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AmmoPouchTester>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AmmoReciever>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BalloonGun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DominantEjectSwitcher>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaShot>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GravityGun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GunHeat>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GunTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GunUIManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ProjectileBalloon>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UtilityModes>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnGun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZoneAggroBroadcaster>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RadialBlur>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RagDollSkeleton>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RandomObject>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RecursivePlayerTeleport>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RenderObjectBroadcaster>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ResetRect>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ResetRope>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ClockBPM>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.StemControl>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_Rhythm>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RigidbodyNeverSleep>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RigVolumeSettings>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RopeSwing>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RopeSwingGripRef>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Rotater>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaLootItem>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Looter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AmmoDispenser>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AttackReceiver_TimeSlow>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChristmasTree>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HealthSetterMachine>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WrightTime>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveableObject>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SceneChunkEntityHider>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SceneGravity>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SetJointRot>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.shaker>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleParticleSpawner>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AlwaysLookAt>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerLeasher>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RandomAvatar>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Simple_OnOff>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SkelGripEvents>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SlidingDoorManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SlidingDoors>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SLZ_LaserPointer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SmokeTrail>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SmoothFollower>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnableCrateWarmup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnableDoorStateSetter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnAllHelper>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnerDifficulties>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SphereTester>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplashFX>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineBody>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineBodyTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineEntity>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CurveSegment>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineJoint>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineJointDespawner>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineJointEventTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineJointSpawnableEmitter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineJointTimeline>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineSpeedController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineShieldController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TargetTracker>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController2>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TempTextureRef>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GunTestBlock>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ParticleSystemTextureStreaming>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimedJointEvents>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ToggleObject>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TrailTimescale>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TransformLerp>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Treadmill>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Trial_GripEvents>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Trial_SpawnerEvents>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialElevator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ControllerToolTip>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ControllerTutorialArt>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HeadTitles>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HeadTitlesTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialGrip>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialRig>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialShaft>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Tween>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TweenBlendshape>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TweenBlendShapeLinear>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ButtonHoverClick>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_UI_BodyMeasurements>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_UI_InGameData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_UI_PopUpMenu>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DrawBezierCurve>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FantasyUIController>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Feedback_Tactile>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HighlightUI>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.IPopUpElementable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LaserCursor>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LoadingScene>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PopupText>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ProgressBar>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BonelabLevelsPanelView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ItemSlotsPanelView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LevelsPanelView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Page>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PageElementView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PageItem>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PageItemView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PageView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PanelView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PopUpMenuView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PreferencesPanelView>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SceneAmmoUI>();
+            MelonLogger.Msg("CUT 9.9");
+           LuaRegisterType<Il2CppSLZ.Bonelab.ScrollButton>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ScrollElementsContainer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnGunUI>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AnalogClock>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIClock>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ToolTip>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ToolTipManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ToolTipText>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIControllerInput>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIGridEnable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UITooltip>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UITranslate>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIWobble>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_HUD>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModKit>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_SmoothFollow>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRGraphicRaycaster>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRInput>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRInputModule>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRPhysicsRaycaster>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRSInfoSwitch>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRStandaloneInputModule>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UnparentOnAwake>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Blip>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BlipHelper>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VolumetricOverride>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VolumetricPlatformSwitch>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRUIInput>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRUIItem>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WeaponPack>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WeaponSpawner>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BlitMesh>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WhiteboardMesh>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WhiteboardMeshComputeTest>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WhiteboardPen>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WhiteboardQuad>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.XRLODBias>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BarrierManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BarrierZoneItem>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZoneCheckpoint>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShaderPrewarmOnStart>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShaderVariantSet>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CubeNeighborTest>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EditorViewCuller>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GridGenTest>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ObjectDestructibleDecorator>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.CylinderElectronicGrip2>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.ClipChooser>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.ClipPair>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.ContinuousSoundPlayer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.LegacySourceNode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneOffAsymmetricSliderNode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneOffDriveEuler>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneOffLeverNodeServo>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneOffLineRendererSink>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneOffSetEuler>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneOffThruster>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneOffValueReaderSink>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneShotSoundPlayer>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.TriggerNode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.ClosestTransformJob>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.LogicGunMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.LogicGun>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.SubgraphTracker>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.AmmoInventory>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.DataManager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.InventorySaveFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.Replacement>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.Difficulty>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.PlayMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.PlayerUnlocks>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.Save>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.PlayerSettings>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.Settings>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SaveData.SpectatorSettings>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.GarageDoorPowerable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.GarageDoorStopTrigger>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.GarageDoor_Phys_Powerable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.Manager_Circuit>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.ElectricItem>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.Control_PowerLever>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.OnOffSwitch>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.Powerable_Joint>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.Powerable>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.PowerSocket>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.PowerSource>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.PowerSourceType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.JoystickForwarder>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.TwoButtonRemoteController>();
+            MelonLogger.Msg("CUT 9.10");
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.CylinderFuseGrip>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.PropLeverSwitch>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Console.SceneDescriber>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.AIAgentKillVolume>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.AutoAgroBoid>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidBullet>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidBumper>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidGun>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.SimpleRBMove>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidAgent>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidAgentKillVolume>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidAgent_SlicedInference>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidAgent_SlicedTrainer>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidAgent_Volume_SlicedInference>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidAgent_Volume_SlicedTrainer>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidController>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidSensor>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BallThrustPointManager>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BallThrustPointManager_V2>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidBallManager>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidBallMassChanger>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidBallMove>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.HeightThrustPointManager>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.OrbitObstacle>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.OrbitObstacleSpawner>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.RadialProjectileSpawner>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.Thruster>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.Thruster_V2>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidNest>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.InferenceAgent>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.PID_Controller_Joint>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.HeightThruster>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.HeightThruster1>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BMMPluginLauncher>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ModelManagerPlugin>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ASEInferenceAgent_Test>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ArtBodyPart>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.NestedAgentReward>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ModelManagerConfig>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ArmWormAgent>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ArmWormAgent_SlicedTrainer>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ArmWorm_SlicedInference>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager_OLD>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.RigidBodyDamageDealer>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.EnemyLocoDriver>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.MuscleCurvePersist>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.MuscleTester>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.MuscleTrainer>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.MuscleTrainer_Deltas>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.TinyWalkerAgent>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManagerMono>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ConeCheck>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.PowerGlove>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BulletListener>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.SimpleMove_Car>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.LinkAgent>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.Bullet>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.Bullet_Inference>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.GridSensorRotate>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.TargetHealth>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.TurretAgent>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.TurretAgentSelfPlay>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.TurretAgent_Inference>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.SelfPlayAreaMngr>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.TurretArea>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.TurretAreaSelfPlay>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ObstacleRayPenalty>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.RayOutputHandler>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.TurnOnGridSensor>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ForceReader>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.Car>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.DestroyCar>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.AreaBuilder>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.WallHandler>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.SpawnController>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ObjectPool>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.ObjSpawner>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BaseInferenceSensor>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.RayInferenceSensor>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.Arrow>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.InputVis>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.MLZoneSpawner>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.MLZoneSpawner_Child>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.changeTextCount>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.GenerateTerrainMesh>();
+           LuaRegisterType<Il2CppLuxURPEssentials.DecalManager>();
+           LuaRegisterType<Il2CppLuxURPEssentials.LuxURP_HelpBtn>();
+           LuaRegisterType<Il2CppLuxURPEssentials.LuxURP_LayerBasedCulling>();
+           LuaRegisterType<Il2CppLuxURPEssentials.LuxURP_SetupGlobals>();
+           LuaRegisterType<Il2CppLuxURPEssentials.RTSize>();
+           LuaRegisterType<Il2CppLuxURPEssentials.RTFormat>();
+           LuaRegisterType<Il2CppLuxURPEssentials.GustMixLayer>();
+           LuaRegisterType<Il2CppLuxURPEssentials.LuxURP_Wind>();
+           LuaRegisterType<Il2CppLuxURPEssentials.GetTerrainHeightNormalMap>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.RotateAndMove>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.SmoothFollow>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.ControlDisplacer>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.ControlDisplacerParticleSys>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.GrassDisplacementRenderFeature>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.GrassDisplacementPass>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.LayerAttribute>();
+           LuaRegisterType<UnityStandardAssets.SceneUtils.PlaceTargetWithMouse>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyCaster>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RigidbodyFirstPersonController>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.BranchContainer>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.BranchPoint>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.BranchSegment>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.EditorIvyGrowth>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.EditorMeshBuilder>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.GrowthBuilder>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.InfoPool>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyParameterInt>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyParameterFloat>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyParameter>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyParametersGUI>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyContainer>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyInfo>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyParameters>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyPreset>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.LeafPoint>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RTBakedMeshBuilder>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RTIvy>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RuntimeBakedIvy>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyController>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RuntimeIvyGrowth>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RuntimeProceduralIvy>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RTBranchContainer>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RTBranchPoint>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RTIvyContainer>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RTLeafPoint>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RTMeshData>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RTVertexData>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RuntimeGrowthParameters>();
+           LuaRegisterType<Il2Cpp.ProceduralTexture2D.TextureType>();
+           LuaRegisterType<Il2Cpp.SwingJointInverter._StartSequence_d__19>();
+           LuaRegisterType<Il2Cpp.SwingJointManager._FullFrame_d__8>();
+           LuaRegisterType<Il2Cpp.SwingJointManager._CoEnableSwingers_d__10>();
+           LuaRegisterType<Il2Cpp.LeanTester._timeoutCheck_d__2>();
+           LuaRegisterType<Il2Cpp.LTGUI.Element_Type>();
+           LuaRegisterType<Il2Cpp.LTDescr.__c>();
+           LuaRegisterType<Il2Cpp.MeshCombiner.__c>();
+           LuaRegisterType<Il2Cpp.MG_Obelisk._LaserLoop_d__27>();
+           LuaRegisterType<Il2Cpp.MG_Obelisk._SliderLoop_d__28>();
+           LuaRegisterType<Il2Cpp.NPC_Tracker_Data.NPC_State>();
+           LuaRegisterType<Il2Cpp.NPC_Tracker_Data.ALIVE_State>();
+           LuaRegisterType<Il2Cpp.NPC_Tracker._CoWaitForSpawns_d__6>();
+           LuaRegisterType<Il2Cpp.EnemyTool.EToolMode>();
+           LuaRegisterType<Il2Cpp.GenPointsInSpline.SpawnPoint>();
+           LuaRegisterType<Il2Cpp.DrainSuck._SuckLoop_d__11>();
+           LuaRegisterType<Il2Cpp.LaserCursorJockey._TOGGLEUI_d__2>();
+           LuaRegisterType<Il2Cpp.IntroTorchSetup._ReactivateTimmer_d__6>();
+           LuaRegisterType<Il2Cpp.SpawnRecycleTester._Spawn_d__8>();
+           LuaRegisterType<Il2Cpp.ThrottlerExt.Throttler>();
+           LuaRegisterType<Il2Cpp.ThrottlerExt._Throttle_d__0>();
+           LuaRegisterType<Il2CppTrees.MinHeap.HeapNode>();
+           LuaRegisterType<Il2CppTrees.SparseVoxelOctree.SparseNode>();
+           LuaRegisterType<Il2CppTrees.SparseVoxelOctree.LeafNode>();
+           LuaRegisterType<Il2CppTrees.SparseVoxelOctree.Layer>();
+           LuaRegisterType<Il2CppPuppetMasta.PropSpawner._SpawnHatJoint_d__29>();
+           LuaRegisterType<Il2CppStressLevelZero.HealthPickup._CoSetCollectable_d__19>();
+           LuaRegisterType<Il2CppStressLevelZero.HealthPickup._CoTimedDespawn_d__29>();
+           LuaRegisterType<Il2CppSplineMesh.ExampleTrack.__c>();
+           LuaRegisterType<Il2CppSplineMesh.MeshBender.FillingMode>();
+           LuaRegisterType<Il2CppSplineMesh.MeshBender.__c>();
+           LuaRegisterType<Il2CppSplineMesh.SplineMeshTiling.__c>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.ControlData.ControlDataForExport>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.ControlData.EyeControl>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.ControlData.EyelidControl>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.ControlData.EyelidBoneMode>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.ControlData.BlendshapesConfigForExport>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.ControlData.BlendshapesConfig>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimator.HeadControl>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimator.HeadTweenMethod>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimator.BlinkState>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimator.HeadSpeed>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimator.EyeDelay>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimator.LookTarget>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimator.FaceLookTarget>();
+           LuaRegisterType<Il2CppRealisticEyeMovements.LookTargetController.State>();
+           LuaRegisterType<Il2CppMK.Glow.ComputeShaderVariants.KeywordState>();
+           LuaRegisterType<Il2CppMK.Glow.Effect.ShaderRenderPass>();
+           LuaRegisterType<Il2CppMK.Glow.Effect.MaterialKeywords>();
+           LuaRegisterType<Il2CppMK.Glow.Effect.Keyword>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow.Texture2DParameter>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow.QualityParameter>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow.AntiFlickerModeParameter>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow.WorkflowParameter>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow.LayerMaskParameter>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow.MinMaxRangeParameter>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow.GlareStyleParameter>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlow.LensFlareStyleParameter>();
+           LuaRegisterType<Il2CppMK.Glow.URP.MKGlowRendererFeature.MKGlowRenderPass>();
+           LuaRegisterType<Il2CppECE.EasyColliderCreator.BestFitSphere>();
+           LuaRegisterType<Il2CppECE.EasyColliderQuickHull.Face>();
+           LuaRegisterType<Il2CppECE.EasyColliderQuickHull.Horizon>();
+           LuaRegisterType<Il2CppECE.EasyColliderQuickHull.__c>();
+           LuaRegisterType<Il2CppECE.EasyColliderRotateDuplicate.ROTATE_AXIS>();
+           LuaRegisterType<Il2CppAra.AraTrail.TrailAlignment>();
+           LuaRegisterType<Il2CppAra.AraTrail.TrailSpace>();
+           LuaRegisterType<Il2CppAra.AraTrail.TrailSorting>();
+           LuaRegisterType<Il2CppAra.AraTrail.Timescale>();
+           LuaRegisterType<Il2CppAra.AraTrail.TextureMode>();
+           LuaRegisterType<Il2CppAra.AraTrail.CurveFrame>();
+           LuaRegisterType<Il2CppAra.AraTrail.Point>();
+           LuaRegisterType<Unity.MLAgentsExamples.ImpactTargetController.TriggerEvent>();
+           LuaRegisterType<Unity.MLAgentsExamples.TargetController.TriggerEvent>();
+           LuaRegisterType<UnityTemplateProjects.SimpleCameraController.CameraState>();
+           LuaRegisterType<Il2CppSLZ.VRMK.IKSolverLimbSlz.BendModifier>();
+           LuaRegisterType<Il2CppSLZ.VRMK.IKSolverTrigonometricSlz.TrigonometricBone>();
+           LuaRegisterType<Il2CppSLZ.VFX.FadeMaterials.Fade>();
+           LuaRegisterType<Il2CppSLZ.VFX.FadeMaterials._Fader_d__8>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericFrameTimer.FrameType>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericTimer.TimeType>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericTimer._Realtime_d__7>();
+           LuaRegisterType<Il2CppSLZ.VFX.GenericTimer._ScaledTime_d__8>();
+           LuaRegisterType<Il2CppSLZ.VFX.LaserVector.Alignment>();
+           LuaRegisterType<Il2CppSLZ.VFX.ParticleTimeWarp._updateTrails_d__8>();
+           LuaRegisterType<Il2CppSLZ.VFX.VFX_AuraHighlight._FXChange_d__46>();
+           LuaRegisterType<Il2CppSLZ.Vehicle.Atv_WheelColliders.WheelType>();
+           LuaRegisterType<Il2CppSLZ.Vehicle.Atv_WheelColliders.SpeedUnit>();
+           LuaRegisterType<Il2CppSLZ.Vehicle.Atv_WheelColliders.Wheel>();
+           LuaRegisterType<Il2CppSLZ.Utilities.DespawnOnDisable._DelayedDespawn_d__2>();
+           LuaRegisterType<Il2CppSLZ.Utilities.GenericSpawnDelayEvent._AsyncDespawn_d__3>();
+           LuaRegisterType<Il2CppSLZ.Utilities.GenericWaitForForwardEvent._CoDelayForward_d__2>();
+           LuaRegisterType<Il2CppSLZ.Utilities.TimedPrefabSpawner._SpawnLoop_d__10>();
+           LuaRegisterType<Il2CppSLZ.SFX.AmbientSFX._Fade_d__29>();
+           LuaRegisterType<Il2CppSLZ.SFX.SimpleSFX.mixerGroups>();
+           LuaRegisterType<Il2CppSLZ.SFX.TriggeredMusic.MusicCue>();
+           LuaRegisterType<Il2CppSLZ.UI.AvatarsPanelView.__c>();
+           LuaRegisterType<Il2CppSLZ.UI.AvatarsPanelView._PopulateMenuAsync_d__91>();
+           LuaRegisterType<Il2CppSLZ.UI.AvatarsPanelView._PromptCycle_d__95>();
+           LuaRegisterType<Il2CppSLZ.UI.AvatarsPanelView._SwapAvatar_d__97>();
+           LuaRegisterType<Il2CppSLZ.UI.SpawnablesPanelView.__c>();
+           LuaRegisterType<Il2CppSLZ.Props.GachaCapsule._PopFXAsync_d__51>();
+           LuaRegisterType<Il2CppSLZ.Props.GachaCapsule._DespawnTimmer_d__52>();
+           LuaRegisterType<Il2CppSLZ.Props.GachaCapsule._SetPreviewMesh_d__54>();
+           LuaRegisterType<Il2CppSLZ.Props.GachaUnlockEvent._PopFXAsync_d__10>();
+           LuaRegisterType<Il2CppSLZ.Data.BoneLeaderData.ScoreType>();
+           LuaRegisterType<Il2CppSLZ.Data.HandPose2.PoseDataGroup>();
+           LuaRegisterType<Il2CppSLZ.Data.HandPose2.PoseData>();
+           LuaRegisterType<Il2CppSLZ.Data.HandPoseViewer.ViewerMode>();
+           LuaRegisterType<Il2CppSLZ.Combat.ProjectileSpawn._CoDelayFire_d__5>();
+           LuaRegisterType<Il2CppSLZ.Combat.SpawnLauncher._Spawn_d__3>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.MobileEncounter.SpawnOrder>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Zones.MobileEncounter._EncounterLoop_d__27>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ObjectiveGun._CoFireFlash_d__17>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GripSwing._CoCheckGrip_d__10>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Launch_Gun.LaunchMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Launch_Gun._CoCoolDown_d__29>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Launch_Gun._CoDisableAimAssist_d__32>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LinkZipStick._CoCheckGrip_d__20>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NavMeshDoor.DoorType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NavMeshDoor._CoForceGarage_d__10>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NPC_Objective.TowerMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NPC_Objective._CoExploder_d__88>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NPC_Objective._Fade_d__95>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NPC_Objective._CoLaser_d__101>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerLaunchPad.LaunchData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShockTrap._CoBlinkCharge_d__48>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShockTrap._CoChargeShock_d__49>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShockTrap._CoShock_d__55>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShockTrap._CoLightningFX_d__59>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShockTrap._CoPortalPlay_d__64>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShutterManager._CoStaggerShuttersSurvival_d__6>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipJointMover.ZipState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipJointMover._CoMoveJoint_d__40>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipJointMover._CoMoveJointDown_d__41>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ZipJointMover._CoCheckGrip_d__42>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl.LinkState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoSearchForLink_d__78>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoTriggerLink_d__79>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoClimbBlock_d__86>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoJump_d__88>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoLaunch_d__89>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoOmniJumpDown_d__90>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoClimbBars_d__91>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoSlide_d__92>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoClimbLedge_d__93>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoZipLineDown_d__94>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoZipLineUp_d__95>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoEscalate_d__96>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoDistCovered_d__97>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoCheckLegsFallenState_d__98>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoCheckCrabFallenState_d__99>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoCrabJumpAttempt_d__104>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoCrabZip_d__105>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AgentLinkControl._CoDespawnDeadEscalator_d__111>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AIHeadbanger._DanceCo_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret.TurretStates>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret._CoSetState_d__73>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret._CoPanicSequence_d__78>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret._CoFlipSequence_d__81>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret._CoAlertSequence_d__84>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret._CoTippedCheck_d__91>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret._CoPackLegs_d__93>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyTurret._CoUnPackLegs_d__94>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AmmoPickup._DelayDespawnAsync_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaCraneController.MoveState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaCraneController.GrabState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaCraneController._CoGrab_d__27>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaCraneController._CoDump_d__29>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_BellInteractable.BellState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_BellInteractable._MoveBell_d__26>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_BellInteractable._CoResetBell_d__28>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_Bomb._CoCountdown_d__9>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_Bomb._CoExpand_d__13>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_DataManager._CoWaitLoadOrCreate_d__7>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_Launcher.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_Launcher._CoLaunchConfetti_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_SpawnCapsule._CoLaunchSequenceArena_d__9>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Bell_Interactable.MoveState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Bell_Interactable._CoMoveJointTarget_d__26>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Bell_Interactable._CoResetBell_d__28>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericLauncher._CoMeasureError_d__28>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GripJointMover.MoveState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GripJointMover._CoMoveJointTarget_d__20>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GripJointMover._CoCheckGrip_d__24>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleGripJointMover.MoveState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleGripJointMover._CoMoveJointTarget_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleGripJointMover._CoCheckGrip_d__18>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimeBender._CoLimitSlowMo_d__18>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimeBender._CoRegenSlowMo_d__19>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TunnelTipper_Chunker._ForceUnloadStartChunk_async_d__3>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArmFinale.ArmStage>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArmFinale._CoTargetWindMill_d__19>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BakeAndWeldVerts.Cluster>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BoardGenerator._BoardSpawnerAsync_d__29>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BoardGenerator._lineloop_d__40>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BoneLeaderManager.LeaderMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BoneLeaderManager._CoWaitAndQuery_d__63>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BoneLeaderManager._CoQueryTimeout_d__66>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ColorMaterialPropertyBlock._LerpColorCo_d__15>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_UI_ProgressBoard._BoardUpdateLoop_d__58>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Conveyor.Mode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CraneControlBox._FullCraneResetCoroutine_d__31>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MagazineDecorator._InitializeAsync_d__3>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DefaultInventoryLoadout.SlotSpawnPair>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DefaultInventoryLoadout._SpawnInSlotsAsync_d__6>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DisableDelay._CoDelayedDisable_d__4>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DoorPortalController.DoorControlGroup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DoorPortalController._DoorSequence_d__42>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperController._ManagedUpdate_d__77>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperController._FireTurret_d__78>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperSequenceController_LongRun._WindForceBurst_d__71>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperSequenceController_LongRun._WindForce_d__73>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperSequenceController_LongRun._VideoTimmer_d__77>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperSequenceController_LongRun._LerpBlend_d__78>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperSequenceController_LongRun._TargetPlayer_d__79>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperSequenceController_LongRun._SpawnOmnis_d__80>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChopperSequenceController_LongRun._RotorPowerUpdate_d__81>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Enemy_Turret._CheckHealth_d__73>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyCollisonRelay.BodyPart>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EnemyDamageReceiver.BodyPart>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Enemy_Health._Regenerate_d__50>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TurretHeadController.FireType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.EntitledChild._CheckAsync_d__1>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Cart._CoMoveTargetTransform_d__28>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Cart._CoLaunchDelayed_d__35>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Cart._CoLaunch_d__37>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CartMultiStop._CoMoveTargetTransform_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DoorControl._SwingOverTime_d__98>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DoorLightControl._FlickerLight_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleDoorControl._CoCloseDoor_d__34>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SimpleDoorControl._CoOpenDoor_d__35>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CarDoorController._SetLatch_d__29>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_Gashapon._CheckGachaLoop_d__42>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_Gashapon._SpawnGacha_d__44>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_Gashapon._PusherPaddle_d__45>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_Gashapon._BallUpdateLoop_d__46>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_MonoMatNew.MonomatInventoryItem>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_MonoMatNew.MonomatInventory>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Control_MonoMatNew.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HubDoorController._CloseCoroutine_d__18>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ExtendedPrefabSpawner._SpawnLoop_d__26>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FadeAndDisableVolume._Fading_d__2>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FadeAndDisableVolume._Unfading_d__3>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_BigAnomalyA._CoLightingPos_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_BigAnomalyA._CoLightningFX_d__15>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_BigAnomalyB._CoLightingPos_d__26>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_BigAnomalyB._CoLightningFX_d__27>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Descent.IntroMusicCues>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Descent._CoroutineSequence_d__69>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Descent._ForceGrabCoroutine_d__70>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Descent._MirrorInProgress_d__72>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Descent._MirrorOutProgress_d__73>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_HandgunBox._Timer_d__22>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Holodeck.ProbePair>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Holodeck._CycleMatOverTimeEditor_d__33>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Holodeck._CycleMatOverTime_d__34>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._BWBoxSequence_d__161>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._KlaxonLight_d__162>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._BackUpYoinkLoad_d__166>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._GeneratorStartSequence_d__170>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._AirlockEnter_d__181>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._AirlockExitCycle_d__182>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._OpenSmallDoor_d__183>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._CloseSmallDoor_d__184>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._OpenBigDoors_d__185>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._CloseBigDoors_d__186>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._DoorCloseTimer_d__187>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Hub._BlinkAirLockCycleLight_d__190>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_intro._Start_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_KartRace.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_KartRace._StartTimer_d__38>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_LongRun._KillPlayerAndReset_d__10>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_MenuVoidG114._StartSequence_d__72>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_MenuVoidG114._DissolveBoneLab_d__80>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_MenuVoidG114._LoadAvatarFromSaveDataAsync_d__85>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Outro._SequenceProgress_d__49>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Outro._ChangeChunk_d__50>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Outro._LoadAvatarFromSaveDataAsync_d__62>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_SprintBridge04._KillPlayerAndReset_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_startup._Start_d__79>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_startup._IntoTimeUpdateLoop_d__80>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_startup._DissolveBoneLab_d__88>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_startup._LoadAvatarFromSaveDataAsync_d__93>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Void._MoveFloorSequence_d__38>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Void._Accelerate_d__39>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Void._Decelerate_d__40>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GameControl_Void._TreadmillMatchSeams_d__43>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenGameControl_Spawner._CoSpawnLoots_d__19>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenGameControl_Spawner._CoSpawnWeaponModeLoots_d__20>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LoadMenuScene._Load_d__4>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SceneBootstrapper_Bonelab._Start_d__8>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnableSaver.SpawnerItemType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController.ArenaStartMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController.ArenaDifficulty>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController.ArenaState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoKingEntrance_d__122>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoPlayerDist_d__147>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._SpawnEnemyLoop_d__149>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoSpawnFriendlyList_d__153>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoFriendlyArrival_d__155>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoCureAll_d__158>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoEndOfWave_d__162>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoResetOnWaveCompleteOrFail_d__167>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoKillCombo_d__175>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._Co_TimerUp_Arena_d__193>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._Co_TimerDown_Arena_d__194>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoDelayedRespawn_d__221>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoSpawnObjectiveEnemies_d__222>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoDelayedObjectiveStart_d__238>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Arena_GameController._CoObjectiveWait_d__242>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController.GameMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController.TimerMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController.EndMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController._CoDelayedStart_d__114>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController._CoTimerUp_d__115>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController._CoTimerUpRealtime_d__116>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController._CoTimerDown_d__117>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController._CoTimerRealtime_d__118>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController._CoDelayedEnd_d__119>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController._CoDelayedDespawn_d__129>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BaseGameController._CoDelayedReload_d__139>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimeTrial_GameController.TimeTrialMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimeTrial_GameController.TimeTrialStartMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimeTrial_GameController.TTDifficulty>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericKeypressEvent.KeyPressType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericKeypressEvent._lookForPress_d__5>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericKeypressEvent._lookForDown_d__6>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericKeypressEvent._lookForUp_d__7>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GeoManager.GeoState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GeoManager._CoDelayedMoveNext_d__25>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GeoMover._CoMoveGeo_d__31>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GeoMover._CoIncrementalMove_d__33>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GeoMover._CoSpawnBoxForest_d__36>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.IrisDoorCtrl._checkDoor_d__17>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.JimmyDoorController._DoorSequence_d__41>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.JimmyDoorController._DoorSequenceByPass_d__43>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarPedestal._DestroyDome_d__8>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CityBlock._Start_d__21>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CityBlock._Calculate_d__24>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LightningStriker._CoLightningFX_d__9>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LinkData.LinkType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LinkData.LData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LinkData._CoMeasureError_d__175>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineDiveTarget._CoWaitForTarget_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NarrativeState.HoldState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NarrativeState._CoHold_d__31>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BasicSeatTrigger._YoinkCoroutine_d__23>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BowlingResetMechanism._ScoreAndResetCoroutine_d__28>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BowlingResetMechanism._PinResetCycle_d__35>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.UnlockedNotUnlockableAndNotRedactedFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.UnlockableNotUnlockedAndNotRedactedFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.UnlockableAndNotRedactedCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.UnlockedAndNotRedactedCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.UnlockedCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.NonAvatarCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.NonRedactedCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.NonUnlockableCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.RedactedCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.UnlockableCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.BlackListCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.DevToolCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.FavoritesCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.GunCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.CrateFilters.NPCCrateFilter>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FunicularController._CartGoCoroutine_d__10>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FunicularController._CartForwardsCoroutine_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FunicularController._CartBackwardsCoroutine_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.FunicularController._StopVFXCoroutine_d__16>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericAnimatorController.AnimatorStateMachineGroup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericAnimatorController.AnimatorSequence>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GenericAnimatorController._SetSpecificIndex_d__26>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LowpassVolumeManager._LerpBlend_d__16>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlateJointAnimator._MainSequence_d__22>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlateJointAnimator._PivotSequence_d__23>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlateJointAnimator._RunnerSequence_d__24>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpiderChart._UpdateLoop_d__41>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OccluderPortalCtrl._checkPortal_d__10>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GauntletElevator._DoorDelayCoroutine_d__35>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineCartControl.RideSpeed>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineCartLapBar._CoCheckBar_d__15>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MineCartLightFlicker._Flicker_d__15>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NooseBonelabIntro.NooseStage>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.NooseBonelabIntro._LoadFXAndLevel_d__70>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SprintBridgeFogWall._UpdateFog_d__7>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.taxiFare._Start_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.taxiFare._Calculate_d__17>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OutroNarrativeController._CoVoiceTest_d__16>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OutroNarrativeController._CoWaitForLine_d__18>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OutroNarrativeController._CoSeated_d__21>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OutroNarrativeController._CoDrive_d__23>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.OutroNarrativeController._CoComplete_d__25>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ParticleAttractorBhv._ParticleAttractor_d__11>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PatchNotesLoader._GetPatchNotes_d__16>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlatformDiscriminator.Platform>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlatformEvent.Platform>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlatformTerrain.TerrainSettings>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BodyVitals.MeasurementState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BodyVitals.RescaleUI>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PlayerAvatarManager._LoadAvatarFromSaveDataAsync_d__3>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PoolShatter.SimpleTrans>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarDice._ActiveRoll_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarDice._DiceResult_d__13>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarDice._ChangeAvatar_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarGun._LoadFavoriteAvatars_d__27>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AvatarGun._SwapAvatar_d__28>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Balloon.BalloonColor>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Balloon._CoWarmupAttach_d__32>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Dice.UnityEventInt>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Dice.DieState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Dice.dieSide>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Dice._Rolling_d__24>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.DiceResults.DiceResultObject>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Fizzler._CoDelayDespawn_d__4>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaCapsuleSpawner._SpawnGachas_d__11>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaCapsuleSpawner._SpawnGacha_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaPopFX._FXChange_d__24>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GachaSpawnProjectile._AsyncSpawnProcedure_d__8>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GlassHandler.GlassType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.MiniDisc._PopFXAsync_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PropJoystick.JoystickData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnerGachaCapsule._AsyncSpawnProcedure_d__11>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AntiGravCup._KinematicSet_d__26>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordDevice._RetractBall_d__159>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordDevice._LerpAnchor_d__166>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordDevice.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordDevice._UpdateAllPreviewMeshes_d__170>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordDevice._SwapAvatar_d__172>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PullCordForceChange._SwapAvatar_d__10>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TorquePlate._CoLaunch_d__10>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GravityGun._CoBlastConfirm_d__16>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ProjectileBalloon._CoDelayFire_d__33>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ProjectileBalloon._CoWarmupAttach_d__34>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnGun._CoFireFlash_d__85>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnGun._SpawnCrate_d__87>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ResetRope.RopeSegments>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ResetRope.RopeSegementCache>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ClockBPM._CountClock_d__26>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_Rhythm._FLASH_DOWNBEAT_d__16>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_Rhythm._FLASH_STEP_d__17>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RopeSwing._CoCheckGrip_d__17>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ArenaLootItem.LootType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AmmoDispenser._RAINAMMO_d__15>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ChristmasTree._PLAY_MUSIC_d__13>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.shaker._TimedShakeCo_d__8>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.shaker._ContinuousShaking_d__9>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.AlwaysLookAt._TickLook_d__9>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.RandomAvatar._SwapAvatar_d__3>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SkelGripEvents._CoAdjustJoints_d__35>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SlidingDoors._CoWaitAndToggleEvent_d__30>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SlidingDoors._CoSlide_d__36>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnableCrateWarmup._WarmupSpreadAsync_d__8>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnableCrateWarmup._WarmupAsync_d__9>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnableDoorStateSetter.SpawnableDoorGroup>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SpawnAllHelper._SpawnAsync_d__4>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplashFX._RegAsync_d__6>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineEntity.ContactCount>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineJointSpawnableEmitter.Mode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SplineJointSpawnableEmitter._SpawnLoop_d__7>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController._CreditsCoroutine_d__94>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController._CoWaitForPush_d__97>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController._EngineSoundCoroutine_d__100>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController._PushPromptCoroutine_d__104>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController._DuckMusicCoroutine_d__107>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController._CoWaitForStop_d__113>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController._CoPlayerDist_d__115>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController2._CreditsCoroutine_d__92>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController2._CoWaitForPush_d__95>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController2._EngineSoundCoroutine_d__98>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController2._PushPromptCoroutine_d__102>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController2._DuckMusicCoroutine_d__105>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController2._CoWaitForStop_d__111>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TaxiController2._CoPlayerDist_d__113>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GunTestBlock.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GunTestBlock._SpawnAsync_d__7>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.GunTestBlock._SpawnAsync_d__8>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TimedJointEvents._CoTimerRoutine_d__20>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TransformLerp._LerpTransform_d__4>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialElevator._CoDoorRoutine_d__46>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialElevator._CoInitialBreakRoutine_d__50>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialElevator._CoSwing_d__52>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialElevator._CoFallRoutine_d__56>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialElevator._CoFallingZeroG_d__57>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialElevator._CoComplete_d__59>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ControllerToolTip._FXChange_d__34>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ControllerToolTip._Following_d__36>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ControllerTutorialArt._CoBlinkHighlight_d__27>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ControllerTutorialArt._FXChange_d__28>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ControllerTutorialArt._ControllerFollow_d__29>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HeadTitles._FXChange_d__52>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HeadTitles._Follow_d__53>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HeadTitlesTrigger._DelayedSENDTITLES_async_d__16>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialRig.InputHighlight>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialRig.SpecificHand>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialShaft.ShaftState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.TutorialShaft._MoveShaftLoop_d__10>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.HighlightUI._CoFadeToColors_d__14>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LaserCursor._FireRayPulse_d__65>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ProgressBar._FadeFX_d__12>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BonelabLevelsPanelView.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BonelabLevelsPanelView._PopulateMenuAsync_d__42>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LevelsPanelView.LevelKeyPair>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LevelsPanelView.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.LevelsPanelView._PopulateMenuAsync_d__25>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PageElementView._Blip_d__17>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PageItemView.SegmentType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PageView._CoChangePage_d__24>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PopUpMenuView._CoShowCursor_d__76>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.PopUpMenuView._CoHideCursor_d__77>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SceneAmmoUI.SceneNames>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.SceneAmmoUI.TextFields>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ScrollButton._SmoothScrolling_d__19>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ScrollButton._RefactoredSmoothScrolling_d__20>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIClock._Clock_d__6>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ToolTip._CoShowPopup_d__17>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ToolTip._CoHidePopup_d__19>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIControllerInput._SceneReloadCounter_d__15>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIControllerInput.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIGridEnable._FXChange_d__11>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UITranslate._TranslateTransform_d__15>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UIWobble._Wobble_d__17>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_HUD._AmmoFollow_Coroutine_d__67>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_HUD._ResetLevel_d__69>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_HUD._ProgressBar_d__70>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_HUD._HUD_SoftFollow_d__74>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_HUD._HeadFollowTimmer_d__75>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup.PageType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup.UI_ModPager>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup.UI_ModSettings>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup.UI_ModViewModel>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup.UI_ModCell>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup._CheckLogIn_d__50>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup._Load_Repositories_d__56>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup._PopulateMenu_d__73>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup._LoadingIcon_d__75>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup._UpdateCells_d__77>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRGraphicRaycaster.BlockingObjects>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRGraphicRaycaster.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRInput.TrackedInput>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRInputModule.ButtonState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRInputModule.MouseState>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRInputModule.MouseButtonEventData>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRPhysicsRaycaster.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VRStandaloneInputModule.InputMode>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.BlipHelper._DespawnCoroutine_d__4>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WeaponPack.WeaponType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WeaponPack.MeleeType>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WeaponSpawner._CoSpawnDefaultPack_d__33>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WeaponSpawner._CoSpawnAllWeaponPacks_d__35>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WhiteboardMesh.penInfo>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WhiteboardMeshComputeTest.penInfo>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.WhiteboardQuad.penInfo>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShaderPrewarmOnStart.PrewarmObjList>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShaderVariantSet.VariantList>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.ShaderVariantSet.Variant>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.CylinderElectronicGrip2.HandAttached>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.ContinuousSoundPlayer._ManagedUpdate_d__58>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.ContinuousSoundPlayer._DoAStart_d__59>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.ContinuousSoundPlayer._FadeVolume_d__63>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneShotSoundPlayer.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.OneShotSoundPlayer._DoAStart_d__50>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.LogicGun._ShowNodeInfo_d__18>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.LogicGun.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.LogicGun._ShowSubgraph_d__19>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.LogicGun._HideSubgraph_d__20>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.VoidLogicSearch.__c>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.VoidLogicSearch._FindClosest10_d__0>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.VoidLogic.VoidLogicSearch._FindClosest_d__1>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.GarageDoorPowerable.MOVINGSTATE>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.GarageDoorPowerable._CoMoveUp_d__34>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.GarageDoorPowerable._CoMoveDown_d__35>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.Powerable._CoUnchargeLoop_d__26>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.PowerSocket._CoChargeLoop_d__20>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidBullet._DespawnCounter_d__8>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidGun._ChargeShot_d__39>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidController._ChargeShot_d__114>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidController._PostLaunchCooldown_d__115>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidController._WayPointCountdown_d__119>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidController.__c>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BallThrustPointManager._WaitFrame_d__39>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BallThrustPointManager._NoiseRoutine_d__43>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BallThrustPointManager_V2._WaitFrame_d__41>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BallThrustPointManager_V2._NoiseRoutine_d__45>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BoidBallManager.__c>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager_OLD._Run_d__31>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager.AgentBackFill>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager._Run_d__59>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager._WaitForAllOutputs_d__62>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager._SlicedInference_d__64>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager._DoSimUpdate_d__67>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManager._CheckForLateInferenceExit_d__69>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.BarracudaModelManagerMono._Run_d__45>();
+           LuaRegisterType<Il2CppSLZ.MLAgents.RayInferenceSensor._SlicedSensorsUpdate_d__20>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.GrassDisplacementRenderFeature.RTDisplacementSize>();
+           LuaRegisterType<Il2CppLux_SRP_GrassDisplacement.GrassDisplacementRenderFeature.GrassDisplacementSettings>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RigidbodyFirstPersonController.MovementSettings>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RigidbodyFirstPersonController.AdvancedSettings>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.RealIvyMathUtils.Segment>();
+           LuaRegisterType<Il2CppDynamite3D.RealIvy.IvyController.State>();
+           LuaRegisterType<Il2CppMK.Glow.PipelineProperties.ShaderProperties.DefaultProperty>();
+           LuaRegisterType<Il2CppSLZ.Bonelab.UI_ModGroup.UI_ModCell._UpdateFromViewModel_d__7>();
+
+
+
         }
 
-
-        private void RegisterUnityTypes()
-        {
-            UserData.RegisterType<Animation>();
-            UserData.RegisterType<AnimationClip>();
-            UserData.RegisterType<AnimationClipPair>();
-            UserData.RegisterType<AnimationCurve>();
-            UserData.RegisterType<AnimationEvent>();
-            UserData.RegisterType<AnimationState>();
-            UserData.RegisterType<Animator>();
-            UserData.RegisterType<AnimatorClipInfo>();
-            UserData.RegisterType<AnimatorControllerParameter>();
-            UserData.RegisterType<AnimatorOverrideController>();
-            UserData.RegisterType<AnimatorStateInfo>();
-            UserData.RegisterType<AnimatorTransitionInfo>();
-            UserData.RegisterType<AnimatorUtility>();
-            UserData.RegisterType<ArticulationBody>();
-            UserData.RegisterType<AudioChorusFilter>();
-            UserData.RegisterType<AudioClip>();
-            UserData.RegisterType<AudioDistortionFilter>();
-            UserData.RegisterType<AudioEchoFilter>();
-            UserData.RegisterType<AudioHighPassFilter>();
-            UserData.RegisterType<AudioListener>();
-            UserData.RegisterType<AudioLowPassFilter>();
-            UserData.RegisterType<AudioRenderer>();
-            UserData.RegisterType<AudioReverbFilter>();
-            UserData.RegisterType<AudioReverbZone>();
-            UserData.RegisterType<AudioSettings>();
-            UserData.RegisterType<AudioSource>();
-            UserData.RegisterType<Behaviour>();
-            UserData.RegisterType<BillboardAsset>();
-            UserData.RegisterType<BillboardRenderer>();
-            UserData.RegisterType<BoneWeight>();
-            UserData.RegisterType<BoneWeight1>();
-            UserData.RegisterType<BoundingSphere>();
-            UserData.RegisterType<Bounds>();
-            UserData.RegisterType<BoundsInt>();
-            UserData.RegisterType<BoxCollider>();
-            UserData.RegisterType<BoxCollider2D>();
-            UserData.RegisterType<BuoyancyEffector2D>();
-            UserData.RegisterType<Camera>();
-            UserData.RegisterType<Canvas>();
-            UserData.RegisterType<CanvasGroup>();
-            UserData.RegisterType<CanvasRenderer>();
-            UserData.RegisterType<CapsuleCollider>();
-            UserData.RegisterType<CapsuleCollider2D>();
-            UserData.RegisterType<CharacterController>();
-            UserData.RegisterType<CharacterInfo>();
-            UserData.RegisterType<CharacterJoint>();
-            UserData.RegisterType<CircleCollider2D>();
-            UserData.RegisterType<Cloth>();
-            UserData.RegisterType<ClothSphereColliderPair>();
-            UserData.RegisterType<Collider>();
-            UserData.RegisterType<Collider2D>();
-            UserData.RegisterType<Collision>();
-            UserData.RegisterType<Collision2D>();
-            UserData.RegisterType<Color>();
-            UserData.RegisterType<Color32>();
-            UserData.RegisterType<ColorUtility>();
-            UserData.RegisterType<CombineInstance>();
-            UserData.RegisterType<Component>();
-            UserData.RegisterType<CompositeCollider2D>();
-            UserData.RegisterType<ConfigurableJoint>();
-            UserData.RegisterType<ConfigurableJointMotion>();
-            UserData.RegisterType<ConstantForce>();
-            UserData.RegisterType<ConstantForce2D>();
-            UserData.RegisterType<ContactFilter2D>();
-            UserData.RegisterType<ContactPoint>();
-            UserData.RegisterType<ContactPoint2D>();
-            UserData.RegisterType<ControllerColliderHit>();
-            UserData.RegisterType<Cubemap>();
-            UserData.RegisterType<CubemapArray>();
-            UserData.RegisterType<CullingGroup>();
-            UserData.RegisterType<CullingGroupEvent>();
-            UserData.RegisterType<CustomCollider2D>();
-            UserData.RegisterType<CustomRenderTexture>();
-            UserData.RegisterType<DetailInstanceTransform>();
-            UserData.RegisterType<DetailPrototype>();
-            UserData.RegisterType<DistanceJoint2D>();
-            UserData.RegisterType<DrivenRectTransformTracker>();
-            UserData.RegisterType<DynamicGI>();
-            UserData.RegisterType<EdgeCollider2D>();
-            UserData.RegisterType<Effector2D>();
-            UserData.RegisterType<ExitGUIException>();
-            UserData.RegisterType<FixedJoint>();
-            UserData.RegisterType<FixedJoint2D>();
-            UserData.RegisterType<Flare>();
-            UserData.RegisterType<FlareLayer>();
-            UserData.RegisterType<FrictionJoint2D>();
-            UserData.RegisterType<FrustumPlanes>();
-            UserData.RegisterType<ForceMode>();
-            UserData.RegisterType<GameObject>();
-            UserData.RegisterType<GeometryUtility>();
-            UserData.RegisterType<Gradient>();
-            UserData.RegisterType<GradientAlphaKey>();
-            UserData.RegisterType<GradientColorKey>();
-            UserData.RegisterType<Grid>();
-            UserData.RegisterType<GridBrushBase>();
-            UserData.RegisterType<GridLayout>();
-            UserData.RegisterType<GUI>();
-            UserData.RegisterType<GUIContent>();
-            UserData.RegisterType<GUILayout>();
-            UserData.RegisterType<GUILayoutOption>();
-            UserData.RegisterType<GUILayoutUtility>();
-            UserData.RegisterType<GUISettings>();
-            UserData.RegisterType<GUISkin>();
-            UserData.RegisterType<GUIStyle>();
-            UserData.RegisterType<GUIStyleState>();
-            UserData.RegisterType<GUIUtility>();
-            UserData.RegisterType<Hash128>();
-            UserData.RegisterType<HDROutputSettings>();
-            UserData.RegisterType<HingeJoint>();
-            UserData.RegisterType<HingeJoint2D>();
-            UserData.RegisterType<HumanBone>();
-            UserData.RegisterType<HumanDescription>();
-            UserData.RegisterType<HumanLimit>();
-            UserData.RegisterType<HumanPoseHandler>();
-            UserData.RegisterType<HumanTrait>();
-            UserData.RegisterType<Input>();
-            UserData.RegisterType<Joint>();
-            UserData.RegisterType<Joint2D>();
-            UserData.RegisterType<JointDrive>();
-            UserData.RegisterType<JointLimits>();
-            UserData.RegisterType<JointMotor>();
-            UserData.RegisterType<JointSpring>();
-            UserData.RegisterType<Keyframe>();
-            UserData.RegisterType<LayerMask>();
-            UserData.RegisterType<LensFlare>();
-            UserData.RegisterType<Light>();
-            UserData.RegisterType<LightBakingOutput>();
-            UserData.RegisterType<LightingSettings>();
-            UserData.RegisterType<LightmapData>();
-            UserData.RegisterType<LightmapSettings>();
-            UserData.RegisterType<LightProbeGroup>();
-            UserData.RegisterType<LightProbeProxyVolume>();
-            UserData.RegisterType<LightProbes>();
-            UserData.RegisterType<LineRenderer>();
-            UserData.RegisterType<LineUtility>();
-            UserData.RegisterType<LocalizationAsset>();
-            UserData.RegisterType<LOD>();
-            UserData.RegisterType<LODGroup>();
-            UserData.RegisterType<Material>();
-            UserData.RegisterType<MaterialPropertyBlock>();
-            UserData.RegisterType<Mathf>();
-            UserData.RegisterType<Matrix4x4>();
-            UserData.RegisterType<Mesh>();
-            UserData.RegisterType<MeshCollider>();
-            UserData.RegisterType<MeshFilter>();
-            UserData.RegisterType<MeshRenderer>();
-            UserData.RegisterType<ModifiableContactPair>();
-            UserData.RegisterType<ModifiableMassProperties>();
-            UserData.RegisterType<MonoBehaviour>();
-            UserData.RegisterType<Motion>();
-            UserData.RegisterType<NavMeshAgent>();
-            UserData.RegisterType<UnityEngine.Object>();
-            UserData.RegisterType<ParticleSystem>();
-            UserData.RegisterType<Particle>();
-            UserData.RegisterType<Physics>();
-            UserData.RegisterType<Physics2D>();
-            UserData.RegisterType<PhysicsMaterial2D>();
-            UserData.RegisterType<Plane>();
-            UserData.RegisterType<PlatformEffector2D>();
-            UserData.RegisterType<Quaternion>();
-            UserData.RegisterType<Ray>();
-            UserData.RegisterType<Ray2D>();
-            UserData.RegisterType<Rect>();
-            UserData.RegisterType<RectTransform>();
-            UserData.RegisterType<ReflectionProbe>();
-            UserData.RegisterType<RenderTexture>();
-            UserData.RegisterType<Renderer>();
-            UserData.RegisterType<Rigidbody>();
-            UserData.RegisterType<Rigidbody2D>();
-            UserData.RegisterType<Shader>();
-            UserData.RegisterType<Sprite>();
-            UserData.RegisterType<SpriteRenderer>();
-            UserData.RegisterType<SoftJointLimit>();
-            UserData.RegisterType<TextAsset>();
-            UserData.RegisterType<TextMesh>();
-            UserData.RegisterType<Texture>();
-            UserData.RegisterType<Texture2D>();
-            UserData.RegisterType<Time>();
-            UserData.RegisterType<TrailRenderer>();
-            UserData.RegisterType<Transform>();
-            UserData.RegisterType<Vector2>();
-            UserData.RegisterType<Vector3>();
-            UserData.RegisterType<Vector4>();
-            UserData.RegisterType<VideoPlayer>();
-            UserData.RegisterType<WheelCollider>();
-            UserData.RegisterType<WheelJoint2D>();
-            UserData.RegisterType<WindZone>();
-
-        }
-
-        public void RegisterSLZTypes()
-        {
-            UserData.RegisterType<Gun.HammerStates>();
-            UserData.RegisterType<Attack>();
-            UserData.RegisterType<SpawnDeathEvent>();
-            UserData.RegisterType<SanityTester>();
-            UserData.RegisterType<TextureStreamingSummary>();
-            UserData.RegisterType<PosePredictionFeatureExample>();
-            UserData.RegisterType<RefreshRateFeatureExample>();
-            UserData.RegisterType<FadeVolume>();
-            UserData.RegisterType<PlayerRemappingConfigurator>();
-            UserData.RegisterType<DecalProjector>();
-            UserData.RegisterType<Il2CppSLZ.VRMK.Avatar>();
-            UserData.RegisterType<AvatarExtension>();
-            UserData.RegisterType<Il2CppSLZ.Bonelab.Saveable>();
-            UserData.RegisterType<AvatarGrip>();
-            UserData.RegisterType<BarrelGrip>();
-            UserData.RegisterType<BodyVirtualController>();
-            UserData.RegisterType<BoxGrip>();
-            UserData.RegisterType<MarrowEntityPoseDecorator>();
-            UserData.RegisterType<CylinderGrip>();
-            UserData.RegisterType<DualHingeVirtualController>();
-            UserData.RegisterType<ForcePullGrip>();
-            UserData.RegisterType<GenericGrip>();
-            UserData.RegisterType<Grip>();
-            UserData.RegisterType<Hand>();
-            UserData.RegisterType<HandgunVirtualController>();
-            UserData.RegisterType<HandReciever>();
-            UserData.RegisterType<HingeVirtualController>();
-            UserData.RegisterType<InteractableHost>();
-            UserData.RegisterType<InteractableHostManager>();
-            UserData.RegisterType<InteractionVolume>();
-            UserData.RegisterType<InventoryHand>();
-            UserData.RegisterType<InventoryHandReceiver>();
-            UserData.RegisterType<InventorySlot>();
-            UserData.RegisterType<InventorySlotReceiver>();
-            UserData.RegisterType<LadderPlatform>();
-            UserData.RegisterType<LadderVirtualController>();
-            UserData.RegisterType<PumpShotgunVirtualController>();
-            UserData.RegisterType<RifleVirtualController>();
-            UserData.RegisterType<Servo>();
-            UserData.RegisterType<SlideVirtualController>();
-            UserData.RegisterType<SlotContainer>();
-            UserData.RegisterType<SphereGrip>();
-            UserData.RegisterType<StaticSlideVirtualController>();
-            UserData.RegisterType<SwingVirtualController>();
-            UserData.RegisterType<TargetGrip>();
-            UserData.RegisterType<VirtualControllerOverride>();
-            UserData.RegisterType<WeaponSlot>();
-            UserData.RegisterType<WorldGrip>();
-            UserData.RegisterType<AlignPlug>();
-            UserData.RegisterType<AmmoPlug>();
-            UserData.RegisterType<AmmoSocket>();
-            UserData.RegisterType<DebugDraw>();
-            UserData.RegisterType<LineMesh>();
-            UserData.RegisterType<CameraSettings>();
-            UserData.RegisterType<PlayerTriggerProxy>();
-            UserData.RegisterType<Player_Health>();
-            UserData.RegisterType<AmmoInventory>();
-            UserData.RegisterType<Constrainer>();
-            UserData.RegisterType<ConstraintTracker>();
-            UserData.RegisterType<DevManipulatorGun>();
-            UserData.RegisterType<FlyingGun>();
-            UserData.RegisterType<GravityManipulatorJob>();
-            UserData.RegisterType<Gun>();
-            UserData.RegisterType<GunManager>();
-            UserData.RegisterType<InventoryAmmoReceiver>();
-            UserData.RegisterType<Magazine>();
-            UserData.RegisterType<SlideMover>();
-            UserData.RegisterType<BallisticPassthrough>();
-            UserData.RegisterType<FirearmCartridge>();
-            UserData.RegisterType<ImpactProperties>();
-            UserData.RegisterType<ImpactPropertiesManager>();
-            UserData.RegisterType<Projectile>();
-            UserData.RegisterType<StabSlash>();
-            UserData.RegisterType<Haptor>();
-            UserData.RegisterType<Health>();
-            UserData.RegisterType<Inventory>();
-            UserData.RegisterType<PlayerDamageReceiver>();
-            UserData.RegisterType<AnimationRig>();
-            UserData.RegisterType<AnimInputRig>();
-            UserData.RegisterType<ArtRig>();
-            UserData.RegisterType<BaseController>();
-            UserData.RegisterType<ControllerRig>();
-            UserData.RegisterType<GameWorldSkeletonRig>();
-            UserData.RegisterType<HeptaRig>();
-            UserData.RegisterType<InterpRig>();
-            UserData.RegisterType<MirrorControllerRig>();
-            UserData.RegisterType<OpenController>();
-            UserData.RegisterType<OpenControllerRig>();
-            UserData.RegisterType<PhysicsRig>();
-            UserData.RegisterType<PhysSoftBody>();
-            UserData.RegisterType<PhysTorso>();
-            UserData.RegisterType<RemapRig>();
-            UserData.RegisterType<Il2CppSLZ.Marrow.Rig>();
-            UserData.RegisterType<RigManager>();
-            UserData.RegisterType<SkeletonHand>();
-            UserData.RegisterType<CollisionSFX>();
-            UserData.RegisterType<CollisionSfxManager>();
-            UserData.RegisterType<GravGunSFX>();
-            UserData.RegisterType<GunSFX>();
-            UserData.RegisterType<HandSFX>();
-            UserData.RegisterType<HeadSFX>();
-            UserData.RegisterType<ImpactSFX>();
-            UserData.RegisterType<ImpactSfxManager>();
-            UserData.RegisterType<MotorSFX>();
-            UserData.RegisterType<PrismaticSFX>();
-            UserData.RegisterType<RollingSFX>();
-            UserData.RegisterType<ShellSFX>();
-            UserData.RegisterType<WindBuffetSFX>();
-            UserData.RegisterType<Atv>();
-            UserData.RegisterType<Seat>();
-            UserData.RegisterType<ObjectDestructible>();
-            UserData.RegisterType<ParticleSpread>();
-            UserData.RegisterType<ParticleSpreadManager>();
-            UserData.RegisterType<ParticleTint>();
-            UserData.RegisterType<SpawnFragment>();
-            UserData.RegisterType<SpawnFragmentArray>();
-            UserData.RegisterType<TextureArrayApplicator>();
-            UserData.RegisterType<CollisionCollector>();
-            UserData.RegisterType<CollisionStay>();
-            UserData.RegisterType<CollisionStaySensor>();
-            UserData.RegisterType<HandPoseAnimator>();
-            UserData.RegisterType<Mirror>();
-            UserData.RegisterType<PhysGrounder>();
-            UserData.RegisterType<PhysHand>();
-            UserData.RegisterType<PhysLimb>();
-            UserData.RegisterType<PlayerAvatarArt>();
-            UserData.RegisterType<RealHeptaAvatar>();
-            UserData.RegisterType<SLZ_Body>();
-            UserData.RegisterType<TestContactMod>();
-            UserData.RegisterType<ZoneTriggerNode>();
-            UserData.RegisterType<RecycleDecorator>();
-            UserData.RegisterType<SpawnDecorator>();
-            UserData.RegisterType<Zone>();
-            UserData.RegisterType<ZoneCuller>();
-            UserData.RegisterType<ZoneGun>();
-            UserData.RegisterType<CrateSpawnSequencer>();
-            UserData.RegisterType<RandomizeCrate>();
-            UserData.RegisterType<SceneChunk>();
-            UserData.RegisterType<SpawnerToggle>();
-            UserData.RegisterType<SpawnForce>();
-            UserData.RegisterType<Zone3dSound>();
-            UserData.RegisterType<ZoneAggro>();
-            UserData.RegisterType<ZoneAmbience>();
-            UserData.RegisterType<ZoneChunkLoader>();
-            UserData.RegisterType<ZoneEnabler>();
-            UserData.RegisterType<ZoneEvents>();
-            UserData.RegisterType<ZoneItem>();
-            UserData.RegisterType<ZoneLight>();
-            UserData.RegisterType<ZoneLinkEvents>();
-            UserData.RegisterType<ZoneLinkItem>();
-            UserData.RegisterType<ZoneLoadLevel>();
-            UserData.RegisterType<ZoneMusic>();
-            UserData.RegisterType<ZoneOcclusion>();
-            UserData.RegisterType<ZoneTriggerSource>();
-            UserData.RegisterType<ZoneLink>();
-            UserData.RegisterType<CrateSpawner>();
-            UserData.RegisterType<CrateSpawnerGrid>();
-            UserData.RegisterType<AddNode>();
-            UserData.RegisterType<BaseNode>();
-            UserData.RegisterType<ButtonNode>();
-            UserData.RegisterType<CounterNode>();
-            UserData.RegisterType<DivideNode>();
-            UserData.RegisterType<EqualNode>();
-            UserData.RegisterType<GreaterThanEqualNode>();
-            UserData.RegisterType<GreaterThanNode>();
-            UserData.RegisterType<LessThanEqualNode>();
-            UserData.RegisterType<LessThanNode>();
-            UserData.RegisterType<LeverNode>();
-            UserData.RegisterType<MaxNode>();
-            UserData.RegisterType<MemoryNode>();
-            UserData.RegisterType<MinNode>();
-            UserData.RegisterType<MultiplyNode>();
-            UserData.RegisterType<PassthroughNode>();
-            UserData.RegisterType<RatchetNode>();
-            UserData.RegisterType<RemapNode>();
-            UserData.RegisterType<SequencerNode>();
-            UserData.RegisterType<SliderNode>();
-            UserData.RegisterType<SubtractNode>();
-            UserData.RegisterType<ToggleButtonNode>();
-            UserData.RegisterType<ToggleNode>();
-            UserData.RegisterType<XorNode>();
-            UserData.RegisterType<DamageVolume>();
-            UserData.RegisterType<EventAdapter>();
-            UserData.RegisterType<LegacySoundPlayer>();
-            UserData.RegisterType<LinearJoint>();
-            UserData.RegisterType<MaterialSwitcher>();
-            UserData.RegisterType<RotatingJoint>();
-            UserData.RegisterType<TextAdapter>();
-            UserData.RegisterType<ToneGenerator>();
-            UserData.RegisterType<PowerSource>();
-            UserData.RegisterType<TransformSensor>();
-            UserData.RegisterType<VoidLogicSpawnExport>();
-            UserData.RegisterType<VoidLogicSpawnImport>();
-            UserData.RegisterType<VoidLogicSpawnInput>();
-            UserData.RegisterType<VoidLogicSpawnOutput>();
-            UserData.RegisterType<PlayerMarker>();
-            UserData.RegisterType<SceneBootstrapper>();
-            UserData.RegisterType<AnimationBlocker>();
-            UserData.RegisterType<BehaviourBase>();
-            UserData.RegisterType<BehaviourBaseNav>();
-            UserData.RegisterType<BehaviourPuppet>();
-            UserData.RegisterType<BreakJointOnPuppet>();
-            UserData.RegisterType<JointBreakBroadcaster>();
-            UserData.RegisterType<MuscleCollisionBroadcaster>();
-            UserData.RegisterType<MuscleCollisionBroadcasterSensor>();
-            UserData.RegisterType<Muscle>();
-            UserData.RegisterType<Muscle.State>();
-            UserData.RegisterType<PID_Controller>();
-            UserData.RegisterType<PressureSensor>();
-            UserData.RegisterType<PuppetMaster>();
-            UserData.RegisterType<PuppetMasterSettings>();
-            UserData.RegisterType<SkinnedBoneRebind>();
-            UserData.RegisterType<AssetSpawner>();
-            UserData.RegisterType<DespawnDelay>();
-            UserData.RegisterType<Poolee>();
-            UserData.RegisterType<SpawnEvents>();
-            UserData.RegisterType<Authenticator>();
-            UserData.RegisterType<AuthenticatorDock>();
-            UserData.RegisterType<AuthenticatorDockDecorator>();
-            UserData.RegisterType<Battery>();
-            UserData.RegisterType<BatteryHolder>();
-            UserData.RegisterType<BatteryHolderDecorator>();
-            UserData.RegisterType<Il2CppSLZ.Marrow.Plug>();
-            UserData.RegisterType<System.Net.Sockets.Socket>();
-            UserData.RegisterType<LiteLoco>();
-            UserData.RegisterType<TempSelectionBase>();
-            UserData.RegisterType<MarrowBehaviour>();
-            UserData.RegisterType<ObjectCleanupEvents>();
-            UserData.RegisterType<ObjectCleanupVolume>();
-            UserData.RegisterType<UtilitySpawnables>();
-            UserData.RegisterType<LinkLateReferenceSubscriptions>();
-            UserData.RegisterType<SceneExportTable>();
-            UserData.RegisterType<ExportTable>();
-            UserData.RegisterType<ArtCull>();
-            UserData.RegisterType<MarrowBody>();
-            UserData.RegisterType<Tracker>();
-            UserData.RegisterType<MarrowEntity>();
-            UserData.RegisterType<MarrowJoint>();
-            UserData.RegisterType<OverlapStateHelper>();
-            UserData.RegisterType<OverlapTrigger>();
-            UserData.RegisterType<RigidbodySettings>();
-            UserData.RegisterType<PolyLine>();
-            UserData.RegisterType<Il2CppSLZ.Marrow.Interaction.SplineJoint>();
-            UserData.RegisterType<XRUICursor>();
-            UserData.RegisterType<XRUICursorReceiver>();
-            UserData.RegisterType<ModIOManager>();
-            UserData.RegisterType<VisualDamageController>();
-            UserData.RegisterType<Actuator>();
-            UserData.RegisterType<AngularVelocityActuator>();
-            UserData.RegisterType<AngularXDriver>();
-            UserData.RegisterType<EventActuator>();
-            UserData.RegisterType<LinearXDriver>();
-            UserData.RegisterType<MaterialSwitchActuator>();
-            UserData.RegisterType<ActuatorSocket>();
-            UserData.RegisterType<Circuit>();
-            UserData.RegisterType<ActuatorSocketDecorator>();
-            UserData.RegisterType<ButtonDecorator>();
-            UserData.RegisterType<SwitchDecorator>();
-            UserData.RegisterType<ExternalActuator>();
-            UserData.RegisterType<ExternalCircuit>();
-            UserData.RegisterType<AddCircuit>();
-            UserData.RegisterType<FlipflopCircuit>();
-            UserData.RegisterType<MultiplyCircuit>();
-            UserData.RegisterType<RemapCircuit>();
-            UserData.RegisterType<ValueCircuit>();
-            UserData.RegisterType<XorCircuit>();
-            UserData.RegisterType<AngularXSensor>();
-            UserData.RegisterType<AngularYSensor>();
-            UserData.RegisterType<AngularZSensor>();
-            UserData.RegisterType<ButtonController>();
-            UserData.RegisterType<CircuitSocket>();
-            UserData.RegisterType<HingeController>();
-            UserData.RegisterType<LinearXSensor>();
-            UserData.RegisterType<SliderController>();
-            UserData.RegisterType<ZoneCircuit>();
-            UserData.RegisterType<BillOfMaterials>();
-            UserData.RegisterType<BlueprintSpawner>();
-            UserData.RegisterType<Audio2dManager>();
-            UserData.RegisterType<Audio3dManager>();
-            UserData.RegisterType<AudioPlayer>();
-            UserData.RegisterType<FootstepSFX>();
-            UserData.RegisterType<MusicAmbience2dSFX>();
-            UserData.RegisterType<AIBrain>();
-            UserData.RegisterType<AIManager>();
-            UserData.RegisterType<Encounter>();
-            UserData.RegisterType<EncounterMonitor>();
-            UserData.RegisterType<RoamArea>();
-            UserData.RegisterType<SlotPosition>();
-            UserData.RegisterType<SpawnAgro>();
-            UserData.RegisterType<SpawnAISettings>();
-            UserData.RegisterType<TriggerRefProxy>();
-            UserData.RegisterType<VoidLogicSubgraph>();
-            UserData.RegisterType<VoidLogicManager>();
-            UserData.RegisterType<TriggeredAudio>();
-            UserData.RegisterType<AgentLinkControl>();
-        }
-        
-        public void ReloadScripts()
-        {
-
-        }
-
-        public override void OnUpdate()
-        {
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.R))
-            {
-                ReloadScripts();
-            }
-
-            if (Input.GetKeyDown(KeyCode.F1))
-            {
-                LoggerInstance.Msg("F1 pressed!");
-                SpawnCube();
-            }
-
-            if (Input.GetKeyDown(KeyCode.F2))
-            {
-                LoggerInstance.Msg("F2 pressed - reloading scripts");
-                ScriptManager.ReloadScripts();
-            }
-
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                if (BoneLib.Player.LeftHand != null)
-                {
-                    Transform T = BoneLib.Player.LeftHand.transform;
-                    API_GameObject.BL_SpawnByBarcode("c1534c5a-683b-4c01-b378-6795416d6d6f", T.position, T.rotation); //ammo box light
-                    API_GameObject.BL_SpawnByBarcode("c1534c5a-fcfc-4f43-8fb0-d29531393131", T.position, T.rotation); //M1911
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.F4))
-            {
-                GameObject M1911 = GameObject.Find("handgun_1911 [0]");
-                if (M1911 != null)
-                {
-                    LuaGun LG = M1911.GetComponent<Gun>().gameObject.AddComponent<LuaGun>();
-                }
-                else
-                {
-                    LoggerInstance.Msg("No 1911 located");
-                }
-            }
-
-
-            if (Input.GetKeyDown(KeyCode.F5))
-            {
-                if (BoneLib.Player.LeftHand != null)
-                {
-                    Transform T = BoneLib.Player.LeftHand.transform;
-                    API_GameObject.BL_SpawnByBarcode(BoneLib.CommonBarcodes.NPCs.Ford, T.position, T.rotation); 
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.F6))
-            {
-                GameObject Ford = GameObject.Find("NPC_Ford_BWOrig [0]");
-                if (Ford != null)
-                {
-                    LuaNPC LG = Ford.GetComponent<AIBrain>().gameObject.AddComponent<LuaNPC>();
-                }
-                else
-                {
-                    LoggerInstance.Msg("No Ford located");
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.F8))
-            {
-               GameObject TestObject = new GameObject();
-               TestObject.SetActive(false);
-               TestObject.name = "TestObject";
-               LineRenderer line = TestObject.AddComponent<LineRenderer>();
-               line.numPositions = 5;
-               Vector3[] pos = new Vector3[5];
-               line.GetPositions(pos);
-               TestObject.SetActive(true);
-              
-            }
-        }
-
+ 
+          
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
+            ///note: probably won't trigger because your lua script won't be loaded
+            MelonLogger.Msg("OnSceneWasInitialized");
+            API_Events.BL_InvokeEvent("OnSceneWasInitialized", DynValue.NewNumber(buildIndex), DynValue.NewString(sceneName));
             base.OnSceneWasInitialized(buildIndex, sceneName);
+          
         }
 
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+        {
+            ///note: probably won't trigger because your lua script won't be loaded
+            MelonLogger.Msg("OnSceneWasLoaded");
+            API_Events.BL_InvokeEvent("OnSceneWasLoaded", DynValue.NewNumber(buildIndex), DynValue.NewString(sceneName));
+            base.OnSceneWasLoaded(buildIndex, sceneName);
+                   }
+        public override void OnSceneWasUnloaded(int buildIndex, string sceneName)
+        {
+            ///note: use to detect the removal of the loading screen scene
+            MelonLogger.Msg("OnSceneWasUnloaded");
+            API_Events.BL_InvokeEvent("OnSceneWasUnloaded", DynValue.NewNumber(buildIndex), DynValue.NewString(sceneName));
+            base.OnSceneWasUnloaded(buildIndex, sceneName);
+        }
 
+        [MoonSharpHidden]
         public override void OnInitializeMelon()
         {
-       
+            API_Events.BL_InvokeEvent("OnInitializeMelon");
         }
 
-
+        [MoonSharpHidden]
         public override void OnLateInitializeMelon()
         {
-            API_GameObject.LoadAllAssemblies();
+
+
+
+            LoadAllAssemblies();
             LoadTypes();
             FieldInjector.SerialisationHandler.Inject<LuaBehaviour>();
             FieldInjector.SerialisationHandler.Inject<LuaGun>();
@@ -818,58 +3989,17 @@ namespace LuaMod
             LuaMenu.SetActive(false);
             LuaMenu.name = "LuaMenu";
             LuaBehaviour LuaMenuBehaviour = LuaMenu.AddComponent<LuaBehaviour>();
-            LuaMenuBehaviour.ScriptName = ("TestBoneMenu.lua");
+            LuaMenuBehaviour.ScriptName = ("\\Examples\\UtilityScript\\TestBoneMenu.lua");
             LuaMenu.SetActive(true);
-            
+
+
+            API_Events.BL_InvokeEvent("OnLateInitializeMelon");
         }
 
 
 
-        public void SpawnCube()
-        {
-            if (BoneLib.Player.Avatar != null)
-            {
 
-
-                Vector3 PlayerPos = BoneLib.Player.Head.position;
-                LoggerInstance.Msg("player head position: " + PlayerPos.ToString());
-
-                GameObject exampleOne = GameObject.CreatePrimitive(PrimitiveType.Cube); //GameObject.Instantiate(Resources.Load("rifle_M16_LaserForegrip_crazy", Il2CppType.Of<GameObject>())) as GameObject;
-
-                LuaBehaviour Lbehaviour = exampleOne.AddComponent<LuaBehaviour>();
-                //Lbehaviour.LoggerInstance = LoggerInstance;
-                Lbehaviour.LoadScript("Mods\\LuaMod\\LuaScripts\\TestA.lua");
-
-                LoggerInstance.Msg("game object spawned.");
-                LoggerInstance.Msg(exampleOne.name);
-
-                Transform examplePos = exampleOne.transform;
-
-                MeshRenderer meshRenderer = exampleOne.GetComponent<MeshRenderer>();
-
-                BoxCollider collider = examplePos.GetComponent<BoxCollider>();
-                collider.enabled = false;
-                examplePos.position = PlayerPos;
-                HelperMethods.SpawnCrate("Authorr.LuaModTest.Spawnable.RifleM16LaserForegripcrazy", PlayerPos);
-
-                meshRenderer.material = BoneLib.Player.Avatar.GetComponent<SkinnedMeshRenderer>().materials[0];
-
-
-
-
-            }
-            else
-            {
-                LoggerInstance.Msg("no player yet");
-            }
-
-        }
-
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
-        {
-
-
-        }
+      
 
     }
 }

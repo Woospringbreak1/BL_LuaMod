@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f914c336bccce574faf877d822a34289, type: 3}
+  m_Name: InfiniteMagazine
+  m_EditorClassIdentifier: 
+  spawnable:
+    crateRef:
+      _barcode:
+        _id: c1534c5a-8bb2-47cc-977a-46954d616761
+    policyData: {fileID: 11400000, guid: 5ec49cff1f58a1f46a6a33c5636f8e62, type: 2}
+  platform: STANAG
+  rounds: 999999

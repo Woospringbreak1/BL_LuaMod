@@ -1,8 +1,0 @@
-{
-    "Lua.diagnostics.globals": [
-        "API_Vector",
-        "Vector3",
-        "API_GameObject",
-        "Physics"
-    ]
-}

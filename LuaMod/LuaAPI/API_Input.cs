@@ -1,9 +1,11 @@
 ﻿using Il2CppSLZ.Marrow;
+
 using UnityEngine;
 
 namespace LuaMod.LuaAPI
 {
-    internal class API_Input
+
+    public class API_Input
     {
 
         public static readonly API_Input Instance = new API_Input();
@@ -48,11 +50,48 @@ namespace LuaMod.LuaAPI
         }
 
 
+        public static bool BL_IsBButtonDownOnce()
+        {
+            if (BoneLib.Player.RightController != null)
+            {
+                return BoneLib.Player.RightController.GetBButtonDown();
+            }
+            return false;
+        }
+
+        public static bool BL_IsBButtonUpOnce()
+        {
+            if (BoneLib.Player.RightController != null)
+            {
+                return BoneLib.Player.RightController.GetBButtonUp();
+            }
+            return false;
+        }
+
+
         public static bool BL_IsXButtonDown()
         {
             if (BoneLib.Player.LeftController != null)
             {
                 return BoneLib.Player.LeftController.GetAButton();
+            }
+            return false;
+        }
+
+        public static bool BL_IsXButtonDownOnce()
+        {
+            if (BoneLib.Player.LeftController != null)
+            {
+                return BoneLib.Player.LeftController.GetAButtonDown();
+            }
+            return false;
+        }
+
+        public static bool BL_IsXButtonUpOnce()
+        {
+            if (BoneLib.Player.LeftController != null)
+            {
+                return BoneLib.Player.LeftController.GetAButtonUp();
             }
             return false;
         }
@@ -66,6 +105,23 @@ namespace LuaMod.LuaAPI
             return false;
         }
 
+        public static bool BL_IsYButtonDownOnce()
+        {
+            if (BoneLib.Player.LeftController != null)
+            {
+                return BoneLib.Player.LeftController.GetBButtonDown();
+            }
+            return false;
+        }
+
+        public static bool BL_IsYButtonUpOnce()
+        {
+            if (BoneLib.Player.LeftController != null)
+            {
+                return BoneLib.Player.LeftController.GetBButtonUp();
+            }
+            return false;
+        }
 
 
 
@@ -125,26 +181,6 @@ namespace LuaMod.LuaAPI
             }
             return false;
         }
-
-
-        public static bool BL_RightController_GetAButtonDown()
-        {
-            if (BoneLib.Player.RightController != null)
-            {
-                return BoneLib.Player.RightController.GetAButtonDown();
-            }
-            return false;
-        }
-
-        public static bool BL_RightController_GetAButtonUp()
-        {
-            if (BoneLib.Player.RightController != null)
-            {
-                return BoneLib.Player.RightController.GetAButtonUp();
-            }
-            return false;   
-        }
-
 
         public static bool BL_IsKeyDown(int keyCodeArg)
         {

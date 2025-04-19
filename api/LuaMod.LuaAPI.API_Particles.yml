@@ -1,0 +1,343 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaAPI.API_Particles
+  commentId: T:LuaMod.LuaAPI.API_Particles
+  id: API_Particles
+  parent: LuaMod.LuaAPI
+  children:
+  - LuaMod.LuaAPI.API_Particles.BL_GetParticles(UnityEngine.ParticleSystem,System.Int32,System.Int32)
+  - LuaMod.LuaAPI.API_Particles.BL_lineRenderer_GetPositions(UnityEngine.LineRenderer)
+  - LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray(System.Int32)
+  - LuaMod.LuaAPI.API_Particles.Instance
+  langs:
+  - csharp
+  - vb
+  name: API_Particles
+  nameWithType: API_Particles
+  fullName: LuaMod.LuaAPI.API_Particles
+  type: Class
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Particles.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: API_Particles
+    path: LuaMod/LuaAPI/API_Particles.cs
+    startLine: 21
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Lua-exposed API for working with Unity particle systems and trail segments.
+  remarks: This API is experimental. Some functions may be unstable and cause crashes due to issues in the underlying engine or bindings.
+  example: []
+  syntax:
+    content: public class API_Particles
+    content.vb: Public Class API_Particles
+  inheritance:
+  - System.Object
+- uid: LuaMod.LuaAPI.API_Particles.Instance
+  commentId: F:LuaMod.LuaAPI.API_Particles.Instance
+  id: Instance
+  parent: LuaMod.LuaAPI.API_Particles
+  langs:
+  - csharp
+  - vb
+  name: Instance
+  nameWithType: API_Particles.Instance
+  fullName: LuaMod.LuaAPI.API_Particles.Instance
+  type: Field
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Particles.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: Instance
+    path: LuaMod/LuaAPI/API_Particles.cs
+    startLine: 23
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static readonly API_Particles Instance
+    return:
+      type: LuaMod.LuaAPI.API_Particles
+    content.vb: Public Shared ReadOnly Instance As API_Particles
+- uid: LuaMod.LuaAPI.API_Particles.BL_GetParticles(UnityEngine.ParticleSystem,System.Int32,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Particles.BL_GetParticles(UnityEngine.ParticleSystem,System.Int32,System.Int32)
+  id: BL_GetParticles(UnityEngine.ParticleSystem,System.Int32,System.Int32)
+  parent: LuaMod.LuaAPI.API_Particles
+  langs:
+  - csharp
+  - vb
+  name: BL_GetParticles(ParticleSystem, int, int)
+  nameWithType: API_Particles.BL_GetParticles(ParticleSystem, int, int)
+  fullName: LuaMod.LuaAPI.API_Particles.BL_GetParticles(UnityEngine.ParticleSystem, int, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Particles.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetParticles
+    path: LuaMod/LuaAPI/API_Particles.cs
+    startLine: 35
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Attempts to retrieve particle data from a Unity ParticleSystem.
+  remarks: Calling this method will result in a crash to desktop (CTD). A bug report is open with the MelonLoader team.
+  example: []
+  syntax:
+    content: public static ParticleSystem.Particle[] BL_GetParticles(ParticleSystem system, int size, int offset)
+    parameters:
+    - id: system
+      type: UnityEngine.ParticleSystem
+      description: The ParticleSystem to extract particles from.
+    - id: size
+      type: System.Int32
+      description: The number of particles to retrieve.
+    - id: offset
+      type: System.Int32
+      description: The offset index to start reading particles.
+    return:
+      type: UnityEngine.ParticleSystem.Particle[]
+      description: An array of Particle objects if successful; null otherwise. Currently known to cause crashes.
+    content.vb: Public Shared Function BL_GetParticles(system As ParticleSystem, size As Integer, offset As Integer) As ParticleSystem.Particle()
+  overload: LuaMod.LuaAPI.API_Particles.BL_GetParticles*
+  nameWithType.vb: API_Particles.BL_GetParticles(ParticleSystem, Integer, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Particles.BL_GetParticles(UnityEngine.ParticleSystem, Integer, Integer)
+  name.vb: BL_GetParticles(ParticleSystem, Integer, Integer)
+- uid: LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray(System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray(System.Int32)
+  id: CreateTrailSegmentArray(System.Int32)
+  parent: LuaMod.LuaAPI.API_Particles
+  langs:
+  - csharp
+  - vb
+  name: CreateTrailSegmentArray(int)
+  nameWithType: API_Particles.CreateTrailSegmentArray(int)
+  fullName: LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray(int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Particles.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: CreateTrailSegmentArray
+    path: LuaMod/LuaAPI/API_Particles.cs
+    startLine: 58
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public Vector3[] CreateTrailSegmentArray(int size)
+    parameters:
+    - id: size
+      type: System.Int32
+    return:
+      type: UnityEngine.Vector3[]
+    content.vb: Public Function CreateTrailSegmentArray(size As Integer) As Vector3()
+  overload: LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray*
+  nameWithType.vb: API_Particles.CreateTrailSegmentArray(Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray(Integer)
+  name.vb: CreateTrailSegmentArray(Integer)
+- uid: LuaMod.LuaAPI.API_Particles.BL_lineRenderer_GetPositions(UnityEngine.LineRenderer)
+  commentId: M:LuaMod.LuaAPI.API_Particles.BL_lineRenderer_GetPositions(UnityEngine.LineRenderer)
+  id: BL_lineRenderer_GetPositions(UnityEngine.LineRenderer)
+  parent: LuaMod.LuaAPI.API_Particles
+  langs:
+  - csharp
+  - vb
+  name: BL_lineRenderer_GetPositions(LineRenderer)
+  nameWithType: API_Particles.BL_lineRenderer_GetPositions(LineRenderer)
+  fullName: LuaMod.LuaAPI.API_Particles.BL_lineRenderer_GetPositions(UnityEngine.LineRenderer)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Particles.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_lineRenderer_GetPositions
+    path: LuaMod/LuaAPI/API_Particles.cs
+    startLine: 74
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Attempts to retrieve line segment positions from a Unity LineRenderer.
+  remarks: Calling this method will result in a crash to desktop (CTD). A bug report is open with the MelonLoader team.
+  example: []
+  syntax:
+    content: public static DynValue BL_lineRenderer_GetPositions(LineRenderer LR)
+    parameters:
+    - id: LR
+      type: UnityEngine.LineRenderer
+      description: The LineRenderer component to read from.
+    return:
+      type: MoonSharp.Interpreter.DynValue
+      description: DynValue containing the position data, or null if failed. Currently unstable.
+    content.vb: Public Shared Function BL_lineRenderer_GetPositions(LR As LineRenderer) As DynValue
+  overload: LuaMod.LuaAPI.API_Particles.BL_lineRenderer_GetPositions*
+references:
+- uid: LuaMod.LuaAPI
+  commentId: N:LuaMod.LuaAPI
+  href: LuaMod.html
+  name: LuaMod.LuaAPI
+  nameWithType: LuaMod.LuaAPI
+  fullName: LuaMod.LuaAPI
+  spec.csharp:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+  spec.vb:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: LuaMod.LuaAPI.API_Particles
+  commentId: T:LuaMod.LuaAPI.API_Particles
+  parent: LuaMod.LuaAPI
+  href: LuaMod.LuaAPI.API_Particles.html
+  name: API_Particles
+  nameWithType: API_Particles
+  fullName: LuaMod.LuaAPI.API_Particles
+- uid: LuaMod.LuaAPI.API_Particles.BL_GetParticles*
+  commentId: Overload:LuaMod.LuaAPI.API_Particles.BL_GetParticles
+  href: LuaMod.LuaAPI.API_Particles.html#LuaMod_LuaAPI_API_Particles_BL_GetParticles_UnityEngine_ParticleSystem_System_Int32_System_Int32_
+  name: BL_GetParticles
+  nameWithType: API_Particles.BL_GetParticles
+  fullName: LuaMod.LuaAPI.API_Particles.BL_GetParticles
+- uid: UnityEngine.ParticleSystem
+  commentId: T:UnityEngine.ParticleSystem
+  parent: UnityEngine
+  isExternal: true
+  name: ParticleSystem
+  nameWithType: ParticleSystem
+  fullName: UnityEngine.ParticleSystem
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: UnityEngine.ParticleSystem.Particle[]
+  isExternal: true
+  name: Particle[]
+  nameWithType: ParticleSystem.Particle[]
+  fullName: UnityEngine.ParticleSystem.Particle[]
+  nameWithType.vb: ParticleSystem.Particle()
+  fullName.vb: UnityEngine.ParticleSystem.Particle()
+  name.vb: Particle()
+  spec.csharp:
+  - uid: UnityEngine.ParticleSystem.Particle
+    name: Particle
+    isExternal: true
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: UnityEngine.ParticleSystem.Particle
+    name: Particle
+    isExternal: true
+  - name: (
+  - name: )
+- uid: UnityEngine
+  commentId: N:UnityEngine
+  isExternal: true
+  name: UnityEngine
+  nameWithType: UnityEngine
+  fullName: UnityEngine
+- uid: LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray*
+  commentId: Overload:LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray
+  href: LuaMod.LuaAPI.API_Particles.html#LuaMod_LuaAPI_API_Particles_CreateTrailSegmentArray_System_Int32_
+  name: CreateTrailSegmentArray
+  nameWithType: API_Particles.CreateTrailSegmentArray
+  fullName: LuaMod.LuaAPI.API_Particles.CreateTrailSegmentArray
+- uid: UnityEngine.Vector3[]
+  isExternal: true
+  name: Vector3[]
+  nameWithType: Vector3[]
+  fullName: UnityEngine.Vector3[]
+  nameWithType.vb: Vector3()
+  fullName.vb: UnityEngine.Vector3()
+  name.vb: Vector3()
+  spec.csharp:
+  - uid: UnityEngine.Vector3
+    name: Vector3
+    isExternal: true
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: UnityEngine.Vector3
+    name: Vector3
+    isExternal: true
+  - name: (
+  - name: )
+- uid: LuaMod.LuaAPI.API_Particles.BL_lineRenderer_GetPositions*
+  commentId: Overload:LuaMod.LuaAPI.API_Particles.BL_lineRenderer_GetPositions
+  href: LuaMod.LuaAPI.API_Particles.html#LuaMod_LuaAPI_API_Particles_BL_lineRenderer_GetPositions_UnityEngine_LineRenderer_
+  name: BL_lineRenderer_GetPositions
+  nameWithType: API_Particles.BL_lineRenderer_GetPositions
+  fullName: LuaMod.LuaAPI.API_Particles.BL_lineRenderer_GetPositions
+- uid: UnityEngine.LineRenderer
+  commentId: T:UnityEngine.LineRenderer
+  parent: UnityEngine
+  isExternal: true
+  name: LineRenderer
+  nameWithType: LineRenderer
+  fullName: UnityEngine.LineRenderer
+- uid: MoonSharp.Interpreter.DynValue
+  commentId: T:MoonSharp.Interpreter.DynValue
+  parent: MoonSharp.Interpreter
+  isExternal: true
+  name: DynValue
+  nameWithType: DynValue
+  fullName: MoonSharp.Interpreter.DynValue
+- uid: MoonSharp.Interpreter
+  commentId: N:MoonSharp.Interpreter
+  isExternal: true
+  name: MoonSharp.Interpreter
+  nameWithType: MoonSharp.Interpreter
+  fullName: MoonSharp.Interpreter
+  spec.csharp:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+  spec.vb:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true

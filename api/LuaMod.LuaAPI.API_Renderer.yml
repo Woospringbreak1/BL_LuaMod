@@ -1,0 +1,407 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaAPI.API_Renderer
+  commentId: T:LuaMod.LuaAPI.API_Renderer
+  id: API_Renderer
+  parent: LuaMod.LuaAPI
+  children:
+  - LuaMod.LuaAPI.API_Renderer.BL_GetAllMaterials(MoonSharp.Interpreter.Script,UnityEngine.MeshRenderer)
+  - LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt(UnityEngine.MeshRenderer,System.Int32)
+  - LuaMod.LuaAPI.API_Renderer.BL_GetMaterialCount(UnityEngine.MeshRenderer)
+  - LuaMod.LuaAPI.API_Renderer.BL_SetAllMaterials(UnityEngine.MeshRenderer,MoonSharp.Interpreter.Table)
+  - LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt(UnityEngine.MeshRenderer,System.Int32,UnityEngine.Material)
+  - LuaMod.LuaAPI.API_Renderer.Instance
+  langs:
+  - csharp
+  - vb
+  name: API_Renderer
+  nameWithType: API_Renderer
+  fullName: LuaMod.LuaAPI.API_Renderer
+  type: Class
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Renderer.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: API_Renderer
+    path: LuaMod/LuaAPI/API_Renderer.cs
+    startLine: 22
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: >-
+    Lua-exposed API for modifying MeshRenderer materials.
+
+    Supports getting, setting, and replacing materials from Lua scripts.
+  example: []
+  syntax:
+    content: >-
+      [MoonSharpUserData]
+
+      public class API_Renderer
+    content.vb: >-
+      <MoonSharpUserData>
+
+      Public Class API_Renderer
+  inheritance:
+  - System.Object
+  attributes:
+  - type: MoonSharp.Interpreter.MoonSharpUserDataAttribute
+    ctor: MoonSharp.Interpreter.MoonSharpUserDataAttribute.#ctor
+    arguments: []
+- uid: LuaMod.LuaAPI.API_Renderer.Instance
+  commentId: F:LuaMod.LuaAPI.API_Renderer.Instance
+  id: Instance
+  parent: LuaMod.LuaAPI.API_Renderer
+  langs:
+  - csharp
+  - vb
+  name: Instance
+  nameWithType: API_Renderer.Instance
+  fullName: LuaMod.LuaAPI.API_Renderer.Instance
+  type: Field
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Renderer.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: Instance
+    path: LuaMod/LuaAPI/API_Renderer.cs
+    startLine: 28
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Singleton instance of the API_Renderer class.
+  example: []
+  syntax:
+    content: public static readonly API_Renderer Instance
+    return:
+      type: LuaMod.LuaAPI.API_Renderer
+    content.vb: Public Shared ReadOnly Instance As API_Renderer
+- uid: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialCount(UnityEngine.MeshRenderer)
+  commentId: M:LuaMod.LuaAPI.API_Renderer.BL_GetMaterialCount(UnityEngine.MeshRenderer)
+  id: BL_GetMaterialCount(UnityEngine.MeshRenderer)
+  parent: LuaMod.LuaAPI.API_Renderer
+  langs:
+  - csharp
+  - vb
+  name: BL_GetMaterialCount(MeshRenderer)
+  nameWithType: API_Renderer.BL_GetMaterialCount(MeshRenderer)
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialCount(UnityEngine.MeshRenderer)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Renderer.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetMaterialCount
+    path: LuaMod/LuaAPI/API_Renderer.cs
+    startLine: 33
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Returns the number of materials on the given MeshRenderer.
+  example: []
+  syntax:
+    content: public static int BL_GetMaterialCount(MeshRenderer renderer)
+    parameters:
+    - id: renderer
+      type: UnityEngine.MeshRenderer
+    return:
+      type: System.Int32
+    content.vb: Public Shared Function BL_GetMaterialCount(renderer As MeshRenderer) As Integer
+  overload: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialCount*
+- uid: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt(UnityEngine.MeshRenderer,System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt(UnityEngine.MeshRenderer,System.Int32)
+  id: BL_GetMaterialAt(UnityEngine.MeshRenderer,System.Int32)
+  parent: LuaMod.LuaAPI.API_Renderer
+  langs:
+  - csharp
+  - vb
+  name: BL_GetMaterialAt(MeshRenderer, int)
+  nameWithType: API_Renderer.BL_GetMaterialAt(MeshRenderer, int)
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt(UnityEngine.MeshRenderer, int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Renderer.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetMaterialAt
+    path: LuaMod/LuaAPI/API_Renderer.cs
+    startLine: 44
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Gets the material at the specified index (zero-based).
+  example: []
+  syntax:
+    content: public static DynValue BL_GetMaterialAt(MeshRenderer renderer, int index)
+    parameters:
+    - id: renderer
+      type: UnityEngine.MeshRenderer
+    - id: index
+      type: System.Int32
+    return:
+      type: MoonSharp.Interpreter.DynValue
+    content.vb: Public Shared Function BL_GetMaterialAt(renderer As MeshRenderer, index As Integer) As DynValue
+  overload: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt*
+  nameWithType.vb: API_Renderer.BL_GetMaterialAt(MeshRenderer, Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt(UnityEngine.MeshRenderer, Integer)
+  name.vb: BL_GetMaterialAt(MeshRenderer, Integer)
+- uid: LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt(UnityEngine.MeshRenderer,System.Int32,UnityEngine.Material)
+  commentId: M:LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt(UnityEngine.MeshRenderer,System.Int32,UnityEngine.Material)
+  id: BL_SetMaterialAt(UnityEngine.MeshRenderer,System.Int32,UnityEngine.Material)
+  parent: LuaMod.LuaAPI.API_Renderer
+  langs:
+  - csharp
+  - vb
+  name: BL_SetMaterialAt(MeshRenderer, int, Material)
+  nameWithType: API_Renderer.BL_SetMaterialAt(MeshRenderer, int, Material)
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt(UnityEngine.MeshRenderer, int, UnityEngine.Material)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Renderer.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SetMaterialAt
+    path: LuaMod/LuaAPI/API_Renderer.cs
+    startLine: 59
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Sets the material at the specified index (zero-based).
+  example: []
+  syntax:
+    content: public static void BL_SetMaterialAt(MeshRenderer renderer, int index, Material mat)
+    parameters:
+    - id: renderer
+      type: UnityEngine.MeshRenderer
+    - id: index
+      type: System.Int32
+    - id: mat
+      type: UnityEngine.Material
+    content.vb: Public Shared Sub BL_SetMaterialAt(renderer As MeshRenderer, index As Integer, mat As Material)
+  overload: LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt*
+  nameWithType.vb: API_Renderer.BL_SetMaterialAt(MeshRenderer, Integer, Material)
+  fullName.vb: LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt(UnityEngine.MeshRenderer, Integer, UnityEngine.Material)
+  name.vb: BL_SetMaterialAt(MeshRenderer, Integer, Material)
+- uid: LuaMod.LuaAPI.API_Renderer.BL_GetAllMaterials(MoonSharp.Interpreter.Script,UnityEngine.MeshRenderer)
+  commentId: M:LuaMod.LuaAPI.API_Renderer.BL_GetAllMaterials(MoonSharp.Interpreter.Script,UnityEngine.MeshRenderer)
+  id: BL_GetAllMaterials(MoonSharp.Interpreter.Script,UnityEngine.MeshRenderer)
+  parent: LuaMod.LuaAPI.API_Renderer
+  langs:
+  - csharp
+  - vb
+  name: BL_GetAllMaterials(Script, MeshRenderer)
+  nameWithType: API_Renderer.BL_GetAllMaterials(Script, MeshRenderer)
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_GetAllMaterials(MoonSharp.Interpreter.Script, UnityEngine.MeshRenderer)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Renderer.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_GetAllMaterials
+    path: LuaMod/LuaAPI/API_Renderer.cs
+    startLine: 82
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Gets all materials on the MeshRenderer as a Lua table.
+  example: []
+  syntax:
+    content: public static Table BL_GetAllMaterials(Script script, MeshRenderer renderer)
+    parameters:
+    - id: script
+      type: MoonSharp.Interpreter.Script
+    - id: renderer
+      type: UnityEngine.MeshRenderer
+    return:
+      type: MoonSharp.Interpreter.Table
+    content.vb: Public Shared Function BL_GetAllMaterials(script As Script, renderer As MeshRenderer) As Table
+  overload: LuaMod.LuaAPI.API_Renderer.BL_GetAllMaterials*
+- uid: LuaMod.LuaAPI.API_Renderer.BL_SetAllMaterials(UnityEngine.MeshRenderer,MoonSharp.Interpreter.Table)
+  commentId: M:LuaMod.LuaAPI.API_Renderer.BL_SetAllMaterials(UnityEngine.MeshRenderer,MoonSharp.Interpreter.Table)
+  id: BL_SetAllMaterials(UnityEngine.MeshRenderer,MoonSharp.Interpreter.Table)
+  parent: LuaMod.LuaAPI.API_Renderer
+  langs:
+  - csharp
+  - vb
+  name: BL_SetAllMaterials(MeshRenderer, Table)
+  nameWithType: API_Renderer.BL_SetAllMaterials(MeshRenderer, Table)
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_SetAllMaterials(UnityEngine.MeshRenderer, MoonSharp.Interpreter.Table)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Renderer.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_SetAllMaterials
+    path: LuaMod/LuaAPI/API_Renderer.cs
+    startLine: 102
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  summary: Sets all materials on the MeshRenderer using a Lua table.
+  example: []
+  syntax:
+    content: public static void BL_SetAllMaterials(MeshRenderer renderer, Table matTable)
+    parameters:
+    - id: renderer
+      type: UnityEngine.MeshRenderer
+    - id: matTable
+      type: MoonSharp.Interpreter.Table
+    content.vb: Public Shared Sub BL_SetAllMaterials(renderer As MeshRenderer, matTable As Table)
+  overload: LuaMod.LuaAPI.API_Renderer.BL_SetAllMaterials*
+references:
+- uid: LuaMod.LuaAPI
+  commentId: N:LuaMod.LuaAPI
+  href: LuaMod.html
+  name: LuaMod.LuaAPI
+  nameWithType: LuaMod.LuaAPI
+  fullName: LuaMod.LuaAPI
+  spec.csharp:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+  spec.vb:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: LuaMod.LuaAPI.API_Renderer
+  commentId: T:LuaMod.LuaAPI.API_Renderer
+  parent: LuaMod.LuaAPI
+  href: LuaMod.LuaAPI.API_Renderer.html
+  name: API_Renderer
+  nameWithType: API_Renderer
+  fullName: LuaMod.LuaAPI.API_Renderer
+- uid: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialCount*
+  commentId: Overload:LuaMod.LuaAPI.API_Renderer.BL_GetMaterialCount
+  href: LuaMod.LuaAPI.API_Renderer.html#LuaMod_LuaAPI_API_Renderer_BL_GetMaterialCount_UnityEngine_MeshRenderer_
+  name: BL_GetMaterialCount
+  nameWithType: API_Renderer.BL_GetMaterialCount
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialCount
+- uid: UnityEngine.MeshRenderer
+  commentId: T:UnityEngine.MeshRenderer
+  parent: UnityEngine
+  isExternal: true
+  name: MeshRenderer
+  nameWithType: MeshRenderer
+  fullName: UnityEngine.MeshRenderer
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: UnityEngine
+  commentId: N:UnityEngine
+  isExternal: true
+  name: UnityEngine
+  nameWithType: UnityEngine
+  fullName: UnityEngine
+- uid: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt*
+  commentId: Overload:LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt
+  href: LuaMod.LuaAPI.API_Renderer.html#LuaMod_LuaAPI_API_Renderer_BL_GetMaterialAt_UnityEngine_MeshRenderer_System_Int32_
+  name: BL_GetMaterialAt
+  nameWithType: API_Renderer.BL_GetMaterialAt
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_GetMaterialAt
+- uid: MoonSharp.Interpreter.DynValue
+  commentId: T:MoonSharp.Interpreter.DynValue
+  parent: MoonSharp.Interpreter
+  isExternal: true
+  name: DynValue
+  nameWithType: DynValue
+  fullName: MoonSharp.Interpreter.DynValue
+- uid: MoonSharp.Interpreter
+  commentId: N:MoonSharp.Interpreter
+  isExternal: true
+  name: MoonSharp.Interpreter
+  nameWithType: MoonSharp.Interpreter
+  fullName: MoonSharp.Interpreter
+  spec.csharp:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+  spec.vb:
+  - uid: MoonSharp
+    name: MoonSharp
+    isExternal: true
+  - name: .
+  - uid: MoonSharp.Interpreter
+    name: Interpreter
+    isExternal: true
+- uid: LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt*
+  commentId: Overload:LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt
+  href: LuaMod.LuaAPI.API_Renderer.html#LuaMod_LuaAPI_API_Renderer_BL_SetMaterialAt_UnityEngine_MeshRenderer_System_Int32_UnityEngine_Material_
+  name: BL_SetMaterialAt
+  nameWithType: API_Renderer.BL_SetMaterialAt
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_SetMaterialAt
+- uid: UnityEngine.Material
+  commentId: T:UnityEngine.Material
+  parent: UnityEngine
+  isExternal: true
+  name: Material
+  nameWithType: Material
+  fullName: UnityEngine.Material
+- uid: LuaMod.LuaAPI.API_Renderer.BL_GetAllMaterials*
+  commentId: Overload:LuaMod.LuaAPI.API_Renderer.BL_GetAllMaterials
+  href: LuaMod.LuaAPI.API_Renderer.html#LuaMod_LuaAPI_API_Renderer_BL_GetAllMaterials_MoonSharp_Interpreter_Script_UnityEngine_MeshRenderer_
+  name: BL_GetAllMaterials
+  nameWithType: API_Renderer.BL_GetAllMaterials
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_GetAllMaterials
+- uid: MoonSharp.Interpreter.Script
+  commentId: T:MoonSharp.Interpreter.Script
+  parent: MoonSharp.Interpreter
+  isExternal: true
+  name: Script
+  nameWithType: Script
+  fullName: MoonSharp.Interpreter.Script
+- uid: MoonSharp.Interpreter.Table
+  commentId: T:MoonSharp.Interpreter.Table
+  parent: MoonSharp.Interpreter
+  isExternal: true
+  name: Table
+  nameWithType: Table
+  fullName: MoonSharp.Interpreter.Table
+- uid: LuaMod.LuaAPI.API_Renderer.BL_SetAllMaterials*
+  commentId: Overload:LuaMod.LuaAPI.API_Renderer.BL_SetAllMaterials
+  href: LuaMod.LuaAPI.API_Renderer.html#LuaMod_LuaAPI_API_Renderer_BL_SetAllMaterials_UnityEngine_MeshRenderer_MoonSharp_Interpreter_Table_
+  name: BL_SetAllMaterials
+  nameWithType: API_Renderer.BL_SetAllMaterials
+  fullName: LuaMod.LuaAPI.API_Renderer.BL_SetAllMaterials

@@ -10,7 +10,7 @@ using static Il2CppSLZ.SFX.SimpleSFX;
 
 namespace LuaMod.LuaAPI
 {
-    internal class API_Audio
+    public class API_Audio
     {
         public static readonly API_Audio Instance = new API_Audio();
 

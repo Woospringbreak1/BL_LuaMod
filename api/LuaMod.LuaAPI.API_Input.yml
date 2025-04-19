@@ -1,0 +1,809 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.LuaAPI.API_Input
+  commentId: T:LuaMod.LuaAPI.API_Input
+  id: API_Input
+  parent: LuaMod.LuaAPI
+  children:
+  - LuaMod.LuaAPI.API_Input.BL_IsAButtonDown
+  - LuaMod.LuaAPI.API_Input.BL_IsAButtonDownOnce
+  - LuaMod.LuaAPI.API_Input.BL_IsAButtonUpOnce
+  - LuaMod.LuaAPI.API_Input.BL_IsBButtonDown
+  - LuaMod.LuaAPI.API_Input.BL_IsBButtonDownOnce
+  - LuaMod.LuaAPI.API_Input.BL_IsBButtonUpOnce
+  - LuaMod.LuaAPI.API_Input.BL_IsKeyDown(System.Int32)
+  - LuaMod.LuaAPI.API_Input.BL_IsXButtonDown
+  - LuaMod.LuaAPI.API_Input.BL_IsXButtonDownOnce
+  - LuaMod.LuaAPI.API_Input.BL_IsXButtonUpOnce
+  - LuaMod.LuaAPI.API_Input.BL_IsYButtonDown
+  - LuaMod.LuaAPI.API_Input.BL_IsYButtonDownOnce
+  - LuaMod.LuaAPI.API_Input.BL_IsYButtonUpOnce
+  - LuaMod.LuaAPI.API_Input.BL_LeftController_IsGrabbed
+  - LuaMod.LuaAPI.API_Input.BL_LeftHand
+  - LuaMod.LuaAPI.API_Input.BL_LeftHandEmpty
+  - LuaMod.LuaAPI.API_Input.BL_RightController_IsGrabbed
+  - LuaMod.LuaAPI.API_Input.BL_RightHand
+  - LuaMod.LuaAPI.API_Input.BL_RightHandEmpty
+  - LuaMod.LuaAPI.API_Input.Instance
+  langs:
+  - csharp
+  - vb
+  name: API_Input
+  nameWithType: API_Input
+  fullName: LuaMod.LuaAPI.API_Input
+  type: Class
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: API_Input
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 7
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public class API_Input
+    content.vb: Public Class API_Input
+  inheritance:
+  - System.Object
+- uid: LuaMod.LuaAPI.API_Input.Instance
+  commentId: F:LuaMod.LuaAPI.API_Input.Instance
+  id: Instance
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: Instance
+  nameWithType: API_Input.Instance
+  fullName: LuaMod.LuaAPI.API_Input.Instance
+  type: Field
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: Instance
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 10
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static readonly API_Input Instance
+    return:
+      type: LuaMod.LuaAPI.API_Input
+    content.vb: Public Shared ReadOnly Instance As API_Input
+- uid: LuaMod.LuaAPI.API_Input.BL_IsAButtonDown
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsAButtonDown
+  id: BL_IsAButtonDown
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsAButtonDown()
+  nameWithType: API_Input.BL_IsAButtonDown()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsAButtonDown()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsAButtonDown
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 13
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsAButtonDown()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsAButtonDown() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsAButtonDown*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsAButtonDownOnce
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsAButtonDownOnce
+  id: BL_IsAButtonDownOnce
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsAButtonDownOnce()
+  nameWithType: API_Input.BL_IsAButtonDownOnce()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsAButtonDownOnce()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsAButtonDownOnce
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 22
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsAButtonDownOnce()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsAButtonDownOnce() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsAButtonDownOnce*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsAButtonUpOnce
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsAButtonUpOnce
+  id: BL_IsAButtonUpOnce
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsAButtonUpOnce()
+  nameWithType: API_Input.BL_IsAButtonUpOnce()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsAButtonUpOnce()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsAButtonUpOnce
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 31
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsAButtonUpOnce()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsAButtonUpOnce() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsAButtonUpOnce*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsBButtonDown
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsBButtonDown
+  id: BL_IsBButtonDown
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsBButtonDown()
+  nameWithType: API_Input.BL_IsBButtonDown()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsBButtonDown()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsBButtonDown
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 42
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsBButtonDown()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsBButtonDown() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsBButtonDown*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsBButtonDownOnce
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsBButtonDownOnce
+  id: BL_IsBButtonDownOnce
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsBButtonDownOnce()
+  nameWithType: API_Input.BL_IsBButtonDownOnce()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsBButtonDownOnce()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsBButtonDownOnce
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 52
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsBButtonDownOnce()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsBButtonDownOnce() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsBButtonDownOnce*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsBButtonUpOnce
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsBButtonUpOnce
+  id: BL_IsBButtonUpOnce
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsBButtonUpOnce()
+  nameWithType: API_Input.BL_IsBButtonUpOnce()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsBButtonUpOnce()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsBButtonUpOnce
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 61
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsBButtonUpOnce()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsBButtonUpOnce() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsBButtonUpOnce*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsXButtonDown
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsXButtonDown
+  id: BL_IsXButtonDown
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsXButtonDown()
+  nameWithType: API_Input.BL_IsXButtonDown()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsXButtonDown()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsXButtonDown
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 71
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsXButtonDown()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsXButtonDown() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsXButtonDown*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsXButtonDownOnce
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsXButtonDownOnce
+  id: BL_IsXButtonDownOnce
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsXButtonDownOnce()
+  nameWithType: API_Input.BL_IsXButtonDownOnce()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsXButtonDownOnce()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsXButtonDownOnce
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 80
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsXButtonDownOnce()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsXButtonDownOnce() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsXButtonDownOnce*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsXButtonUpOnce
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsXButtonUpOnce
+  id: BL_IsXButtonUpOnce
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsXButtonUpOnce()
+  nameWithType: API_Input.BL_IsXButtonUpOnce()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsXButtonUpOnce()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsXButtonUpOnce
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 89
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsXButtonUpOnce()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsXButtonUpOnce() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsXButtonUpOnce*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsYButtonDown
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsYButtonDown
+  id: BL_IsYButtonDown
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsYButtonDown()
+  nameWithType: API_Input.BL_IsYButtonDown()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsYButtonDown()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsYButtonDown
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 98
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsYButtonDown()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsYButtonDown() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsYButtonDown*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsYButtonDownOnce
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsYButtonDownOnce
+  id: BL_IsYButtonDownOnce
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsYButtonDownOnce()
+  nameWithType: API_Input.BL_IsYButtonDownOnce()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsYButtonDownOnce()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsYButtonDownOnce
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 107
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsYButtonDownOnce()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsYButtonDownOnce() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsYButtonDownOnce*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsYButtonUpOnce
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsYButtonUpOnce
+  id: BL_IsYButtonUpOnce
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsYButtonUpOnce()
+  nameWithType: API_Input.BL_IsYButtonUpOnce()
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsYButtonUpOnce()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsYButtonUpOnce
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 116
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsYButtonUpOnce()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsYButtonUpOnce() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsYButtonUpOnce*
+- uid: LuaMod.LuaAPI.API_Input.BL_LeftHand
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_LeftHand
+  id: BL_LeftHand
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_LeftHand()
+  nameWithType: API_Input.BL_LeftHand()
+  fullName: LuaMod.LuaAPI.API_Input.BL_LeftHand()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_LeftHand
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 127
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static GameObject BL_LeftHand()
+    return:
+      type: UnityEngine.GameObject
+    content.vb: Public Shared Function BL_LeftHand() As GameObject
+  overload: LuaMod.LuaAPI.API_Input.BL_LeftHand*
+- uid: LuaMod.LuaAPI.API_Input.BL_RightHand
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_RightHand
+  id: BL_RightHand
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_RightHand()
+  nameWithType: API_Input.BL_RightHand()
+  fullName: LuaMod.LuaAPI.API_Input.BL_RightHand()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_RightHand
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 138
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static GameObject BL_RightHand()
+    return:
+      type: UnityEngine.GameObject
+    content.vb: Public Shared Function BL_RightHand() As GameObject
+  overload: LuaMod.LuaAPI.API_Input.BL_RightHand*
+- uid: LuaMod.LuaAPI.API_Input.BL_RightHandEmpty
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_RightHandEmpty
+  id: BL_RightHandEmpty
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_RightHandEmpty()
+  nameWithType: API_Input.BL_RightHandEmpty()
+  fullName: LuaMod.LuaAPI.API_Input.BL_RightHandEmpty()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_RightHandEmpty
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 147
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_RightHandEmpty()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_RightHandEmpty() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_RightHandEmpty*
+- uid: LuaMod.LuaAPI.API_Input.BL_LeftHandEmpty
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_LeftHandEmpty
+  id: BL_LeftHandEmpty
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_LeftHandEmpty()
+  nameWithType: API_Input.BL_LeftHandEmpty()
+  fullName: LuaMod.LuaAPI.API_Input.BL_LeftHandEmpty()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_LeftHandEmpty
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 156
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_LeftHandEmpty()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_LeftHandEmpty() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_LeftHandEmpty*
+- uid: LuaMod.LuaAPI.API_Input.BL_LeftController_IsGrabbed
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_LeftController_IsGrabbed
+  id: BL_LeftController_IsGrabbed
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_LeftController_IsGrabbed()
+  nameWithType: API_Input.BL_LeftController_IsGrabbed()
+  fullName: LuaMod.LuaAPI.API_Input.BL_LeftController_IsGrabbed()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_LeftController_IsGrabbed
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 166
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_LeftController_IsGrabbed()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_LeftController_IsGrabbed() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_LeftController_IsGrabbed*
+- uid: LuaMod.LuaAPI.API_Input.BL_RightController_IsGrabbed
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_RightController_IsGrabbed
+  id: BL_RightController_IsGrabbed
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_RightController_IsGrabbed()
+  nameWithType: API_Input.BL_RightController_IsGrabbed()
+  fullName: LuaMod.LuaAPI.API_Input.BL_RightController_IsGrabbed()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_RightController_IsGrabbed
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 175
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_RightController_IsGrabbed()
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_RightController_IsGrabbed() As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_RightController_IsGrabbed*
+- uid: LuaMod.LuaAPI.API_Input.BL_IsKeyDown(System.Int32)
+  commentId: M:LuaMod.LuaAPI.API_Input.BL_IsKeyDown(System.Int32)
+  id: BL_IsKeyDown(System.Int32)
+  parent: LuaMod.LuaAPI.API_Input
+  langs:
+  - csharp
+  - vb
+  name: BL_IsKeyDown(int)
+  nameWithType: API_Input.BL_IsKeyDown(int)
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsKeyDown(int)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/LuaAPI/API_Input.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: BL_IsKeyDown
+    path: LuaMod/LuaAPI/API_Input.cs
+    startLine: 184
+  assemblies:
+  - LuaMod
+  namespace: LuaMod.LuaAPI
+  syntax:
+    content: public static bool BL_IsKeyDown(int keyCodeArg)
+    parameters:
+    - id: keyCodeArg
+      type: System.Int32
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function BL_IsKeyDown(keyCodeArg As Integer) As Boolean
+  overload: LuaMod.LuaAPI.API_Input.BL_IsKeyDown*
+  nameWithType.vb: API_Input.BL_IsKeyDown(Integer)
+  fullName.vb: LuaMod.LuaAPI.API_Input.BL_IsKeyDown(Integer)
+  name.vb: BL_IsKeyDown(Integer)
+references:
+- uid: LuaMod.LuaAPI
+  commentId: N:LuaMod.LuaAPI
+  href: LuaMod.html
+  name: LuaMod.LuaAPI
+  nameWithType: LuaMod.LuaAPI
+  fullName: LuaMod.LuaAPI
+  spec.csharp:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+  spec.vb:
+  - uid: LuaMod
+    name: LuaMod
+    href: LuaMod.html
+  - name: .
+  - uid: LuaMod.LuaAPI
+    name: LuaAPI
+    href: LuaMod.LuaAPI.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: LuaMod.LuaAPI.API_Input
+  commentId: T:LuaMod.LuaAPI.API_Input
+  parent: LuaMod.LuaAPI
+  href: LuaMod.LuaAPI.API_Input.html
+  name: API_Input
+  nameWithType: API_Input
+  fullName: LuaMod.LuaAPI.API_Input
+- uid: LuaMod.LuaAPI.API_Input.BL_IsAButtonDown*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsAButtonDown
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsAButtonDown
+  name: BL_IsAButtonDown
+  nameWithType: API_Input.BL_IsAButtonDown
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsAButtonDown
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: LuaMod.LuaAPI.API_Input.BL_IsAButtonDownOnce*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsAButtonDownOnce
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsAButtonDownOnce
+  name: BL_IsAButtonDownOnce
+  nameWithType: API_Input.BL_IsAButtonDownOnce
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsAButtonDownOnce
+- uid: LuaMod.LuaAPI.API_Input.BL_IsAButtonUpOnce*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsAButtonUpOnce
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsAButtonUpOnce
+  name: BL_IsAButtonUpOnce
+  nameWithType: API_Input.BL_IsAButtonUpOnce
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsAButtonUpOnce
+- uid: LuaMod.LuaAPI.API_Input.BL_IsBButtonDown*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsBButtonDown
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsBButtonDown
+  name: BL_IsBButtonDown
+  nameWithType: API_Input.BL_IsBButtonDown
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsBButtonDown
+- uid: LuaMod.LuaAPI.API_Input.BL_IsBButtonDownOnce*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsBButtonDownOnce
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsBButtonDownOnce
+  name: BL_IsBButtonDownOnce
+  nameWithType: API_Input.BL_IsBButtonDownOnce
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsBButtonDownOnce
+- uid: LuaMod.LuaAPI.API_Input.BL_IsBButtonUpOnce*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsBButtonUpOnce
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsBButtonUpOnce
+  name: BL_IsBButtonUpOnce
+  nameWithType: API_Input.BL_IsBButtonUpOnce
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsBButtonUpOnce
+- uid: LuaMod.LuaAPI.API_Input.BL_IsXButtonDown*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsXButtonDown
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsXButtonDown
+  name: BL_IsXButtonDown
+  nameWithType: API_Input.BL_IsXButtonDown
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsXButtonDown
+- uid: LuaMod.LuaAPI.API_Input.BL_IsXButtonDownOnce*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsXButtonDownOnce
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsXButtonDownOnce
+  name: BL_IsXButtonDownOnce
+  nameWithType: API_Input.BL_IsXButtonDownOnce
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsXButtonDownOnce
+- uid: LuaMod.LuaAPI.API_Input.BL_IsXButtonUpOnce*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsXButtonUpOnce
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsXButtonUpOnce
+  name: BL_IsXButtonUpOnce
+  nameWithType: API_Input.BL_IsXButtonUpOnce
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsXButtonUpOnce
+- uid: LuaMod.LuaAPI.API_Input.BL_IsYButtonDown*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsYButtonDown
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsYButtonDown
+  name: BL_IsYButtonDown
+  nameWithType: API_Input.BL_IsYButtonDown
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsYButtonDown
+- uid: LuaMod.LuaAPI.API_Input.BL_IsYButtonDownOnce*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsYButtonDownOnce
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsYButtonDownOnce
+  name: BL_IsYButtonDownOnce
+  nameWithType: API_Input.BL_IsYButtonDownOnce
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsYButtonDownOnce
+- uid: LuaMod.LuaAPI.API_Input.BL_IsYButtonUpOnce*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsYButtonUpOnce
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsYButtonUpOnce
+  name: BL_IsYButtonUpOnce
+  nameWithType: API_Input.BL_IsYButtonUpOnce
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsYButtonUpOnce
+- uid: LuaMod.LuaAPI.API_Input.BL_LeftHand*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_LeftHand
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_LeftHand
+  name: BL_LeftHand
+  nameWithType: API_Input.BL_LeftHand
+  fullName: LuaMod.LuaAPI.API_Input.BL_LeftHand
+- uid: UnityEngine.GameObject
+  commentId: T:UnityEngine.GameObject
+  parent: UnityEngine
+  isExternal: true
+  name: GameObject
+  nameWithType: GameObject
+  fullName: UnityEngine.GameObject
+- uid: UnityEngine
+  commentId: N:UnityEngine
+  isExternal: true
+  name: UnityEngine
+  nameWithType: UnityEngine
+  fullName: UnityEngine
+- uid: LuaMod.LuaAPI.API_Input.BL_RightHand*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_RightHand
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_RightHand
+  name: BL_RightHand
+  nameWithType: API_Input.BL_RightHand
+  fullName: LuaMod.LuaAPI.API_Input.BL_RightHand
+- uid: LuaMod.LuaAPI.API_Input.BL_RightHandEmpty*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_RightHandEmpty
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_RightHandEmpty
+  name: BL_RightHandEmpty
+  nameWithType: API_Input.BL_RightHandEmpty
+  fullName: LuaMod.LuaAPI.API_Input.BL_RightHandEmpty
+- uid: LuaMod.LuaAPI.API_Input.BL_LeftHandEmpty*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_LeftHandEmpty
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_LeftHandEmpty
+  name: BL_LeftHandEmpty
+  nameWithType: API_Input.BL_LeftHandEmpty
+  fullName: LuaMod.LuaAPI.API_Input.BL_LeftHandEmpty
+- uid: LuaMod.LuaAPI.API_Input.BL_LeftController_IsGrabbed*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_LeftController_IsGrabbed
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_LeftController_IsGrabbed
+  name: BL_LeftController_IsGrabbed
+  nameWithType: API_Input.BL_LeftController_IsGrabbed
+  fullName: LuaMod.LuaAPI.API_Input.BL_LeftController_IsGrabbed
+- uid: LuaMod.LuaAPI.API_Input.BL_RightController_IsGrabbed*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_RightController_IsGrabbed
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_RightController_IsGrabbed
+  name: BL_RightController_IsGrabbed
+  nameWithType: API_Input.BL_RightController_IsGrabbed
+  fullName: LuaMod.LuaAPI.API_Input.BL_RightController_IsGrabbed
+- uid: LuaMod.LuaAPI.API_Input.BL_IsKeyDown*
+  commentId: Overload:LuaMod.LuaAPI.API_Input.BL_IsKeyDown
+  href: LuaMod.LuaAPI.API_Input.html#LuaMod_LuaAPI_API_Input_BL_IsKeyDown_System_Int32_
+  name: BL_IsKeyDown
+  nameWithType: API_Input.BL_IsKeyDown
+  fullName: LuaMod.LuaAPI.API_Input.BL_IsKeyDown
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer

@@ -1,0 +1,320 @@
+### YamlMime:ManagedReference
+items:
+- uid: LuaMod.ScriptManager
+  commentId: T:LuaMod.ScriptManager
+  id: ScriptManager
+  parent: LuaMod
+  children:
+  - LuaMod.ScriptManager.DeregisterScript(LuaMod.LuaModScript)
+  - LuaMod.ScriptManager.InitiateFileSystemMonitor
+  - LuaMod.ScriptManager.RegisterScript(LuaMod.LuaModScript)
+  - LuaMod.ScriptManager.ReloadScripts
+  - LuaMod.ScriptManager.ScriptList
+  langs:
+  - csharp
+  - vb
+  name: ScriptManager
+  nameWithType: ScriptManager
+  fullName: LuaMod.ScriptManager
+  type: Class
+  source:
+    remote:
+      path: LuaMod/ScriptManager.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: ScriptManager
+    path: LuaMod/ScriptManager.cs
+    startLine: 2
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static class ScriptManager
+    content.vb: Public Module ScriptManager
+  inheritance:
+  - System.Object
+- uid: LuaMod.ScriptManager.ScriptList
+  commentId: F:LuaMod.ScriptManager.ScriptList
+  id: ScriptList
+  parent: LuaMod.ScriptManager
+  langs:
+  - csharp
+  - vb
+  name: ScriptList
+  nameWithType: ScriptManager.ScriptList
+  fullName: LuaMod.ScriptManager.ScriptList
+  type: Field
+  source:
+    remote:
+      path: LuaMod/ScriptManager.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: ScriptList
+    path: LuaMod/ScriptManager.cs
+    startLine: 4
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static List<LuaModScript> ScriptList
+    return:
+      type: System.Collections.Generic.List{LuaMod.LuaModScript}
+    content.vb: Public Shared ScriptList As List(Of LuaModScript)
+- uid: LuaMod.ScriptManager.RegisterScript(LuaMod.LuaModScript)
+  commentId: M:LuaMod.ScriptManager.RegisterScript(LuaMod.LuaModScript)
+  id: RegisterScript(LuaMod.LuaModScript)
+  parent: LuaMod.ScriptManager
+  langs:
+  - csharp
+  - vb
+  name: RegisterScript(LuaModScript)
+  nameWithType: ScriptManager.RegisterScript(LuaModScript)
+  fullName: LuaMod.ScriptManager.RegisterScript(LuaMod.LuaModScript)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/ScriptManager.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: RegisterScript
+    path: LuaMod/ScriptManager.cs
+    startLine: 6
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static void RegisterScript(LuaModScript script)
+    parameters:
+    - id: script
+      type: LuaMod.LuaModScript
+    content.vb: Public Shared Sub RegisterScript(script As LuaModScript)
+  overload: LuaMod.ScriptManager.RegisterScript*
+- uid: LuaMod.ScriptManager.DeregisterScript(LuaMod.LuaModScript)
+  commentId: M:LuaMod.ScriptManager.DeregisterScript(LuaMod.LuaModScript)
+  id: DeregisterScript(LuaMod.LuaModScript)
+  parent: LuaMod.ScriptManager
+  langs:
+  - csharp
+  - vb
+  name: DeregisterScript(LuaModScript)
+  nameWithType: ScriptManager.DeregisterScript(LuaModScript)
+  fullName: LuaMod.ScriptManager.DeregisterScript(LuaMod.LuaModScript)
+  type: Method
+  source:
+    remote:
+      path: LuaMod/ScriptManager.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: DeregisterScript
+    path: LuaMod/ScriptManager.cs
+    startLine: 12
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static void DeregisterScript(LuaModScript script)
+    parameters:
+    - id: script
+      type: LuaMod.LuaModScript
+    content.vb: Public Shared Sub DeregisterScript(script As LuaModScript)
+  overload: LuaMod.ScriptManager.DeregisterScript*
+- uid: LuaMod.ScriptManager.ReloadScripts
+  commentId: M:LuaMod.ScriptManager.ReloadScripts
+  id: ReloadScripts
+  parent: LuaMod.ScriptManager
+  langs:
+  - csharp
+  - vb
+  name: ReloadScripts()
+  nameWithType: ScriptManager.ReloadScripts()
+  fullName: LuaMod.ScriptManager.ReloadScripts()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/ScriptManager.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: ReloadScripts
+    path: LuaMod/ScriptManager.cs
+    startLine: 17
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static void ReloadScripts()
+    content.vb: Public Shared Sub ReloadScripts()
+  overload: LuaMod.ScriptManager.ReloadScripts*
+- uid: LuaMod.ScriptManager.InitiateFileSystemMonitor
+  commentId: M:LuaMod.ScriptManager.InitiateFileSystemMonitor
+  id: InitiateFileSystemMonitor
+  parent: LuaMod.ScriptManager
+  langs:
+  - csharp
+  - vb
+  name: InitiateFileSystemMonitor()
+  nameWithType: ScriptManager.InitiateFileSystemMonitor()
+  fullName: LuaMod.ScriptManager.InitiateFileSystemMonitor()
+  type: Method
+  source:
+    remote:
+      path: LuaMod/ScriptManager.cs
+      branch: main
+      repo: https://github.com/Woospringbreak1/BL_LuaMod.git
+    id: InitiateFileSystemMonitor
+    path: LuaMod/ScriptManager.cs
+    startLine: 31
+  assemblies:
+  - LuaMod
+  namespace: LuaMod
+  syntax:
+    content: public static void InitiateFileSystemMonitor()
+    content.vb: Public Shared Sub InitiateFileSystemMonitor()
+  overload: LuaMod.ScriptManager.InitiateFileSystemMonitor*
+references:
+- uid: LuaMod
+  commentId: N:LuaMod
+  href: LuaMod.html
+  name: LuaMod
+  nameWithType: LuaMod
+  fullName: LuaMod
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Collections.Generic.List{LuaMod.LuaModScript}
+  commentId: T:System.Collections.Generic.List{LuaMod.LuaModScript}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.List`1
+  href: LuaMod.LuaModScript.html
+  name: List<LuaModScript>
+  nameWithType: List<LuaModScript>
+  fullName: System.Collections.Generic.List<LuaMod.LuaModScript>
+  nameWithType.vb: List(Of LuaModScript)
+  fullName.vb: System.Collections.Generic.List(Of LuaMod.LuaModScript)
+  name.vb: List(Of LuaModScript)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: <
+  - uid: LuaMod.LuaModScript
+    name: LuaModScript
+    href: LuaMod.LuaModScript.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: LuaMod.LuaModScript
+    name: LuaModScript
+    href: LuaMod.LuaModScript.html
+  - name: )
+- uid: System.Collections.Generic.List`1
+  commentId: T:System.Collections.Generic.List`1
+  isExternal: true
+  name: List<T>
+  nameWithType: List<T>
+  fullName: System.Collections.Generic.List<T>
+  nameWithType.vb: List(Of T)
+  fullName.vb: System.Collections.Generic.List(Of T)
+  name.vb: List(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: LuaMod.ScriptManager.RegisterScript*
+  commentId: Overload:LuaMod.ScriptManager.RegisterScript
+  href: LuaMod.ScriptManager.html#LuaMod_ScriptManager_RegisterScript_LuaMod_LuaModScript_
+  name: RegisterScript
+  nameWithType: ScriptManager.RegisterScript
+  fullName: LuaMod.ScriptManager.RegisterScript
+- uid: LuaMod.LuaModScript
+  commentId: T:LuaMod.LuaModScript
+  parent: LuaMod
+  href: LuaMod.LuaModScript.html
+  name: LuaModScript
+  nameWithType: LuaModScript
+  fullName: LuaMod.LuaModScript
+- uid: LuaMod.ScriptManager.DeregisterScript*
+  commentId: Overload:LuaMod.ScriptManager.DeregisterScript
+  href: LuaMod.ScriptManager.html#LuaMod_ScriptManager_DeregisterScript_LuaMod_LuaModScript_
+  name: DeregisterScript
+  nameWithType: ScriptManager.DeregisterScript
+  fullName: LuaMod.ScriptManager.DeregisterScript
+- uid: LuaMod.ScriptManager.ReloadScripts*
+  commentId: Overload:LuaMod.ScriptManager.ReloadScripts
+  href: LuaMod.ScriptManager.html#LuaMod_ScriptManager_ReloadScripts
+  name: ReloadScripts
+  nameWithType: ScriptManager.ReloadScripts
+  fullName: LuaMod.ScriptManager.ReloadScripts
+- uid: LuaMod.ScriptManager.InitiateFileSystemMonitor*
+  commentId: Overload:LuaMod.ScriptManager.InitiateFileSystemMonitor
+  href: LuaMod.ScriptManager.html#LuaMod_ScriptManager_InitiateFileSystemMonitor
+  name: InitiateFileSystemMonitor
+  nameWithType: ScriptManager.InitiateFileSystemMonitor
+  fullName: LuaMod.ScriptManager.InitiateFileSystemMonitor

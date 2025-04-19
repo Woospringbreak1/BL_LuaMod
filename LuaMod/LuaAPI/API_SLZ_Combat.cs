@@ -4,86 +4,85 @@ using Il2CppSLZ.Marrow;
 using Il2CppSLZ.Marrow.AI;
 using Il2CppSLZ.Marrow.Combat;
 using Il2CppSLZ.Marrow.PuppetMasta;
+using MoonSharp.Interpreter;
 using UnityEngine;
 
 namespace LuaMod.LuaAPI
 {
-    internal class API_SLZ_Combat
+    public class API_SLZ_Combat
     {
 
         public static readonly API_SLZ_Combat Instance = new API_SLZ_Combat();
 
-        public static Attack BL_CreateAttackStruct(int damage, Collider collider, Vector3 pos, Vector3 normal)
-        {
-            Attack attack = new Attack();
-            attack.attackType = Il2CppSLZ.Marrow.Data.AttackType.Piercing;
-            attack.collider = collider;
-            attack.origin = pos;
-            attack.damage = damage;
-            attack.normal = normal;
-
-            return attack;
-
-        }
 
         public static bool ApplyForce(Rigidbody rb, Vector3 pos, Vector3 normal, float force)
         {
-            if (rb == null || rb.isKinematic)
+            return LuaSafeCall.Run(() =>
             {
-                return false;
-            }
-            else
-            {
+                if (rb == null || rb.isKinematic)
+                {
+                    return false;
+                }
+
                 Vector3 forceapply = normal * force;
                 rb.AddForceAtPosition(forceapply, pos);
                 return true;
-            }
+            }, $"ApplyForce(rb: {rb?.name}, pos: {pos}, normal: {normal}, force: {force})");
         }
+
 
 
 
         public static bool BL_AttackEnemy(GameObject obj, float damage, Collider col, Vector3 pos, Vector3 normal)
         {
-
-            Attack attack = new Attack();
-            attack.attackType = Il2CppSLZ.Marrow.Data.AttackType.Piercing;
-            attack.collider = col;
-            attack.origin = pos;
-            attack.damage = damage;
-            attack.normal = normal;
-            attack.direction = normal;
-
-
-            BehaviourBaseNav DR = obj.GetComponentInChildren<BehaviourBaseNav>();
-            BehaviourCrablet DC = obj.GetComponentInChildren<BehaviourCrablet>();
-            ObjectDestructible DP = obj.GetComponentInChildren<ObjectDestructible>();
-            PhysicsRig PR = obj.GetComponentInChildren<PhysicsRig>();
-            //DP.OnDestruction
-            if (DR != null)
+            return LuaSafeCall.Run(() =>
             {
-                DR.health.TakeDamage(1, attack);
-            }
-            else if (DC != null)
-            {
-                DC.health.TakeDamage(1, attack);
-                DC.MountAttack(damage);
-            }
-            else if(DP != null)
-            {
-                DP.ReceiveAttack(attack);
-            }
-            else if (PR != null)
-            {
-                API_Player.BL_PlayerHealth().TAKEDAMAGE(damage);
-            }
-            else
-            {
-                MelonLoader.MelonLogger.Error("no IAttackReciever found");
-            }
+                if (obj == null) throw new ScriptRuntimeException("Target GameObject is null");
 
+                Attack attack = new Attack
+                {
+                    attackType = Il2CppSLZ.Marrow.Data.AttackType.Piercing,
+                    collider = col,
+                    origin = pos,
+                    damage = damage,
+                    normal = normal,
+                    direction = normal
+                };
 
-            return false;
+                BehaviourBaseNav DR = obj.GetComponentInChildren<BehaviourBaseNav>();
+                BehaviourCrablet DC = obj.GetComponentInChildren<BehaviourCrablet>();
+                ObjectDestructible DP = obj.GetComponentInChildren<ObjectDestructible>();
+                PhysicsRig PR = obj.GetComponentInChildren<PhysicsRig>();
+
+                if (DR != null)
+                {
+                    DR.health.TakeDamage(1, attack);
+                    return true;
+                }
+                else if (DC != null)
+                {
+                    DC.health.TakeDamage(1, attack);
+                    DC.MountAttack(damage);
+                    return true;
+                }
+                else if (DP != null)
+                {
+                    DP.ReceiveAttack(attack);
+                    return true;
+                }
+                else if (PR != null)
+                {
+                    API_Player.BL_PlayerHealth().TAKEDAMAGE(damage);
+                    return true;
+                }
+                else
+                {
+                    MelonLoader.MelonLogger.Warning("[BL_AttackEnemy] No IAttackReceiver found on " + obj.name);
+                    return false;
+                }
+            }, $"BL_AttackEnemy('{obj?.name}', {damage})");
         }
+
 
 
     }
