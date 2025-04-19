@@ -1,0 +1,7 @@
+{
+    "name": "FieldInjector",
+    "version_number": "2.1.1",
+    "website_url": "",
+    "description": "A utility for other mods to inject monobehaviour fields into the IL2CPP domain.",
+    "dependencies": []
+}
