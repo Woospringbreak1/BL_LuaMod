@@ -1,0 +1,17 @@
+{
+  "workspace": {
+    "library": [
+      "./API"
+    ]
+  },
+  "Lua.diagnostics.globals": [
+    "GameObject",
+    "Transform",
+    "Vector3",
+    "Quaternion",
+    "Time",
+    "Physics",
+    "Input",
+    "Camera"
+  ]
+}

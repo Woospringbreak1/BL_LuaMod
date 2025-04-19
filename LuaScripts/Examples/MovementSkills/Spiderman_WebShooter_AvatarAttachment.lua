@@ -1,0 +1,134 @@
+--LuaBehaviour
+
+
+function Start()
+    print("Hello, World from Spiderman_Webshooter!")
+
+    WebLaunchSound = nil
+    
+end
+
+WaitingForResourceSpawn = false
+function SpawnResources()
+    if(not WaitingForResourceSpawn) then
+        API_GameObject.BL_SpawnByBarcode(BL_This,"SpiderManResources","BonelabMeridian.Luamodexamplecontent.Spawnable.SpiderManResources", Vector3.zero, Quaternion.identity,nil, true)
+        WaitingForResourceSpawn = true
+    end
+end
+
+function OnDestroy()
+    DestroyConnections()
+end
+
+function OnDisable()
+    DestroyConnections()
+end
+
+function DestroyConnections()
+    for _,webproj in pairs(WebShooterProjectiles) do
+        API_GameObject.BL_Destroy(webproj.gameObject)
+    end
+    WebShooterProjectiles = {}
+end
+
+function PlayWebLaunchSound()
+    if(WebLaunchSound ~= nil and not WebLaunchSound.isPlaying) then
+        WebLaunchSound.Play()
+    end
+end
+
+function ShouldShoot()
+    local ControllerGrabbed = false
+    local HandEmpty = false
+    if(Lefthanded) then
+        ControllerGrabbed = API_Input.BL_LeftController_IsGrabbed()
+        HandEmpty = API_Input.BL_LeftHandEmpty()
+    else
+        ControllerGrabbed = API_Input.BL_RightController_IsGrabbed()
+        HandEmpty = API_Input.BL_RightHandEmpty()
+    end
+    --print("ShouldShoot? " + tostring())
+    return ControllerGrabbed and HandEmpty --and WebLaunchSound ~= nil
+end
+
+
+function SetLeftHanded(leftHandMode)
+
+    if(API_Input.BL_LeftHand() == nil or API_Input.BL_RightHand() == nil) then
+        return
+    end
+
+    if(leftHandMode == Lefthanded) then
+        return
+    end
+
+    Lefthanded = leftHandMode
+
+    if(Lefthanded) then
+        HandTransform = API_Input.BL_LeftHand().transform
+    else
+        HandTransform = API_Input.BL_RightHand().transform
+    end
+    HandRB = API_GameObject.BL_GetComponent(HandTransform.gameObject,"Rigidbody")
+    DestroyConnections()
+
+end
+
+WebShooterProjectiles = {}
+ActOnce = false
+function Update()
+
+    if(BL_This == nil or not API_GameObject.BL_IsValid(BL_Host) or not BL_This.Ready) then
+        return
+    end
+
+    if(SpiderManResources == nil or not API_GameObject.BL_IsValid(SpiderManResources)) then
+        SpawnResources()
+        return
+    else
+
+    if(WebLaunchSound == nil and API_GameObject.BL_IsValid(SpiderManResources) ) then
+        WebLaunchSound = API_GameObject.BL_GetComponent(SpiderManResources,"AudioSource")
+        return
+    end
+
+    if(HandTransform == nil and API_Input.BL_LeftHand() ~= nil) then
+        HandTransform = API_Input.BL_LeftHand().transform
+        HandRB= API_GameObject.BL_GetComponent(HandTransform.gameObject,"Rigidbody")
+        return
+    end
+
+    if(ShouldShoot()) then
+        if(not ActOnce) then
+            PlayWebLaunchSound()
+            print("spawning projectile from spiderman webshooter!")
+            Fpoint = HandTransform
+            Pos = Fpoint.position + Fpoint.forward*0.35
+            Rot = Fpoint.rotation;
+            API_GameObject.BL_SpawnByBarcode(BL_This,"WebProjectile","BonelabMeridian.Luamodexamplecontent.Spawnable.SpidermanWebProjectile", Pos, Rot,nil, true)
+            ActOnce = true
+        end
+    else
+        ActOnce = false
+        DestroyConnections()
+    end
+
+    if(WebProjectile ~= nil ) then
+        local WebProjectileBehaviour = API_GameObject.BL_GetComponentInChildren(WebProjectile,"LuaBehaviour")
+
+        if(WebProjectileBehaviour.Ready) then
+            local suc = WebProjectileBehaviour.CallFunction("SetOwnerGun", HandRB)
+            table.insert(WebShooterProjectiles,WebProjectileBehaviour)
+            WebProjectile = nil
+        else
+            print("webshooter projectile not ready")
+        end
+    end
+
+
+
+    end
+
+
+end
+
