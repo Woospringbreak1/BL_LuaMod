@@ -19,10 +19,10 @@ namespace LuaMod.LuaAPI
         public LuaBehaviour owner;
     }
 
-    /// <summary>
-    /// NOTE: THIS CLASS PROBABLY A MEMORY LEAK - NEED TO DESTROY SCRIPT REFERENCES WHEN DESTROYED
-    /// </summary>
 
+    /// <summary>
+    /// Lua-exposed API for calling and listening to global events from Lua scripts
+    /// </summary>
     public class API_Events
     {
 
@@ -66,7 +66,7 @@ namespace LuaMod.LuaAPI
         
         public static bool BL_SubscribeEvent(UnityEvent Uevent, LuaBehaviour Owner, string func)
         {
-            
+            throw new NotImplementedException();
             return true;
         }
 
@@ -74,7 +74,7 @@ namespace LuaMod.LuaAPI
 
         private bool UnityEvent(UnityEvent Uevent)
         {
-           
+            throw new NotImplementedException();
             return true;
         }
 
@@ -82,6 +82,7 @@ namespace LuaMod.LuaAPI
 
         public static bool BL_SubscribeEvent(string eventName, LuaBehaviour Owner, string func)
         {
+            
             List<EventListner> ListenerList;
 
             if (!EventListeners.ContainsKey(eventName))

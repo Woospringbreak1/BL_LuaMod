@@ -2,12 +2,14 @@ function Start()
 
     -- delete all VOID meshes created by CrateSpawners
 
-    CrateSpawners = API_GameObject.BL_GetComponentsInChildren(BL_Host,"CrateSpawner")
+    CrateSpawners = API_GameObject.BL_FindComponentsInWorld("CrateSpawner",true)
 
 
     for _,spawner in ipairs(CrateSpawners) do
         local meshRenderer = API_GameObject.BL_GetComponent(spawner.gameObject,"MeshRenderer")
-        API_GameObject.BL_Destroy(meshRenderer) 
+        if( meshRenderer ~= nil) then
+            API_GameObject.BL_Destroy(meshRenderer) 
+        end
     end
 
 

@@ -60,6 +60,9 @@ namespace LuaMod.LuaAPI
         }
 
 
+        /// <summary>
+        /// Converts a UnityEngine.Object to a subtype, not a simple cast.
+        /// </summary>
         public static DynValue BL_ConvertObjectToType(UnityEngine.Object obj, string CompType)
         {
 
@@ -119,10 +122,12 @@ namespace LuaMod.LuaAPI
             return input;
         }
 
+        /// <summary>
+        /// Bypasses issues related to getting values of c# arrays from lua
+        /// And may god have mercy on my soul
+        /// </summary>
         public static DynValue BL_GetArrayElement(object target, string fieldName, int index)
         {
-            /// Bypasses issues related to getting values of c# arrays from lua
-            /// And may god have mercy on my soul
             return LuaSafeCall.Run(() =>
             {
 
@@ -181,10 +186,13 @@ namespace LuaMod.LuaAPI
         }
 
 
+        /// <summary>
+        /// Bypasses issues related to appending values to c# arrays from lua
+        /// And may god have mercy on my soul
+        /// </summary>
         public static void BL_AppendToArray(object target, string fieldName, object value)
         {
-            /// Bypasses issues related to appending values to c# arrays from lua
-            /// And may god have mercy on my soul
+
             LuaSafeCall.Run(() =>
             {
 
@@ -294,10 +302,13 @@ namespace LuaMod.LuaAPI
         }
 
 
+        /// <summary>
+        /// Bypasses issues related to setting values of c# arrays from lua
+        /// And may god have mercy on my soul
+        /// </summary>
         public static void BL_SetArrayElement(object target, string fieldName, int index, object value)
         {
-            /// Bypasses issues related to setting values of c# arrays from lua
-            /// And may god have mercy on my soul
+
             LuaSafeCall.Run(() =>
             {
 

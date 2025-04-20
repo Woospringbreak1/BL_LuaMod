@@ -20,8 +20,12 @@ function API_Player.BL_GetControllerRig() end
 function API_Player.BL_PlayerHealth() end
 
 ---@param pos Vector3
----@param rot Quaternion
-function API_Player.BL_SetAvatarPosition(pos, rot) end
+---@param fwd Vector3
+---@param zeroVelocity bool
+---@return bool
+function API_Player.BL_SetAvatarPosition(pos, fwd, zeroVelocity) end
 
 ---@param pos Vector3
-function API_Player.BL_SetAvatarPosition(pos) end
+---@param zeroVelocity bool
+---@return bool
+function API_Player.BL_SetAvatarPosition(pos, zeroVelocity) end

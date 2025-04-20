@@ -15,24 +15,10 @@ namespace LuaMod.LuaAPI
         public static readonly API_SLZ_Combat Instance = new API_SLZ_Combat();
 
 
-        public static bool ApplyForce(Rigidbody rb, Vector3 pos, Vector3 normal, float force)
-        {
-            return LuaSafeCall.Run(() =>
-            {
-                if (rb == null || rb.isKinematic)
-                {
-                    return false;
-                }
-
-                Vector3 forceapply = normal * force;
-                rb.AddForceAtPosition(forceapply, pos);
-                return true;
-            }, $"ApplyForce(rb: {rb?.name}, pos: {pos}, normal: {normal}, force: {force})");
-        }
-
-
-
-
+        /// <summary>
+        /// Damages an Enemy/Destructable Object/Player
+        /// Due to a bug, doesn't damage crablets
+        /// </summary>
         public static bool BL_AttackEnemy(GameObject obj, float damage, Collider col, Vector3 pos, Vector3 normal)
         {
             return LuaSafeCall.Run(() =>

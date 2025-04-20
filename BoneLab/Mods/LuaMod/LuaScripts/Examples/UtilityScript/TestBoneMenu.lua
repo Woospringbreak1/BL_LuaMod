@@ -156,21 +156,3 @@ end
     --API_BoneMenu.BL_DeletePage(MainPage) 
  end
 
-function PlayerEventTest(Attack)
-   -- print("PlayerHealth_OnReceivedDamage event received! " .. tostring(Attack))
-   -- print("attack damage: " .. tostring(Attack.damage))
-end
-
-function PlayerEventTest2(Attack)
-    --print("custom event from LUA")
-end
-
-function PlayerEventTest3(NPC)
-   -- print("NPC Killed :( " .. NPC.name)
-end
-
-function PlayerEventTest4(Object, Attack)
-   -- print(Object.name .. " received damage: ")
-   -- print(" received damage: " .. tostring(Attack.damage))
-end
-

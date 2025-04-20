@@ -26,10 +26,6 @@ function Test()
 end
 function Update()
     
-    if(IsValid(Button1Controller)) then
-        print("Button1Controller: " .. tostring(Button1Controller._charged))
-    end
-
     ---wait until everything has spawned and all scripts are loaded
     if(not IsValid(Button1Controller) or not IsValid(Button2Controller) or not IsValid(Button3Controller) or not IsValid(Button4Controller)) then
         if(IsValid(Button1) and IsValid(Button2) and IsValid(Button3) and IsValid(Button4)) then

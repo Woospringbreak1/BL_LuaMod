@@ -19,13 +19,13 @@ namespace LuaMod.LuaAPI
     {
         public static readonly API_SLZ_VoidLogic Instance = new API_SLZ_VoidLogic();
 
-
+        /// <summary>
+        /// Sets a MarrowEntityPoseDecorator to a pose given by barcode. Required due to bug preventing the registration of DataCardReference<EntityPose>
+        /// </summary>
         public static bool BL_SetMarrowEntityPoseDectoratorPose(MarrowEntityPoseDecorator posedec,string barcode)
         {
             LuaSafeCall.Run(() =>
             {
-                ///required due to bug preventing the registration of DataCardReference<EntityPose>
-                ///
                 if (posedec != null)
                 {
                     posedec.MarrowEntityPose = new DataCardReference<EntityPose>(barcode);

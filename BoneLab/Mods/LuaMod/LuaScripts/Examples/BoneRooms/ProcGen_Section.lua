@@ -23,7 +23,7 @@ function Start()
                 --print("skipping blocker")
             end
 
-            if(not isblocker and renderer.name ~= "DOOR" and not string.find(renderer.name,"CrateSpawner")) then
+            if(not isblocker and renderer.name ~= "DOOR" and  renderer.name ~= "CeilingLight" and not string.find(renderer.name,"CrateSpawner")) then
                 SwitchRenderers[i] = renderer
                 i = i + 1
             end

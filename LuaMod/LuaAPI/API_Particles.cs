@@ -14,11 +14,9 @@ using static UnityEngine.ParticleSystem;
 namespace LuaMod.LuaAPI
 {
     /// <summary>
-    /// Lua-exposed API for working with Unity particle systems and trail segments.
+    /// Lua-exposed API for working with Unity particle systems and trail segments. - not functional due to Melonloader bugs
     /// </summary>
-    /// <remarks>
-    /// This API is experimental. Some functions may be unstable and cause crashes due to issues in the underlying engine or bindings.
-    /// </remarks>
+
     public class API_Particles
     {
         public static readonly API_Particles Instance = new API_Particles();

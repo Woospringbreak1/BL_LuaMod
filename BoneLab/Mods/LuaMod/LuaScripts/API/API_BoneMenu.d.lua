@@ -1,17 +1,28 @@
 ---@class API_BoneMenu
 API_BoneMenu = {}
 
----@type Page
-API_BoneMenu.BL_Page = nil
-
 ---@param page Page
 ---@param name string
 ---@param color Color
 ---@param owner LuaBehaviour
----@param func string
+---@param function string
 ---@return LuaFunctionElement
-function API_BoneMenu.BL_CreateFunction(page, name, color, owner, func) end
+function API_BoneMenu.BL_CreateFunction(page, name, color, owner, function) end
 
 ---@param page Page
----@return boolean
+---@return bool
 function API_BoneMenu.BL_DeletePage(page) end
+
+---@param page Page
+---@param name string
+---@param color Color
+---@param start float
+---@param increment float
+---@param min float
+---@param max float
+---@param owner LuaBehaviour
+---@param function string
+---@return FloatElement
+function API_BoneMenu.BL_CreateFloatElement(page, name, color, start, increment, min, max, owner, function) end
+
+function API_BoneMenu.InvokeFloatAction() end

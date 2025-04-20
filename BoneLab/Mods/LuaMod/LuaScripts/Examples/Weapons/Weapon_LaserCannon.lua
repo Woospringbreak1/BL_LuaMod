@@ -50,17 +50,11 @@ function TriggerSurfaceImpact(pos, normal)
 end
 
 function DamageEnemy(pos, normal,collider,gameObject,rigidbody)
-    if(gameObject ~= nil) then
-        if(rigidbody ~= nil) then    
-            API_SLZ_Combat.BL_AttackEnemy(gameObject,2.0*Time.deltaTime*60,collider,pos,normal)
-            API_SLZ_Combat.ApplyForce(rigidbody,pos,normal,2000*Time.deltaTime*60)
-        else
-            print("rigidbody is nil")   
-        end
-    else
-        print("GameObject is nil")
+    if(IsValid(gameObject) and IsValid(rigidbody)) then
+        API_SLZ_Combat.BL_AttackEnemy(gameObject,2.0*Time.deltaTime*60,collider,pos,normal)
+        local forceToApply  = 2000*Time.deltaTime*60
+        rigidbody.AddForceAtPosition(normal*forceToApply, pos)  
     end
-
 end
 
 function PlayLaserSound()

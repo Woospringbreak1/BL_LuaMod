@@ -270,11 +270,12 @@ function DamageEnemy(pos, normal, collider, gameObject, rigidbody)
 
         if (rigidbody ~= nil) then
             API_SLZ_Combat.BL_AttackEnemy(gameObject, 0.9 * Time.deltaTime * 60, collider, pos, normal)
-
+            local forceToApply  = (20000 + (20000 * math.random())) * Time.deltaTime * 60
             if(gameObject.transform.root == Target.transform.root) then -- don't push the player out of the beam
-                API_SLZ_Combat.ApplyForce(rigidbody, pos, normal, (5000) * Time.deltaTime * 60)
+                forceToApply = (5000) * Time.deltaTime * 60
+                rigidbody.AddForceAtPosition(normal*forceToApply, pos)
             else
-                API_SLZ_Combat.ApplyForce(rigidbody, pos, normal, (20000 + (20000 * math.random())) * Time.deltaTime * 60)
+                rigidbody.AddForceAtPosition(normal*forceToApply, pos)
             end
 
             print("rigidbody is nil")
@@ -439,7 +440,7 @@ end
 
 function STATE_BANG_FLOOR_FUNC()
 
-    if(WellcapVisible and BangDelay == nil) then
+    if(WellcapSeenByPlayer and BangDelay == nil) then
         BangDelay = Time.time + 5.0 --delay 10 seconds from scene load
     end
 
@@ -748,10 +749,6 @@ function STATE_DYING_FUNC()
 end
 
 function CullExtraSkeletons()
-   -- if (#SkeletonMinions < MaxMinionCount) then
-  --       print("not enough skeletons to cull " .. tostring(#SkeletonMinions))
-  --      return
-  --  end
 
     local targetPos = GetTargetPos()
     if (targetPos == nil) then
@@ -797,10 +794,10 @@ function SlowUpdate()
     CullExtraSkeletons()
 end
 
-WellcapVisible = false
+WellcapSeenByPlayer = false
 function WellcapVisible()
     print("WellcapVisible called on boss script")
-    WellcapVisible = true
+    WellcapSeenByPlayer = true
 end
 
 Setup = true
@@ -846,10 +843,6 @@ function Update()
     MoveLaserAim(false)
     LookAtTarget()
     PropelMortarProjectiles()
-
-    if not (STATE_RISE_UP) then
-        --  OscilateMovement()
-    end
 
 
     if (STATE_DELAYED_START) then

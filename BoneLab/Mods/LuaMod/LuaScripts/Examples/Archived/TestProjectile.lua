@@ -35,7 +35,8 @@ function DamageEnemy(pos, normal,collider,gameObject,rigidbody)
         if(rigidbody ~= nil) then    
             print("calling BL_AttackEnemy")
             API_SLZ_Combat.BL_AttackEnemy(gameObject,20,collider,pos,normal)
-            API_SLZ_Combat.ApplyForce(rigidbody,pos,normal,10000)
+            local forceToApply  = (10000 * Time.deltaTime)
+            rigidbody.AddForceAtPosition(normal*forceToApply, pos)
         else
             print("rigidbody is nil")
         end

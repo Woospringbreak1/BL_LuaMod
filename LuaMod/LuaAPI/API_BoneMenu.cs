@@ -11,11 +11,12 @@ using System.Threading.Tasks;
 
 namespace LuaMod.LuaAPI
 {
+    /// <summary>
+    /// Lua-exposed API for creating and binding BoneMenu menus
+    /// </summary>
     public class API_BoneMenu
     {
-        /// <summary>
-        /// NOTE: AS IT STANDS, PLAYERS CAN STILL CALL PAGE.CREATEFUNCTION - NEEDS TO BE REMOVED FOR SAFETY
-        /// </summary>
+        
         public static readonly API_BoneMenu Instance = new API_BoneMenu();
 
  

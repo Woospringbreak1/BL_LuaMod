@@ -10,6 +10,9 @@ using static Il2CppSLZ.SFX.SimpleSFX;
 
 namespace LuaMod.LuaAPI
 {
+    /// <summary>
+    /// Lua-exposed API for playing sounds. Stub, use AudioSources etc.
+    /// </summary>
     public class API_Audio
     {
         public static readonly API_Audio Instance = new API_Audio();

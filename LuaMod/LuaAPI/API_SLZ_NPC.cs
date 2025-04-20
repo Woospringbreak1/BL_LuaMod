@@ -11,7 +11,9 @@ namespace LuaMod.LuaAPI
         public static readonly API_SLZ_NPC Instance = new API_SLZ_NPC();
 
 
-
+        /// <summary>
+        /// Finds the closest point on the world Navmesh
+        /// </summary>
         public static UnityEngine.Vector3? BL_SamplePosition(UnityEngine.Vector3 position, float maxDistance, int areaMask = -1)
         {
             return LuaSafeCall.Run(() =>
@@ -26,7 +28,9 @@ namespace LuaMod.LuaAPI
             }, $"BL_SamplePosition(pos: {position}, dist: {maxDistance}, mask: {areaMask})");
         }
 
-
+        /// <summary>
+        /// Calculate a path on the world Navmesh
+        /// </summary>
         public static UnityEngine.AI.NavMeshPath BL_CalculatePath(UnityEngine.Vector3 start_pos, UnityEngine.Vector3 end_pos, int areaMask = -1)
         {
             return LuaSafeCall.Run(() =>
@@ -44,13 +48,22 @@ namespace LuaMod.LuaAPI
             }, $"BL_CalculatePath(start: {start_pos}, end: {end_pos}, areaMask: {areaMask})");
         }
 
-
+        /// <summary>
+        /// Make an NPC attack an NPC/Destructable Object/Player
+        /// </summary>
         public bool BL_SetNPCAnger(GameObject NPC, GameObject Target)
         {
             return LuaSafeCall.Run(() =>
             {
-                if (NPC == null) throw new ScriptRuntimeException("NPC GameObject is null");
-                if (Target == null) throw new ScriptRuntimeException("Target GameObject is null");
+                if (NPC == null)
+                {
+                    throw new ScriptRuntimeException("NPC GameObject is null");
+                }
+
+                if (Target == null)
+                {
+                    throw new ScriptRuntimeException("Target GameObject is null");
+                }
 
                 if (!NPC.TryGetComponent<AIBrain>(out AIBrain aiBrain))
                 {

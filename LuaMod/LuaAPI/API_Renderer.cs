@@ -19,6 +19,7 @@ namespace LuaMod.LuaAPI
     /// <summary>
     /// Lua-exposed API for modifying MeshRenderer materials.
     /// Supports getting, setting, and replacing materials from Lua scripts.
+    /// Possibly redundant with array manipulation functions in API_Utils
     /// </summary>
     [MoonSharpUserData]
     public class API_Renderer

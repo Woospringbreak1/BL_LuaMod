@@ -1,10 +1,9 @@
 -- LuaBehaviour
 function Start()
     print("Hello, World! from Spiderman_WebProjectile.lua")
-    ProjectileSpeed = 0.8
+    ProjectileSpeed = 40
     ProjectileRigidBody = API_GameObject.BL_GetComponent(BL_Host,"Rigidbody")
     Webline = API_GameObject.BL_GetComponent(BL_Host,"LineRenderer")
-    --RopeJoint = API_GameObject.BL_GetComponent(BL_Host,"ConfigurableJoint")
     OwnerGun = nil -- gun that spawned this projectile
     OwnerGunRB = nil
 
@@ -24,13 +23,13 @@ function OnCollisionEnter(collision)
 end
 
 
+
 function EmbedProjectile(targetRB)
-    ---set up frozen joint with target Rigidbody
+    ---weld the projectile to the target
     Frozen = true --stop trying to move it
     ProjectileRigidBody.isKinematic = false
-
+    
     local EmbedJoint = API_GameObject.BL_AddComponent(BL_Host,"ConfigurableJoint")
-
     EmbedJoint.connectedBody = targetRB
     EmbedJoint.xMotion = ConfigurableJointMotion.Locked
     EmbedJoint.yMotion = ConfigurableJointMotion.Locked    
@@ -39,6 +38,7 @@ function EmbedProjectile(targetRB)
     EmbedJoint.angularXMotion = ConfigurableJointMotion.Locked
     EmbedJoint.angularXMotion = ConfigurableJointMotion.Locked    
     EmbedJoint.angularZMotion = ConfigurableJointMotion.Locked 
+    
 
     EmbedJoint.enableCollision = false 
     --EmbedJoint.autoConfigureConnectedAnchor = false
@@ -57,7 +57,7 @@ function EmbedProjectile(targetRB)
 end
 
 function FreezeProjectile()
-
+    --set up a length-limited joint between the projectile and the player
     local RopeLength = (BL_Host.transform.position - OwnerGun.transform.position).magnitude
 
     
@@ -114,13 +114,13 @@ function FixedUpdate()
 
         if (ProjectileRigidBody ~= nil and not Frozen) then    
             LastPosition = BL_Host.transform.position
-            local newPosition = BL_Host.transform.position + ((BL_Host.transform.forward * ProjectileSpeed))
+            local newPosition = BL_Host.transform.position + ((BL_Host.transform.forward * ProjectileSpeed * Time.fixedDeltaTime))
             local BackOffsetPosition = LastPosition - ((BL_Host.transform.forward * ProjectileSpeed * 2.0 * Time.fixedDeltaTime ))
             ProjectileRigidBody.MovePosition(newPosition, BL_Host.transform.rotation)
             
             raycast = API_Physics.BL_RayCast(newPosition,BackOffsetPosition)
-            if(raycast ~= nil) then 
-                ProjectileRigidBody.MovePosition(raycast.point, BL_Host.transform.rotation)
+            if(raycast ~= nil and raycast.collider.transform.root ~= OwnerGun.transform.root) then 
+                ProjectileRigidBody.position = raycast.point
                 FreezeProjectile()
 
                 if(raycast.collider.gameObject.transform.root ~= OwnerGun.transform.root) then
@@ -130,6 +130,7 @@ function FixedUpdate()
                 end
 
             end
+           
 
         else    
             --print("ProjectileRigidBody is nil")
