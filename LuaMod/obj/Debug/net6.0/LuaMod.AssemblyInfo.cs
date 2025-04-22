@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LuaMod")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d95584ddf879f6575560fff382fa110edbfa43ad")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e46ce2902676b4f14f2bbf5a5309e62218b1172c")]
 [assembly: System.Reflection.AssemblyProductAttribute("LuaMod")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LuaMod")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

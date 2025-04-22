@@ -1,5 +1,0 @@
-BEGIN SAVE INFO
-false
-true
-true
-false

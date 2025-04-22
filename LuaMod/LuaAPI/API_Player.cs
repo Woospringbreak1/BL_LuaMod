@@ -52,12 +52,9 @@ namespace LuaMod.LuaAPI
 
         public static PhysicsRig BL_GetPhysicsRig()
         {
-
-          
             if (BoneLib.Player.PhysicsRig != null)
             {
                 return (BoneLib.Player.PhysicsRig);
-            
             }
             return null;
 
@@ -72,6 +69,15 @@ namespace LuaMod.LuaAPI
             }
             return null;
 
+        }
+
+        public static RemapRig BL_GetRemapRig()
+        {
+            if (BoneLib.Player.RemapRig != null)
+            {
+                return (BoneLib.Player.RemapRig);
+            }
+            return null;
         }
 
         public static Health BL_PlayerHealth()

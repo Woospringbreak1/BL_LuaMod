@@ -162,5 +162,84 @@ namespace LuaMod.LuaAPI
                 return UserData.Create(results);
             }, $"BL_CapsuleCastAll(p1: {point1}, p2: {point2}, radius: {radius}, dir: {direction}, dist: {maxDistance}, mask: {layerMask})");
         }
+
+
+        public static DynValue BL_CheckSphere(Vector3 position, float radius, int layerMask = Physics.DefaultRaycastLayers)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                bool result = Physics.CheckSphere(position, radius, layerMask);
+                return DynValue.NewBoolean(result);
+            }, $"BL_CheckSphere(pos: {position}, radius: {radius}, mask: {layerMask})");
+        }
+
+        public static DynValue BL_CheckBox(Vector3 center, Vector3 halfExtents, Quaternion orientation, int layerMask = Physics.DefaultRaycastLayers)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                bool result = Physics.CheckBox(center, halfExtents, orientation, layerMask);
+                return DynValue.NewBoolean(result);
+            }, $"BL_CheckBox(center: {center}, halfExtents: {halfExtents}, orientation: {orientation}, mask: {layerMask})");
+        }
+
+        public static DynValue BL_CheckCapsule(Vector3 start, Vector3 end, float radius, int layerMask = Physics.DefaultRaycastLayers)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                bool result = Physics.CheckCapsule(start, end, radius, layerMask);
+                return DynValue.NewBoolean(result);
+            }, $"BL_CheckCapsule(start: {start}, end: {end}, radius: {radius}, mask: {layerMask})");
+        }
+
+
+        public static DynValue BL_OverlapSphere(Vector3 position, float radius, int layerMask = Physics.DefaultRaycastLayers)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                Collider[] colliders = Physics.OverlapSphere(position, radius, layerMask);
+                if (colliders == null || colliders.Length == 0)
+                    return DynValue.Nil;
+
+                List<DynValue> results = new List<DynValue>();
+                foreach (var c in colliders)
+                    results.Add(UserData.Create(c));
+
+                return UserData.Create(results);
+            }, $"BL_OverlapSphere(pos: {position}, radius: {radius}, mask: {layerMask})");
+        }
+
+        public static DynValue BL_OverlapBox(Vector3 center, Vector3 halfExtents, Quaternion orientation, int layerMask = Physics.DefaultRaycastLayers)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                Collider[] colliders = Physics.OverlapBox(center, halfExtents, orientation, layerMask);
+                if (colliders == null || colliders.Length == 0)
+                    return DynValue.Nil;
+
+                List<DynValue> results = new List<DynValue>();
+                foreach (var c in colliders)
+                    results.Add(UserData.Create(c));
+
+                return UserData.Create(results);
+            }, $"BL_OverlapBox(center: {center}, halfExtents: {halfExtents}, orientation: {orientation}, mask: {layerMask})");
+        }
+
+        public static DynValue BL_OverlapCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.DefaultRaycastLayers)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                Collider[] colliders = Physics.OverlapCapsule(point0, point1, radius, layerMask);
+                if (colliders == null || colliders.Length == 0)
+                    return DynValue.Nil;
+
+                List<DynValue> results = new List<DynValue>();
+                foreach (var c in colliders)
+                    results.Add(UserData.Create(c));
+
+                return UserData.Create(results);
+            }, $"BL_OverlapCapsule(p0: {point0}, p1: {point1}, radius: {radius}, mask: {layerMask})");
+        }
+
+
     }
 }
