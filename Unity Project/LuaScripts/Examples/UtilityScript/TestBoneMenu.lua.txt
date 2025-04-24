@@ -17,60 +17,53 @@ function Start()
     func2 = API_BoneMenu.BL_CreateFunction(secondPage,"test 2", Color.white,BL_This,"GUITestFunction2");
 
     API_Events.BL_SubscribeEvent("BoneMenu_Float_OnValueChanged",BL_This,"BoneMenu_Float_Changed")
+
+    NextCheckTimeSM = 0.0
+    NextCheckTimeJP = 0.0
+    NextCheckTimeVT = 0.0
     
 end
 
 function SetupSpidermanSkills()
-   local locate = GameObject.Find("SpidermanSkills")
-   if(locate == nil or not API_GameObject.BL_IsValid(locate)) then
-      SpiderManSkills = API_GameObject.BL_CreateEmptyGameObject()
-      SpiderManSkills.SetActive(false)
-      SpiderManSkills.name = "SpidermanSkills"
-      SpiderBehaviour = API_GameObject.BL_AddComponent(SpiderManSkills,"LuaBehaviour")
-      SpiderBehaviour.ScriptName = ("\\Examples\\MovementSkills\\Spiderman_WebShooter_AvatarAttachment.lua")
-      SpiderManSkills.SetActive(true)      
-   else
-      SpiderManSkills = locate
+   if(Time.time > NextCheckTimeSM and (SpiderManSkills == nil or not API_GameObject.BL_IsValid(SpiderManSkills))) then
+         API_GameObject.BL_SpawnByBarcode(BL_This,"SpiderManSkills","BonelabMeridian.Luamodexamplecontent.Spawnable.SpiderManResources", Vector3.zero, Quaternion.identity,nil, true)
+         NextCheckTimeSM = Time.time + 2.5
    end
 end
 
 function SetupJetpack()
-   local locate = GameObject.Find("AbioticFactorJetpack")
-   if(locate == nil or not API_GameObject.BL_IsValid(locate)) then
-      AbioticFactorJetpack = API_GameObject.BL_CreateEmptyGameObject()
-      AbioticFactorJetpack.SetActive(false)
-      AbioticFactorJetpack.name = "AbioticFactorJetpack"
-      AbioticFactorJetpackBehaviour = API_GameObject.BL_AddComponent(AbioticFactorJetpack,"LuaBehaviour")
-      AbioticFactorJetpackBehaviour.ScriptName = ("\\Examples\\MovementSkills\\AbioticFactor_Jetpack_AvatarAttachment.lua")
-      AbioticFactorJetpack.SetActive(true)      
-   else
-      AbioticFactorJetpack = locate
+   --local locate = GameObject.Find("AbioticFactorJetpack")
+   if(Time.time > NextCheckTimeJP and (AbioticFactorJetpack == nil or not API_GameObject.BL_IsValid(AbioticFactorJetpack))) then
+      API_GameObject.BL_SpawnByBarcode(BL_This,"AbioticFactorJetpack","BonelabMeridian.Luamodexamplecontent.Spawnable.JetpackController", Vector3.zero, Quaternion.identity,nil, true)
+      NextCheckTimeJP = Time.time + 2.5   
    end
 end
 
 NextCheckTime = 0
 function SetupVertigoTeleporter()
-   local locate = GameObject.Find("VertigoTeleporter")
-   if(Time.time > NextCheckTime and ( locate == nil or not API_GameObject.BL_IsValid(locate))) then
+   --local locate = GameObject.Find("VertigoTeleporter")
+   if(Time.time > NextCheckTimeVT and ( VertigoTeleporter == nil or not API_GameObject.BL_IsValid(VertigoTeleporter))) then
       API_GameObject.BL_SpawnByBarcode(BL_This,"VertigoTeleporter","BonelabMeridian.Luamodexamplecontent.Spawnable.VertigoTeleporterAttachment", Vector3.zero, Quaternion.identity,nil, true)
-      NextCheckTime = Time.time + 0.5
-   else
-      VertigoTeleporter = locate
+      NextCheckTimeVT = Time.time + 2.5
    end
 end
 
 function SpidermanToggleUpdate()
 
+   if(SpiderBehaviour == nil and IsValid(SpiderManSkills)) then
+      SpiderBehaviour = API_GameObject.BL_GetComponent(SpiderManSkills,"LuaBehaviour")
+   end
+
    if(SpidermanToggle == nil) then
       return
    end
 
-   if(SpiderManSkills ~= nil and API_GameObject.BL_IsValid(SpiderManSkills) and SpiderBehaviour.Ready) then
+   if(SpiderManSkills ~= nil and IsValid(SpiderManSkills) and SpiderBehaviour ~= nil and IsValid(SpiderBehaviour) and SpiderBehaviour.Ready) then
       SpiderBehaviour.CallFunction("SetLeftHanded", SpidermanHandToggle.value) --should really be an event
    end
 
    if(SpidermanToggle.value) then
-      if(SpiderManSkills == nil or not API_GameObject.BL_IsValid(SpiderManSkills)) then
+      if(SpiderManSkills == nil or not IsValid(SpiderManSkills)) then
          SetupSpidermanSkills()
       end
    else
@@ -119,7 +112,7 @@ end
 
 function Update()
 
-   if(BL_This == nil or not API_GameObject.BL_IsValid(BL_Host) or not BL_This.Ready) then
+   if(BL_This == nil or not API_GameObject.BL_IsValid(BL_Host) or not BL_This.Ready or API_Player.BL_GetRemapRig() == nil) then --check for remaprig to prevent odd issues with spawning before the player
       return
   end
 

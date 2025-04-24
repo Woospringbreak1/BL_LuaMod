@@ -7,10 +7,10 @@ def rename_lua_files(root_dir):
                 old_path = os.path.join(dirpath, filename)
                 new_path = old_path + ".txt"
 
-                # Avoid overwriting if .lua.txt already exists
+                # Remove the target if it already exists
                 if os.path.exists(new_path):
-                    print(f"[SKIP] {new_path} already exists.")
-                    continue
+                    os.remove(new_path)
+                    print(f"[OVERWRITE] Removed existing file: {new_path}")
 
                 os.rename(old_path, new_path)
                 print(f"[RENAME] {old_path} -> {new_path}")
