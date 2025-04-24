@@ -345,7 +345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: \Examples\Weapons\PlasmaProjectile.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: 095671ead73b79a4daacf5d6cad458c6, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags: []
   Ready: 0

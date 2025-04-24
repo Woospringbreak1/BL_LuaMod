@@ -1,4 +1,7 @@
-require("Examples\\ErrorHandling\\BaseExample.lua")
+function Start()
+    local luaResources = API_GameObject.BL_GetComponent(BL_Host,"LuaResources")
+    require(luaResources.GetObject("BaseExample.lua","TextAsset"))
+end
 
 StackOverflow = false
 function SetStatus(status)

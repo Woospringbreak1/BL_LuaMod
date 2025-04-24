@@ -775,7 +775,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: \Examples\AncientOblisk_BossFight\Boss_AncientOblisk_BunkerGun.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: 62aa5b859cfb86f4bae6a2d8bbb49268, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags:
   - BOSS_ANCIENTOBLISK_BUNKERGUN
@@ -1022,7 +1022,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: \Examples\MovementSkills\JetpackFuelMeter.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: fc85261ae31efe44598a6950c42d88f2, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags: []
   Ready: 0
@@ -4818,7 +4818,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: \Examples\Weapons\Weapon_LaserCannon.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: 77692111730aded4692706920254e5ab, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags: []
   Ready: 0

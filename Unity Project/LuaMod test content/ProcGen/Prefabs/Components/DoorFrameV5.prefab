@@ -779,7 +779,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: Examples\BoneRooms\ProcGen_Door.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: 4e6af8409aca1914e855e9823ba79d08, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags:
   - ProcGen_Door

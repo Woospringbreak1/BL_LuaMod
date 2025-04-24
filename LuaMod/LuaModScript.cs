@@ -1,4 +1,5 @@
 ﻿using Il2CppSLZ.Marrow;
+using Il2CppSystem.Runtime.Serialization;
 using LuaMod.LuaAPI;
 using MelonLoader;
 using Microsoft.VisualBasic.FileIO;
@@ -122,7 +123,7 @@ namespace LuaMod
 
 
 
-        public bool LoadScript(string filename, bool reloading)
+        public bool LoadScript(string filename, bool reloading,LuaBehaviour host)
         {
             filename = API_Utils.RemoveDoubleSlashes(filename);
 
@@ -151,6 +152,9 @@ namespace LuaMod
 
             LuaFileName = filename;
 
+            _LuaScript.Globals.Set("BL_Host", UserData.Create(host.gameObject));
+            _LuaScript.Globals.Set("BL_This", UserData.Create(host));
+
             try
             {
                 DynValue entry = _LuaScript.LoadFile(filename);
@@ -173,10 +177,10 @@ namespace LuaMod
 
 
 
-        public bool LoadScript(TextAsset scriptAsset, bool reloading)
+        public bool LoadScript(TextAsset scriptAsset, bool reloading,LuaBehaviour host)
         {
             if (scriptAsset == null)
-            {
+            {   
                 return false;
             }
                 
@@ -196,6 +200,9 @@ namespace LuaMod
 
             LuaFileName = string.Empty;
             LuaAsset = scriptAsset;
+
+            _LuaScript.Globals.Set("BL_Host", UserData.Create(host.gameObject));
+            _LuaScript.Globals.Set("BL_This", UserData.Create(host));
 
             try
             {
@@ -293,90 +300,166 @@ namespace LuaMod
             ScriptManager.DeregisterScript(this);
         }
 
+        // File-based
         private DynValue LoadModule(string module)
+        {
+            return LoadModuleInternal(module, null);
+        }
+
+        // Asset-based
+        private DynValue LoadModule(TextAsset moduleAsset)
+        {
+            if (moduleAsset == null)
+                throw new ScriptRuntimeException("Provided TextAsset is null");
+
+            string moduleName = moduleAsset.name;
+            return LoadModuleInternal(moduleName, moduleAsset.text);
+        }
+
+        // Shared logic
+        private DynValue LoadModuleInternal(string moduleName, string codeOverride = null)
         {
             return LuaSafeCall.Run(() =>
             {
-                string path = Security.GetRelativeScriptPath(module);
-
-                if (!Security.IsSafePath(path))
+                string code;
+                if (codeOverride != null)
                 {
-                    throw new ScriptRuntimeException($"attempted to access an unsafe path: {module}");
-                }    
-                    
-
-                if (!File.Exists(path))
-                {
-                    throw new ScriptRuntimeException($"Module '{module}' not found at path: {path}");
+                    code = codeOverride;
                 }
-                   
+                else
+                {
+                    string path = Security.GetRelativeScriptPath(moduleName);
 
-                string code = File.ReadAllText(path);
+                    if (!Security.IsSafePath(path))
+                    {
+                        throw new ScriptRuntimeException($"attempted to access an unsafe path: {moduleName}");
+                    }
 
-                // Load without executing yet
-                DynValue func = _LuaScript.LoadString(code, null, $"module:{module}");
+                    if (!File.Exists(path))
+                    {
+                        throw new ScriptRuntimeException($"Module '{moduleName}' not found at path: {path}");
+                    }
+                        
 
-                // Execute with protections
+                    code = File.ReadAllText(path);
+                }
+
+                DynValue func = _LuaScript.LoadString(code, null, $"module:{moduleName}");
                 DynValue result = CallScriptFunction(func);
 
                 if (result.Type == DataType.Table || result.Type == DataType.UserData || result.Type == DataType.Function)
                 {
-                    _LuaScript.Globals.Set(module, result);
+                    _LuaScript.Globals.Set(moduleName, result);
+                    _loadedModules[moduleName] = result;
                     return result;
                 }
 
-                _LuaScript.Globals.Set(module, DynValue.True);
-                _loadedModules[module] = DynValue.True;
+                _LuaScript.Globals.Set(moduleName, DynValue.True);
+                _loadedModules[moduleName] = DynValue.True;
                 return DynValue.True;
 
-            }, $"require('{module}')");
+            }, $"loadmodule('{moduleName}')");
         }
 
 
 
 
+        // File-based require
         private DynValue Require(string module)
+        {
+            return RequireInternal(module, null);
+        }
+
+        // Asset-based require
+        private DynValue Require(TextAsset moduleAsset)
+        {
+            if (moduleAsset == null)
+                throw new ScriptRuntimeException("Provided TextAsset is null");
+
+            string moduleName = moduleAsset.name;
+            return RequireInternal(moduleName, moduleAsset.text);
+        }
+
+        // Shared internal require logic
+        private DynValue RequireInternal(string moduleName, string codeOverride = null)
         {
             return LuaSafeCall.Run(() =>
             {
-                if (_loadedModules.TryGetValue(module, out var cached))
+                if (_loadedModules.TryGetValue(moduleName, out var cached))
                 {
                     return cached;
                 }
-                   
-                string path = Security.GetRelativeScriptPath(module);
 
-                if (!Security.IsSafePath(path))
+                string code;
+
+                if (codeOverride != null)
                 {
-                    throw new ScriptRuntimeException($"attempted to access an unsafe path: {module}");
+                    code = codeOverride;
                 }
-                    
-
-                if (!File.Exists(path))
+                else
                 {
-                    throw new ScriptRuntimeException($"Module '{module}' not found at path: {path}");
+                    string path = Security.GetRelativeScriptPath(moduleName);
+
+                    if (!Security.IsSafePath(path))
+                    {
+                        throw new ScriptRuntimeException($"attempted to access an unsafe path: {moduleName}");
+                    }
+                        
+
+                    if (!File.Exists(path))
+                    {
+                        throw new ScriptRuntimeException($"Module '{moduleName}' not found at path: {path}");
+                    }
+                        
+
+                    code = File.ReadAllText(path);
                 }
-                   
 
-                string code = File.ReadAllText(path);
-
-                DynValue func = _LuaScript.LoadString(code, null, $"require:{module}");
+                DynValue func = _LuaScript.LoadString(code, null, $"require:{moduleName}");
                 DynValue result = CallScriptFunction(func);
 
                 if (result.Type == DataType.Table || result.Type == DataType.UserData || result.Type == DataType.Function)
                 {
-                    _LuaScript.Globals.Set(module, result);
-                    _loadedModules[module] = result;
+                    _LuaScript.Globals.Set(moduleName, result);
+                    _loadedModules[moduleName] = result;
                     return result;
                 }
 
-                _LuaScript.Globals.Set(module, DynValue.True);
-                _loadedModules[module] = DynValue.True;
+                _LuaScript.Globals.Set(moduleName, DynValue.True);
+                _loadedModules[moduleName] = DynValue.True;
                 return DynValue.True;
 
-            }, $"require('{module}')");
+            }, $"require('{moduleName}')");
         }
 
+
+        // Exposed to Lua: require(string | TextAsset)
+        private DynValue Lua_Require(object module)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                if (module is string s)
+                    return Require(s);
+                else if (module is TextAsset ta)
+                    return Require(ta);
+                else
+                    throw new ScriptRuntimeException("require() must be called with a string or TextAsset");
+            }, "Lua_Require");
+        }
+
+        // Exposed to Lua: loadmodule(string | TextAsset)
+        private DynValue Lua_LoadModule(object module)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+                if (module is string s)
+                    return LoadModule(s);
+                else if (module is TextAsset ta)
+                    return LoadModule(ta);
+                else
+                    throw new ScriptRuntimeException("loadmodule() must be called with a string or TextAsset");
+            }, "Lua_LoadModule");
+        }
 
 
         private void LoadFunctionPointers()
@@ -414,8 +497,8 @@ namespace LuaMod
          
 
             _LuaScript.Globals["IsValid"] = (Func<GameObject, bool>)API_GameObject.BL_IsValid;
-            _LuaScript.Globals["LoadModule"] = (Func<string, DynValue>)this.LoadModule;
-            _LuaScript.Globals["require"] = (Func<string, DynValue>)this.Require;
+            _LuaScript.Globals["require"] = (Func<object, DynValue>)Lua_Require;
+            _LuaScript.Globals["loadmodule"] = (Func<object, DynValue>)Lua_LoadModule;
 
             //SLZ
             _LuaScript.Globals["HammerStates"] = UserData.CreateStatic<Gun.HammerStates>();

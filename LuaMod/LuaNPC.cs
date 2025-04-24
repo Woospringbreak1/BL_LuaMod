@@ -40,14 +40,12 @@ namespace LuaMod
 
         private void OnAIBrainDeath(AIBrain aIBrain)
         {
-            MelonLoader.MelonLogger.Msg("AI Brain is dead");
             CallScriptFunction(OnDeathFunction);
 
         }
 
         private void OnAIBrainResurrect(AIBrain aIBrain)
         {
-            MelonLoader.MelonLogger.Msg("AI Brain is dead");
             CallScriptFunction(OnResurrectionFunction);
         }
 

@@ -29,7 +29,6 @@ namespace LuaMod
 
         public static string GetRelativePath(string filename)
         {
-            // Prevent rooted paths from overriding the base directory
             string sanitizedFilename = filename.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string outpath = Path.GetFullPath(Path.Combine(resourcesRoot, sanitizedFilename));
             return outpath;

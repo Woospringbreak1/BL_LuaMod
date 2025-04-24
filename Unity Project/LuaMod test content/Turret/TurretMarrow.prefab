@@ -1396,8 +1396,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: TurretScriptV3.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: e11bdc1ab94528946895cde8a70d12cb, type: 3}
   SlowUpdateTime: 0.5
+  ScriptTags: []
+  Ready: 0
 --- !u!114 &1277464948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2285,6 +2287,8 @@ MonoBehaviour:
   ScriptName: TurretWeapon.lua
   ScriptAsset: {fileID: 0}
   SlowUpdateTime: 0.5
+  ScriptTags: []
+  Ready: 0
   AttachedGun: {fileID: 8889114428463756053}
   AttachedGunSlide: {fileID: 8888995545187310244}
   SupressBullet: 1

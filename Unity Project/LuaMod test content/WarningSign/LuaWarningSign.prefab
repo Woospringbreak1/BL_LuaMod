@@ -358,7 +358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: Examples\UtilityScript\WarningSign.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: 745b9c94198e7964b87ec2c48a198a47, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags: []
   Ready: 0

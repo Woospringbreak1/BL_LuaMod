@@ -1426,11 +1426,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: \Examples\AncientOblisk_BossFight\Boss_AncientOblisk_Bunker.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: 5d046ab107c6939439307a793191a880, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags: []
   Ready: 0
-  Resources: []
 --- !u!65 &5674302250485327775
 BoxCollider:
   m_ObjectHideFlags: 0

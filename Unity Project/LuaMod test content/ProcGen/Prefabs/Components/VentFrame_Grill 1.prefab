@@ -963,6 +963,7 @@ GameObject:
   - component: {fileID: 6176460859643444377}
   - component: {fileID: 4127261696482921669}
   - component: {fileID: 5463612546507788332}
+  - component: {fileID: 4698345028523804549}
   m_Layer: 0
   m_Name: DOOR
   m_TagString: Untagged
@@ -1238,12 +1239,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: Examples\BoneRooms\ProcGen_Door.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: 4e6af8409aca1914e855e9823ba79d08, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags:
   - ProcGen_Door
   - DOORTYPE_VENT
   Ready: 0
+--- !u!54 &4698345028523804549
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591581437074248727}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &2762821256378085211
 GameObject:
   m_ObjectHideFlags: 0

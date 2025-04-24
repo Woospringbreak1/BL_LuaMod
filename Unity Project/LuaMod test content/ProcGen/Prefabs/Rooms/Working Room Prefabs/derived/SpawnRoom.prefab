@@ -433,7 +433,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: Examples\BoneRooms\ProcGen_Section.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: a70030962bdb9dc46b5b0a6906f0112e, type: 3}
   SlowUpdateTime: 0.3
   ScriptTags:
   - ProcGen_Section

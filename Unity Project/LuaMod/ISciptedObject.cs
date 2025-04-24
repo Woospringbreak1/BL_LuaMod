@@ -15,7 +15,7 @@ namespace LuaMod
         public void LoadBehaviourFunctionPointers();
         public bool SetupBehaviourFunctions();
         public bool ReloadScript();
-        public bool LoadScript(TextAsset Script);
+        public bool LoadScript(TextAsset Script, ISciptedObject host);
         public bool LoadScript(string Script);
         public bool CallFunction(string functionname, params DynValue[] args);
     }

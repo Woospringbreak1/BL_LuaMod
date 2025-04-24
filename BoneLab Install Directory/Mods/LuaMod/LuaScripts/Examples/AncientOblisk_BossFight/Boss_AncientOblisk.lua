@@ -260,10 +260,10 @@ function DamageEnemy(pos, normal, collider, gameObject, rigidbody)
                     TargetLuaBehaviour.CallFunction("DestroyedByBoss")
                     return
                 end
-                print("boss laser target: " .. TargetLuaBehaviour.name)
+                --print("boss laser target: " .. TargetLuaBehaviour.name)
                 --tell Bunkergun to kill it's self
             else
-                print("boss laser target: " .. TargetLuaBehaviour.name)
+                --print("boss laser target: " .. TargetLuaBehaviour.name)
             end
             return
         end
@@ -278,10 +278,8 @@ function DamageEnemy(pos, normal, collider, gameObject, rigidbody)
                 rigidbody.AddForceAtPosition(normal*forceToApply, pos)
             end
 
-            print("rigidbody is nil")
+            --print("rigidbody is nil")
         end
-    else
-        print("GameObject is nil")
     end
 end
 
@@ -588,11 +586,11 @@ function STATE_READY_FUNC()
             STATE_READY = false
             STATE_LAUNCHING_MORTAR = true
             return
-        elseif (fireOption == 2) then
+        elseif (fireOption == 2 and Target == PlayerTarget) then
             STATE_READY = false
             STATE_DISPATCHDRONES = true
             return
-        elseif (fireOption == 3) then
+        else
             STATE_READY = false
             STATE_CHARGING_LASER = true
             STATE_CHARGING_LASER_TIME = Time.time
@@ -734,10 +732,8 @@ function STATE_DYING_FUNC()
         if (Time.time > nextExplosion) then
             local explosionPosition = GetRandomPointOnMeshRendererSphere(coneMeshRenderer)
             local explosionPosition2 = GetRandomPointOnMeshRendererSphere(coneMeshRenderer)
-            API_GameObject.BL_SpawnByBarcode("c1534c5a-26fd-4606-aa5e-1098426c6173", explosionPosition,
-                Quaternion.identity)
-            API_GameObject.BL_SpawnByBarcode("SLZ.BONELAB.Content.Spawnable.BlasterLightningNegative", explosionPosition2,
-                Quaternion.identity)
+            API_GameObject.BL_SpawnByBarcode("c1534c5a-26fd-4606-aa5e-1098426c6173", explosionPosition,Quaternion.identity)
+            API_GameObject.BL_SpawnByBarcode("SLZ.BONELAB.Content.Spawnable.BlasterLightningNegative", explosionPosition2,Quaternion.identity)
             nextExplosion = Time.time + math.random() * deathExplosionDelay
             deathExplosionCount = deathExplosionCount + 1
         end
@@ -781,7 +777,7 @@ function CullExtraSkeletons()
     -- Rebuild the list without nils
     local cleaned = {}
     for _, obj in ipairs(SkeletonMinions) do
-        print(obj.name .. " is active? " .. tostring(obj.activeInHierarchy) .. " " .. tostring(obj.activeSelf))
+        --print(obj.name .. " is active? " .. tostring(obj.activeInHierarchy) .. " " .. tostring(obj.activeSelf))
         if (obj ~= nil and IsValid(obj) and obj.activeInHierarchy) then
             table.insert(cleaned, obj)
         end
@@ -790,13 +786,13 @@ function CullExtraSkeletons()
 end
 
 function SlowUpdate()
-    print("BOSS SLOW UPDATE!")
+    --print("BOSS SLOW UPDATE!")
     CullExtraSkeletons()
 end
 
 WellcapSeenByPlayer = false
 function WellcapVisible()
-    print("WellcapVisible called on boss script")
+    --print("WellcapVisible called on boss script")
     WellcapSeenByPlayer = true
 end
 
@@ -877,13 +873,13 @@ function Update()
         -- print("STATE_DISPATCHDRONES")
     elseif (STATE_DESTROYBUNKER1) then
         STATE_DESTROYBUNKER1_FUNC()
-        print("STATE_DESTROYBUNKER1")
+        --print("STATE_DESTROYBUNKER1")
     elseif (STATE_DESTROYBUNKER2) then
         STATE_DESTROYBUNKER2_FUNC()
-        print("STATE_DESTROYBUNKER2")
+        --print("STATE_DESTROYBUNKER2")
     elseif (STATE_DESTROYBUNKER3) then
         STATE_DESTROYBUNKER3_FUNC()
-        print("STATE_DESTROYBUNKER3")
+        --print("STATE_DESTROYBUNKER3")
     elseif (STATE_DYING) then
         STATE_DYING_FUNC()
     end

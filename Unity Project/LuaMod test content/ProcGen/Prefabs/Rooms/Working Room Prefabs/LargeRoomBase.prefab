@@ -1123,7 +1123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: Examples\BoneRooms\ProcGen_Section.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: a70030962bdb9dc46b5b0a6906f0112e, type: 3}
   SlowUpdateTime: 0.3
   ScriptTags:
   - ProcGen_Section
@@ -1591,6 +1591,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 1018112800793416375, guid: fab99945564c56842a32a8b5869bc868, type: 3}
+      propertyPath: ScriptAsset
+      value: 
+      objectReference: {fileID: 4900000, guid: 4e6af8409aca1914e855e9823ba79d08, type: 3}
     - target: {fileID: 3165536590219981001, guid: fab99945564c56842a32a8b5869bc868, type: 3}
       propertyPath: m_RootOrder
       value: 12

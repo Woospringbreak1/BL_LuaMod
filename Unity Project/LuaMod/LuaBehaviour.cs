@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Security;
 using UnityEngine;
+using UnityEngine.ProBuilder.MeshOperations;
+
 
 
 
@@ -22,7 +24,7 @@ namespace LuaMod
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
     //[RegisterTypeInIl2Cpp]  //handled by FieldInjector
 #endif
-    public class LuaBehaviour : MonoBehaviour, ISciptedObject
+    public class LuaBehaviour : MonoBehaviour//, ISciptedObject
     {
         /// <summary>
         /// The name of the Lua script file (used if ScriptAsset is null).
@@ -91,8 +93,7 @@ namespace LuaMod
         public void LoadBehaviourFunctionPointers()
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
-            BehaviourScript.SetGlobal("BL_Host",this.gameObject);
-            BehaviourScript.SetGlobal("BL_This", this);
+
 #endif
         }
         [MoonSharpHidden]
@@ -100,21 +101,27 @@ namespace LuaMod
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
             BehaviourScript = new LuaModScript();
+            bool ScriptLoaded = false;
 
-
-            if (ScriptName != null && ScriptName != "")
+            if (ScriptName != "" && LoadScript(Security.GetRelativeScriptPath(ScriptName)))
             {
-                LoadScript(Security.GetRelativeScriptPath(ScriptName));
+                ScriptLoaded = true;
             }
-            else if (ScriptAsset != null)
+            else if (ScriptAsset != null && LoadScript(ScriptAsset))
             {
-                LoadScript(ScriptAsset);
+                ScriptLoaded = true;
             }
 
+            if (!ScriptLoaded)
+            {
+                MelonLogger.Warning("No Valid script for LuaBehaviour " + this.name);
+                Ready = false;
+                return;
+            }
 
             CallScriptFunction(StartFunction);
 
-            if(SlowUpdateFunction != null && SlowUpdateFunction != DynValue.Nil)
+            if (SlowUpdateFunction != null && SlowUpdateFunction != DynValue.Nil)
             {
                 SetSlowUpdate(true, SlowUpdateTime);
             }
@@ -202,6 +209,12 @@ namespace LuaMod
         void SlowUpdate()
         {
         #if !(UNITY_EDITOR || UNITY_STANDALONE)
+            if (!Ready || !BehaviourScript.ScriptIsValid())
+            {
+                return;
+            }
+
+        
             CallScriptFunction(SlowUpdateFunction);
         #endif
         }
@@ -329,19 +342,16 @@ namespace LuaMod
         [MoonSharpHidden]
         public DynValue CallScriptFunction(DynValue DyFunc,params object[] Args)
         {
-            ///not intended for use in lua scripts. Throws exceptions when target or parameters are not correct
+            
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
 
-            if (DyFunc == null || DyFunc.Type == DataType.Nil || DyFunc.Type == DataType.Void)
+            if (DyFunc == null || DyFunc.Type == DataType.Nil || DyFunc.Type == DataType.Void || BehaviourScript == null || !BehaviourScript.ScriptIsValid())
             {
                 return null;
             }
 
             return LuaSafeCall.Run(() =>
             {
-                if (BehaviourScript == null || !BehaviourScript.ScriptIsValid())
-                    throw new ScriptRuntimeException($"CallScriptFunction failed: BehaviourScript is null or invalid on object '{this.name}'");
-
                 try
                 {
                     return BehaviourScript.CallScriptFunction(DyFunc, Args);
@@ -478,7 +488,6 @@ namespace LuaMod
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
             MelonLoader.MelonLogger.Msg("running reload on LuaBehaviour " + this.gameObject.name);
             SetupBehaviourFunctions();
-            LoadBehaviourFunctionPointers();
             //reload parameter directory?
             return true;
 #endif
@@ -489,11 +498,10 @@ namespace LuaMod
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
 
-            if (BehaviourScript.LoadScript(Script, false))
+            if (BehaviourScript.LoadScript(Script, false,this))
             {
                 ScriptAsset = Script;
                 SetupBehaviourFunctions();
-                LoadBehaviourFunctionPointers();
                 BehaviourScript.PostReloadScript = new LuaModScript.del_postreload(ReloadScript);
                 return true;
             }
@@ -511,11 +519,10 @@ namespace LuaMod
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
 
-            if (BehaviourScript.LoadScript(Script, false))
+            if (BehaviourScript.LoadScript(Script, false,this))
             {
                //ScriptName = Script;
                 SetupBehaviourFunctions();
-                LoadBehaviourFunctionPointers();
                 BehaviourScript.PostReloadScript = new LuaModScript.del_postreload(ReloadScript);
                 return true;
             }

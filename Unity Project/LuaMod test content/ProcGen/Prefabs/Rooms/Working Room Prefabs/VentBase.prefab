@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: \Examples\BoneRooms\ProcGen_Section.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: a70030962bdb9dc46b5b0a6906f0112e, type: 3}
   SlowUpdateTime: 0
   ScriptTags:
   - ProcGen_Section
@@ -458,7 +458,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1125484490468403654, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 1495
+      value: 1498
       objectReference: {fileID: 0}
     - target: {fileID: 1125484490468403654, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_SelectedEdges.Array.size
@@ -486,7 +486,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3070213445293809165, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 1904
+      value: 1907
       objectReference: {fileID: 0}
     - target: {fileID: 3295725163910095092, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_Mesh
@@ -494,7 +494,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3295725163910095092, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 1736
+      value: 1739
       objectReference: {fileID: 0}
     - target: {fileID: 4127261696482921669, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_Mesh
@@ -506,7 +506,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6142128139011623384, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 2495
+      value: 2498
       objectReference: {fileID: 0}
     - target: {fileID: 6176460859643444377, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_SelectedEditorRenderState
@@ -558,7 +558,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7827413493018248531, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 2196
+      value: 2199
       objectReference: {fileID: 0}
     - target: {fileID: 7974107175366913277, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_Mesh
@@ -566,7 +566,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7974107175366913277, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 1503
+      value: 1506
       objectReference: {fileID: 0}
     - target: {fileID: 8809539246613837364, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_Mesh
@@ -640,7 +640,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1125484490468403654, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 1498
+      value: 1501
       objectReference: {fileID: 0}
     - target: {fileID: 1125484490468403654, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_SelectedEdges.Array.size
@@ -676,7 +676,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3070213445293809165, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 1907
+      value: 1910
       objectReference: {fileID: 0}
     - target: {fileID: 3295725163910095092, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_Mesh
@@ -684,7 +684,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3295725163910095092, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 1739
+      value: 1742
       objectReference: {fileID: 0}
     - target: {fileID: 4127261696482921669, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_Mesh
@@ -700,7 +700,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6142128139011623384, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 2498
+      value: 2501
       objectReference: {fileID: 0}
     - target: {fileID: 6210986473443278362, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_LocalRotation.w
@@ -744,7 +744,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7827413493018248531, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 2199
+      value: 2202
       objectReference: {fileID: 0}
     - target: {fileID: 7974107175366913277, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_Mesh
@@ -752,7 +752,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7974107175366913277, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_VersionIndex
-      value: 1506
+      value: 1509
       objectReference: {fileID: 0}
     - target: {fileID: 8074303346388341005, guid: b17267afddf992547a6824b4ce668a82, type: 3}
       propertyPath: m_SelectedEditorRenderState

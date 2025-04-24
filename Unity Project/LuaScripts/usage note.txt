@@ -1,0 +1,1 @@
+these embedded scripts are overwritten by .lua scripts placed in the [bonelab install directory]/mods/luamod/luascripts folder

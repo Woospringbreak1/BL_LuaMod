@@ -272,11 +272,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: \Examples\MovementSkills\JetpackFuelMeter.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: fc85261ae31efe44598a6950c42d88f2, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags: []
   Ready: 0
-  Resources: []
 --- !u!82 &5387811793980486145
 AudioSource:
   m_ObjectHideFlags: 0

@@ -229,11 +229,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScriptName: \Examples\MovementSkills\Spiderman_WebProjectile.lua
-  ScriptAsset: {fileID: 0}
+  ScriptAsset: {fileID: 4900000, guid: 3993ab91bf54bd74d87e3a51301a7bad, type: 3}
   SlowUpdateTime: 0.5
   ScriptTags: []
   Ready: 0
-  Resources: []
 --- !u!114 &1799601222770770170
 MonoBehaviour:
   m_ObjectHideFlags: 0
