@@ -122,9 +122,6 @@ function OnTriggerEnter(OtherCollider)
           --  print("Incremented room -- from section")
             AlreadySeen = true
         end 
-        if(OtherCollider.transform.root == API_Player.BL_GetAvatarGameObject().transform.root) then
-        print("other check also good")  
-        end
 
     end
 
@@ -138,22 +135,6 @@ function SeenByPlayer()
     if(Hidden) then
 
         ShowRenderers()
-
-        --[[
-        for _, light in pairs(Lights) do 
-            if(IsValid(light)) then
-                light.enabled = false
-            end
-        end
-
-        for _, renderer in pairs(SwitchRenderers) do  
-            if(IsValid(renderer)) then
-                renderer.enabled = true 
-                Hidden = false
-                Visible = true
-            end
-        end
-        ]]--
     end
 
 end
@@ -164,35 +145,9 @@ function SlowUpdate()
 
 if(not Visible and DisableTime ~= nil and Time.time > DisableTime) then
     HideRenderers()
-    --[[
-    for _, light in pairs(Lights) do 
-        if(IsValid(light)) then
-            light.enabled = false
-        end
-    end
-
-    for _, renderer in pairs(SwitchRenderers) do  
-        if(IsValid(renderer)) then
-            renderer.enabled = false 
-            Hidden = true
-        end
-    end
-    --]]
 end
 
---check for player
---SlowUpdate continues when game object is disabled
 
---[[
-    if(DisableTime ~= nil) then
-        if(TIme.time > DisableTime) then
-            for _, renderer in pairs(SwitchRenderers) do  
-                renderer.enabled = false 
-                Hidden = true
-            end
-        end
-    end
- --]]
     
     if( API_Input.BL_LeftHand() == nil) then
         return
@@ -204,24 +159,6 @@ end
 
     if (Distance.sqrMagnitude < Range)then 
         ShowRenderers()
-        --[[
-        for _, light in pairs(Lights) do 
-            if(IsValid(light)) then
-                light.enabled = true
-            end
-        end
-
-        for _, renderer in pairs(SwitchRenderers) do
-            if(IsValid(renderer)) then
-                renderer.enabled = true
-                Visible = true
-                Hidden = false
-            end
-         end
-         --]]
     end
-        
-   -- DisplayTime = DisplayTime - BL_This.SlowUpdateTime
-   
-
+  
 end

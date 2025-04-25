@@ -2,16 +2,16 @@
 
 
 function Start()
-    print("Hello, World from the turret gun!")
+   -- print("Hello, World from the turret gun!")
     --print("locating LuaGun")
 
-    print("locating Rigidbody")
+   -- print("locating Rigidbody")
     TestRigidbody = API_GameObject.BL_GetComponent(BL_Host,"Rigidbody")
      print("CastTestRigidbody mass: " .. TestRigidbody.mass)
     
-    print("locating LuaGun")
+   -- print("locating LuaGun")
     Luascript = API_GameObject.BL_GetComponent(BL_Host,"LuaGun")
-    print("active script: " .. Luascript.ScriptName)
+   -- print("active script: " .. Luascript.ScriptName)
 
     
 end
@@ -35,7 +35,7 @@ end
 function OnFire()
     -- Note: OnFire is called when the weapon is fired
     -- return true to allow the gun to fire normally
-    print("spawning projectile from turret gun!")
+    --print("spawning projectile from turret gun!")
     Fpoint = Luascript.GetFirepointPosition()
 
     Pos = Fpoint.position + Fpoint.forward*0.2--BL_Host.transform.position + (BL_Host.transform.forward*0.5)

@@ -7,7 +7,7 @@ end
 
 Started = false
 function  OnBecameVisible()
-    print("WELL CAP VISIBLE")
+    --print("WELL CAP VISIBLE")
     if(not Started ) then
         BossLuaBehaviour.CallFunction("WellcapVisible")
         Started = true

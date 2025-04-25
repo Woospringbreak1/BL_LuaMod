@@ -24,7 +24,7 @@ end
 
 function Block()
 --block this door so the player can't pass
-    print("attempting to block door")
+    --print("attempting to block door")
     Blocked = true
     Blockers.setActive(true)
 end

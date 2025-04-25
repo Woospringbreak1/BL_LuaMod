@@ -151,7 +151,7 @@ function GetRandomDoor(existingDoor, room)
         if (Behaviour.ScriptTags.Contains("ProcGen_Door") and Behaviour.ScriptTags.Contains(existingDoorType) and not Behaviour.ScriptTags.Contains("ProcGen_Door_ExitOnly") and not Behaviour.ScriptTags.Contains("ProcGen_Door_Generated")  )  then
            table.insert(Doors, Behaviour)
         else
-            print("Incompatible door type with: " .. tostring(existingDoorType))
+            --print("Incompatible door type with: " .. tostring(existingDoorType))
         end
     end
 
@@ -271,7 +271,7 @@ function AttemptSpawnRoom(door, prefab)
     for f in colliders do
         local obj = f.gameObject
         if (obj ~= NewRoom and not obj.transform:IsChildOf(NewRoom.transform) and obj ~= door and not obj.transform:IsChildOf(door.transform.root) and not string.find(obj.name,"SW_Ventilation_Cap") ) then
-            print("Collision detected " .. obj.name .. " ")
+            --print("Collision detected " .. obj.name .. " ")
             API_GameObject.BL_Destroy(NewRoom)
             return nil
         end
@@ -302,17 +302,6 @@ function AttemptSpawnRoom(door, prefab)
     return NewRoom_LuaBehaviour
 end
 
-function AddToNextEmptySlot(addArray, addItem)
-    print("add array " .. tostring(addArray))
-    print("add item " .. tostring(addItem))
-    for i = 0, 5 - 1 do --hardcoded to avoid annoying array interop issue
-        if addArray[i] == nil then
-            addArray[i] = addItem
-            return true
-        end
-    end
-    return false -- no available slot
-end
 
 function SpawnRoomForDoor(door, forcespawn)
     -- Create a shuffled copy of ProcGenPrefabs to avoid bias
@@ -464,7 +453,8 @@ function SlowUpdate()
 
 
         if(IsValid(value) and not value.ScriptTags.Contains("ProcGen_Section_Spawned")) then
-            print("spawning " .. value.name)
+            --print("spawning " .. value.name)
+            --spawn any CrateSpawners in the room
             value.CallFunction("Spawn")
         end
 

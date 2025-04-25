@@ -4,10 +4,10 @@ function Start()
     RandSeed = API_GameObject.TimeSinceOpen()
     math.randomseed(RandSeed)
 
-    print("Hello, World from Text mesh pro!")
+    --print("Hello, World from Text mesh pro!")
     TextMeshProA = API_GameObject.BL_GetComponent(BL_Host,"TextMeshPro")
-    print(tostring(TextMeshProA))
-    print(TextMeshProA.text)
+    --print(tostring(TextMeshProA))
+    --print(TextMeshProA.text)
 
     CurrentReading = 10
     
