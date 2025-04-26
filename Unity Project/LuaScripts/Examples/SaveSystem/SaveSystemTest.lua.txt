@@ -1,7 +1,4 @@
 function Start()
-    --after the map has loaded, we can set up our button references
-    API_Events.BL_SubscribeEvent("OnSceneWasInitialized",BL_This,"Test")
-
     local saveFileName = "SaveSystemTest_SaveGame.txt"
     FileAccess = API_FileAccess.BL_OpenFile(saveFileName)
 
@@ -21,9 +18,7 @@ function Start()
 
 end
 
-function Test()
-    print("should be called...")
-end
+
 function Update()
     
     ---wait until everything has spawned and all scripts are loaded
@@ -100,13 +95,3 @@ function SetButtonDecorator(button,status)
     end
 end
 
-function Haxxor()
-    ---should throw an exception.
-    ---let me know if it doesn't
-    print("attempting to open file outside of sandbox")
-    local fileAccessHack = API_FileAccess.BL_OpenFile("..\\..\\..\\..\\..\\..\\..\\SaveSystemTest.txt")
-    fileAccessHack.WriteLine("Line1")
-    fileAccessHack.WriteLine("Line2")
-    fileAccessHack.WriteLine("Line3")
-end
-    

@@ -1,7 +1,7 @@
 --LuaBehaviour
 
 function Start()
-    print("BUNKER SCRIPT ONLINE!")
+    --print("BUNKER SCRIPT ONLINE!")
     Boss = API_GameObject.BL_FindInWorld("AncientObliskV2")
     BossBehaviour = API_GameObject.BL_GetComponent(Boss,"LuaBehaviour")
     Player = nil
@@ -31,7 +31,7 @@ function Update()
         local playerRig = API_Player.BL_GetPhysicsRig()
         if(playerRig ~= nil) then
             Player = playerRig.gameObject
-            print("PLAYER VARIABLE SET " .. Player.name)
+           -- print("PLAYER VARIABLE SET " .. Player.name)
         end
 
     end

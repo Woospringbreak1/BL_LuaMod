@@ -8,13 +8,21 @@ function Start()
     Blocked = false
     DoorSpaned = false
     
-
     Blockers.setActive(false)
-    Doors.setActive(false)
+    --Doors.setActive(false)
     Renderer.enabled = false
 
    -- BL_Host.transform.parent = BL_Host.transform.parent.parent
     BL_This.ScriptTags.Add("ProcGen_Door_Ready")
+
+
+    --hacky bug fix - vents are always blocked. fix later.
+    if(BL_This.ScriptTags.Contains("DOORTYPE_VENT")) then
+        Block()
+        BL_This.ScriptTags.Add("ProcGen_Door_Generated")
+        print("blocking vent on spawn")
+    end
+
 end
 
 function SpawnDoor()
@@ -24,7 +32,7 @@ end
 
 function Block()
 --block this door so the player can't pass
-    --print("attempting to block door")
+    print("attempting to block door")
     Blocked = true
     Blockers.setActive(true)
 end

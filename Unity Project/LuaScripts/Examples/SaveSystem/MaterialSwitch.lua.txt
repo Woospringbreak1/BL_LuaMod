@@ -15,10 +15,10 @@ function Start()
 end
 
 function SetStatus(status,floatstatus,nil2,nil3)
-    print("incoming status: " .. tostring(status))
-    print("incoming Float status: " .. tostring(floatstatus))
+    --print("incoming status: " .. tostring(status))
+    --print("incoming Float status: " .. tostring(floatstatus))
     Status = (status == 1 or status == true) --hack to accomodate the incoming event as well as button loading
-    print("Status: " .. tostring(Status))
+    --print("Status: " .. tostring(Status))
 
 
     if Status then

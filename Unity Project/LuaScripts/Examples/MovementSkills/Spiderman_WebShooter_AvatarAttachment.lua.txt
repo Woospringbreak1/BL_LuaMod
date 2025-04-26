@@ -92,7 +92,7 @@ function Update()
     if(ShouldShoot()) then
         if(not ActOnce) then
             PlayWebLaunchSound()
-            print("spawning projectile from spiderman webshooter!")
+            --print("spawning projectile from spiderman webshooter!")
             Fpoint = HandTransform
             Pos = Fpoint.position + Fpoint.forward*0.35
             Rot = Fpoint.rotation;
@@ -112,7 +112,7 @@ function Update()
             table.insert(WebShooterProjectiles,WebProjectileBehaviour)
             WebProjectile = nil
         else
-            print("webshooter projectile not ready")
+            --print("webshooter projectile not ready")
         end
     end
 

@@ -2928,21 +2928,21 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 214e0ec6352381244b7a812a3304c365, type: 3}
   secondGrip: []
   slidePull:
-  - {fileID: 8300000, guid: 787361795f9e1884dbece36a98acac09, type: 3}
+  - {fileID: 0}
   slideRelease:
-  - {fileID: 8300000, guid: 752640068b1d50e489ef257ccd1befcd, type: 3}
+  - {fileID: 0}
   magazineInsert:
   - {fileID: 8300000, guid: 561b5b86ce535dc4dbeb258f3acc0fdb, type: 3}
   magazineDrop:
   - {fileID: 8300000, guid: 141f35fc567e86b4391ce9f1f4a046dc, type: 3}
   dryFire:
-  - {fileID: 8300000, guid: 21c2f287f60745d41be9a140e5ab09a8, type: 3}
+  - {fileID: 0}
   dryFireSlow:
-  - {fileID: 8300000, guid: 21c2f287f60745d41be9a140e5ab09a8, type: 3}
+  - {fileID: 0}
   slideLockFire:
-  - {fileID: 8300000, guid: 6665363a37e051d4b8246bf0a47bb035, type: 3}
+  - {fileID: 0}
   slideLockFireSlow:
-  - {fileID: 8300000, guid: 6665363a37e051d4b8246bf0a47bb035, type: 3}
+  - {fileID: 0}
 --- !u!114 &7937578372155811007
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ require(luaResources.GetObject("BaseExample.lua","TextAsset"))
 
 
 function SetStatus(status)
-    print("MemoryUse setStatus called " .. tostring(status))
+    --print("MemoryUse setStatus called " .. tostring(status))
     if(status) then
         print("allocating as much memory as possible")
         AllocateAllMemory()

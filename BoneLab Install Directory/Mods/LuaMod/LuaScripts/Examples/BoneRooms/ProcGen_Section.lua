@@ -140,25 +140,28 @@ function SeenByPlayer()
 end
 
 
-
+CloseToPLayer = false
 function SlowUpdate()
 
-if(not Visible and DisableTime ~= nil and Time.time > DisableTime) then
-    HideRenderers()
-end
-
-
     
-    if( API_Input.BL_LeftHand() == nil) then
+    if( API_Player.BL_GetAvatarCenter() == nil) then
         return
     end
 
-    local PlayerPos = API_Input.BL_LeftHand().transform.position
 
+    local PlayerPos = API_Player.BL_GetAvatarCenter()
     local Distance = BL_Host.transform.position - PlayerPos
 
     if (Distance.sqrMagnitude < Range)then 
+
         ShowRenderers()
+        CloseToPLayer = true
+    else
+        CloseToPLayer = false
     end
   
+    if(not Visible and not CloseToPLayer --[[and DisableTime ~= nil and Time.time > DisableTime--]] ) then
+        HideRenderers()
+    end
+
 end

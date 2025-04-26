@@ -20,49 +20,30 @@ function Start()
 
     -- Define hardcoded ProcGenBarcodes
     ProcGenBarcodes = {
-        --"sdf.LuaProcGen.Spawnable.Corner2Turrets",
-        --"sdf.LuaProcGen.Spawnable.Cube2",
-        --"sdf.LuaProcGen.Spawnable.Cube9",
-       -- "sdf.LuaProcGen.Spawnable.Corner2Turrets",
-        --"sdf.LuaProcGen.Spawnable.Cube2",
-        --"sdf.LuaProcGen.Spawnable.Cube9",
-        "sdf.LuaProcGen.Spawnable.LargeRioomBase",
-        "sdf.LuaProcGen.Spawnable.HallwayShort",
-       -- "sdf.LuaProcGen.Spawnable.MediumRoom",
-        "sdf.LuaProcGen.Spawnable.NullbodyRoom1",
-        "sdf.LuaProcGen.Spawnable.NullbodyRoom1",
-        "sdf.LuaProcGen.Spawnable.Room1",
-       -- "sdf.LuaProcGen.Spawnable.Room2",
-        "sdf.LuaProcGen.Spawnable.Room1",
-       -- "sdf.LuaProcGen.Spawnable.Room2",
-        "sdf.LuaProcGen.Spawnable.SmallOffice",
-        "sdf.LuaProcGen.Spawnable.SmallRoom",
-        "sdf.LuaProcGen.Spawnable.TestWorldEntryWay",
-        "sdf.LuaProcGen.Spawnable.Corner2",
-        "sdf.LuaProcGen.Spawnable.Corner",
-        "sdf.LuaProcGen.Spawnable.LongHallway2",
-        "sdf.LuaProcGen.Spawnable.LongHallwayVent",
-        "sdf.LuaProcGen.Spawnable.ShortHallway2",
-        "sdf.LuaProcGen.Spawnable.ShortHallway",
-        "sdf.LuaProcGen.Spawnable.VentCorner",
-        "sdf.LuaProcGen.Spawnable.VentDrop",
-        "sdf.LuaProcGen.Spawnable.VentBase",
-        "sdf.LuaProcGen.Spawnable.VentBase",
-        "sdf.LuaProcGen.Spawnable.DropDown",
-        "sdf.LuaProcGen.Spawnable.DropDown",
-        "sdf.LuaProcGen.Spawnable.Breakroom",
-        "sdf.LuaProcGen.Spawnable.TestWorldEntryWay",
-        "sdf.LuaProcGen.Spawnable.TestWorldPiece2",
-        "sdf.LuaProcGen.Spawnable.TestWorldPiece3",
-        "sdf.LuaProcGen.Spawnable.TestWorldPiece"
-       -- "sdf.LuaProcGen.Spawnable.VerticalVentBase",
-       -- "sdf.LuaProcGen.Spawnable.DropDownVentBottom",
-      --  "sdf.LuaProcGen.Spawnable.DropDownVentTop"   
+       
+       -- "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENVentBase",
+        --"BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENVentDrop",
+       -- "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENVentCorner",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENVentBase",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENSpawnRoom",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENSmallOffice",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENShortHallway2",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENShortHallway",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENLongHallwayVent",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENLongHallway",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENLargeRoomBase",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENLarge4DoorRoom",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENHallwayShort",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENDropDown",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENCorner2",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENBreakDown",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGEN4DoorRoom",
+        "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGEN3DoorTallHallway"
     }
 
     SpawnedSections = {}
     -- Entryway barcode
-    EntrywayBarcode = "sdf.LuaProcGen.Spawnable.NullbodyRoom1"
+    EntrywayBarcode = "BonelabMeridian.Luamodexamplecontent.Spawnable.PROCGENSpawnRoom"
 
     -- Spawn Entryway
     API_GameObject.BL_SpawnByBarcode(BL_This, "Entryway", EntrywayBarcode, Vector3.one, Quaternion.identity, BL_Host, false)
@@ -248,10 +229,10 @@ function AttemptSpawnRoom(door, prefab)
     local NewDoor = GetRandomDoor(door,NewRoom)
 
     --print("attempting to spawn " .. prefab.name)
-    if not NewDoor then
-       -- print("ERROR - NO DOOR FOUND - DESTROYING NewRoom " .. NewRoom.name)
+    if (NewDoor == nil or not IsValid(NewDoor)) then
+        print("ERROR - NO DOOR FOUND - DESTROYING NewRoom " .. NewRoom.name)
         API_GameObject.BL_Destroy(NewRoom)
-        return nil
+        return false
     end
 
     NewDoor.ScriptTags.Add("ProcGen_Door_Generated")      
@@ -261,7 +242,7 @@ function AttemptSpawnRoom(door, prefab)
 
     if(BoxCol == nil) then
         print("main collider not found")
-        return nil
+        return false
 
     end
 
@@ -273,7 +254,7 @@ function AttemptSpawnRoom(door, prefab)
         if (obj ~= NewRoom and not obj.transform:IsChildOf(NewRoom.transform) and obj ~= door and not obj.transform:IsChildOf(door.transform.root) and not string.find(obj.name,"SW_Ventilation_Cap") ) then
             --print("Collision detected " .. obj.name .. " ")
             API_GameObject.BL_Destroy(NewRoom)
-            return nil
+            return false
         end
     end
 
@@ -299,7 +280,7 @@ function AttemptSpawnRoom(door, prefab)
     table.insert(SpawnedSections, NewRoom_LuaBehaviour)
     DoorLuaBeh.ScriptTags.Add("ProcGen_Door_Generated");
 
-    return NewRoom_LuaBehaviour
+    return true
 end
 
 
@@ -318,7 +299,7 @@ function SpawnRoomForDoor(door, forcespawn)
 -- Fisher-Yates shuffle to randomize the order
     -- Try to spawn a room from the shuffled list
     for _, entry in ipairs(shuffledPrefabs) do
-        if (AttemptSpawnRoom(door, entry.prefab) ~= nil) then
+        if (AttemptSpawnRoom(door, entry.prefab)) then
             return true
         end
     end
@@ -363,7 +344,7 @@ function ProccessRoom(room)
            RoomExitCount = RoomExitCount + 1
            -- print("spawned a new room")
         else
-           -- print("failed to spawn")
+            print("failed to spawn")
             Door.ScriptTags.Add("ProcGen_Door_Generated")
             Door.CallFunction("Block")
         end
@@ -462,7 +443,7 @@ function SlowUpdate()
         if(IsValid(value) and not value.ScriptTags.Contains("ProcGen_Section_Generated")) then
             if(value.GetScriptVariable("Visible") == true) then
                 ProccessRoom(value.gameObject)
-                return
+                --return
             end
         else
             --print("Room " .. tostring(index) .. " not visible")

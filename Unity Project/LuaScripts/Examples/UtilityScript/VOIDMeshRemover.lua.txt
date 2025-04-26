@@ -4,14 +4,14 @@ function Start()
 
     CrateSpawners = API_GameObject.BL_FindComponentsInWorld("CrateSpawner",true)
 
-
-    for _,spawner in ipairs(CrateSpawners) do
-        local meshRenderer = API_GameObject.BL_GetComponent(spawner.gameObject,"MeshRenderer")
-        if( meshRenderer ~= nil) then
-            API_GameObject.BL_Destroy(meshRenderer) 
+    if(CrateSpawners ~= nil and IsValid(CrateSpawners)) then
+        for _,spawner in ipairs(CrateSpawners) do
+            local meshRenderer = API_GameObject.BL_GetComponent(spawner.gameObject,"MeshRenderer")
+            if( meshRenderer ~= nil) then
+                API_GameObject.BL_Destroy(meshRenderer) 
+            end
         end
     end
-
 
     --delete this script to save resources
 

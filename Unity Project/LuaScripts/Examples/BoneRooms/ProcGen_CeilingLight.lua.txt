@@ -24,18 +24,10 @@ function Start()
 
     end
   
+    API_GameObject.BL_Destroy(BL_This) -- save resources
 end
 
 
-function Update()
-
-    if(BL_This.Ready) then
-        if(not HumSound.isPlaying) then
-           -- HumSound.Play() 
-        end
-    end
-
-end
 
 function OnDestroy()
 API_GameObject.BL_Destroy(onMaterial)

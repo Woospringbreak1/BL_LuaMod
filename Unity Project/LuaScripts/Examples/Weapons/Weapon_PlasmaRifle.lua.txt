@@ -18,11 +18,20 @@ function OnFire()
     local Pos = Fpoint.position + Fpoint.forward*0.2--BL_Host.transform.position + (BL_Host.transform.forward*0.5)
     local Rot = BL_Host.transform.rotation;
     API_GameObject.BL_SpawnByBarcode(BL_This,"Projectile","BonelabMeridian.Luamodexamplecontent.Spawnable.PlasmaProjectile", Pos, Rot,nil, true)
+
+    --bug if ammo is zero, even though it shouldn't be used - prevent this
+    --print(tostring(BL_This.AttachedGun.chamberedCartridge))
+    --print(tostring( BL_This.AttachedGun._ammoInventory.GetCartridgeCount(BL_This.AttachedGun.chamberedCartridge)))
+    if( BL_This.AttachedGun._ammoInventory.GetCartridgeCount(BL_This.AttachedGun.chamberedCartridge) == 0) then
+        BL_This.AttachedGun._ammoInventory.AddCartridge(BL_This.AttachedGun._ammoInventory.mediumAmmoGroup, 1)
+    end
+    BL_This.SetMagazineRounds(32)
+
     return false -- return false to prevent the default firing behaviour
 end
 
 function Update()
-
+   
     if(Projectile ~= nil ) then
         local ProjectileBehaviour = API_GameObject.BL_GetComponentInChildren(Projectile,"LuaBehaviour")
 
