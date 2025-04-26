@@ -57,20 +57,16 @@ namespace LuaMod
             /// load unity assemblies to allow GetComponent to work
             LoadAssemblyTypes("UnityEngine.Core");
             LoadAssemblyTypes("UnityEngine.CoreModule");
-            //LoadAssemblyTypes("UnityEngine");
             LoadAssemblyTypes("UnityEngine.PhysicsModule");
             LoadAssemblyTypes("UnityEngine.UIModule");
             LoadAssemblyTypes("UnityEngine.AIModule");
             LoadAssemblyTypes("UnityEngine.AnimationModule");
-            LoadAssemblyTypes("UnityEngine.RenderingModule");
             LoadAssemblyTypes("UnityEngine.TextRenderingModule");
             LoadAssemblyTypes("UnityEngine.ParticleSystemModule");
             LoadAssemblyTypes("UnityEngine.TerrainModule");
             LoadAssemblyTypes("UnityEngine.AudioModule");
             LoadAssemblyTypes("UnityEngine.VideoModule");
             LoadAssemblyTypes("UnityEngine.InputLegacyModule");
-            LoadAssemblyTypes("UnityEngine.InputSystem");
-            LoadAssemblyTypes("UnityEngine.Core");
             LoadAssemblyTypes("UnityEngine.CoreModule");
             LoadAssemblyTypes("UnityEngine");
             LoadAssemblyTypes("Unity.TextMeshPro");
@@ -79,17 +75,7 @@ namespace LuaMod
             LoadAssemblyTypes("Il2CppSLZ.Marrow");
             LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
             LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
-            LoadAssemblyTypes("Il2CppSLZ.SFX");
-            LoadAssemblyTypes("Il2CppSLZ.VFX");
-            LoadAssemblyTypes("SLZ.VFX");
-            LoadAssemblyTypes("Il2CppSLZ.Bonelab");
             LoadAssemblyTypes("Assembly-CSharp");
-            //PrintAssemblyTypes("Il2CppSLZ.SFX");
-            //PrintAssemblyTypes("Il2CppSLZ.Algorithms");
-            //PrintAssemblyTypes("Il2CppSLZ.Algorithms.Unity");
-            //PrintAssemblyTypes("Il2CppSLZ.Marrow");
-            //PrintAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Core");
-            //PrintAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
             LoadAssemblyTypes();
             //come back for more later...
 
@@ -106,7 +92,7 @@ namespace LuaMod
                 if (InheritsFromUnityComponent(type))
                 {
                     AcceptedTypes.Add(type);
-                    MelonLoader.MelonLogger.Msg(type.Name + " added to reference list");
+                    //MelonLoader.MelonLogger.Msg(type.Name + " added to reference list");
                 }
                 else
                 {
@@ -143,8 +129,11 @@ namespace LuaMod
                 {
             "io", "network", "lowlevel", "low level", "unsafe", "file", "directory", "webcam",
             "microphone", "location", "windows", "security", "diagnostic", "net", "process",
-            "thread", "systeminfo", "reflection", "garbagecollector", "garbage", "collector"
-        };
+            "thread", "systeminfo", "reflection", "garbagecollector", "garbage", "collector",
+            "delegate", "graphicsbuffer", "graphics", "internal", "debug", "experimental",
+            "qualitysettings", "display", "buffer", "gizmos", "rendering", "execute",
+            "unityengineinternal", "microsoft", "embedded", "command", "apple", "testtools"
+        }; ;
 
                 outputLines.Add($"// Enums from assembly: {assembly.FullName}");
                 outputLines.Add("");
@@ -289,7 +278,7 @@ namespace LuaMod
         {
             try
             {
-                Assembly assembly;
+                Assembly assembly = null;
 
                 // Try loading by name first, if that fails, try loading by file path
                 try
@@ -298,7 +287,7 @@ namespace LuaMod
                 }
                 catch (Exception)
                 {
-                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY RISK
+                   // assembly = Assembly.LoadFrom(assemblyPathOrName); 
                 }
 
                 // Get types and append to the static list
@@ -332,9 +321,9 @@ namespace LuaMod
         {
             try
             {
-                Assembly assembly;
-                PrintComponents(assemblyPathOrName);
-                PrintEnums(assemblyPathOrName);
+                Assembly assembly = null;
+                //PrintComponents(assemblyPathOrName);
+                //PrintEnums(assemblyPathOrName);
                 // Try loading by name first, if that fails, try loading by file path
                 try
                 {
@@ -342,7 +331,7 @@ namespace LuaMod
                 }
                 catch (Exception)
                 {
-                    assembly = Assembly.LoadFrom(assemblyPathOrName); //TODO: THIS IS PROBABLY A SECURITY 
+                  //  assembly = Assembly.LoadFrom(assemblyPathOrName); 
                 }
 
                 // Get types and append to the static list
@@ -364,7 +353,7 @@ namespace LuaMod
 
                 LoadedTypes.AddRange(AcceptedTypes);
 
-                // MelonLoader.MelonLogger.Msg($"Successfully loaded {AcceptedTypes.Count} types from {assembly.FullName}");
+                 MelonLoader.MelonLogger.Msg($"Successfully loaded {AcceptedTypes.Count} types from {assembly.FullName}");
             }
             catch (Exception ex)
             {
@@ -567,7 +556,7 @@ namespace LuaMod
         public void RegisterBulkTypes()
         {
             // Types from assembly: UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("UnityEngine.CoreModule");
+            //MelonLogger.Msg("UnityEngine.CoreModule");
            LuaRegisterType<Unity.Jobs.IJob>();
            LuaRegisterType<Unity.Jobs.IJobFor>();
            LuaRegisterType<Unity.Jobs.IJobParallelFor>();
@@ -916,7 +905,7 @@ namespace LuaMod
 
 
             // Types from assembly: UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("UnityEngine.PhysicsModule");
+            //MelonLogger.Msg("UnityEngine.PhysicsModule");
             
            LuaRegisterType<UnityEngine.ConfigurableJointMotion>();
            LuaRegisterType<UnityEngine.SoftJointLimit>();
@@ -957,7 +946,7 @@ namespace LuaMod
            LuaRegisterType<UnityEngine.ModifiableContactPatch.Flags>();
 
             // Types from assembly: UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("UnityEngine.UIModule");
+           // MelonLogger.Msg("UnityEngine.UIModule");
            LuaRegisterType<UnityEngine.ICanvasRaycastFilter>();
            LuaRegisterType<UnityEngine.CanvasGroup>();
            LuaRegisterType<UnityEngine.CanvasRenderer>();
@@ -967,7 +956,7 @@ namespace LuaMod
            LuaRegisterType<UnityEngine.Canvas.WillRenderCanvases>();
 
             // Types from assembly: UnityEngine.AIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("UnityEngine.AIModule");
+           // MelonLogger.Msg("UnityEngine.AIModule");
            LuaRegisterType<UnityEngine.AI.NavMeshPathStatus>();
            LuaRegisterType<UnityEngine.AI.NavMeshPath>();
            LuaRegisterType<UnityEngine.AI.ObstacleAvoidanceType>();
@@ -990,7 +979,7 @@ namespace LuaMod
            LuaRegisterType<UnityEngine.AI.NavMesh.OnNavMeshPreUpdate>();
 
             // Types from assembly: UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg(" UnityEngine.AnimationModule");
+          //  MelonLogger.Msg(" UnityEngine.AnimationModule");
            LuaRegisterType<UnityEngine.SharedBetweenAnimatorsAttribute>();
            LuaRegisterType<UnityEngine.PlayMode>();
            LuaRegisterType<UnityEngine.QueueMode>();
@@ -1031,7 +1020,7 @@ namespace LuaMod
            LuaRegisterType<UnityEngine.AnimatorOverrideController.OnOverrideControllerDirtyCallback>();
 
             // Types from assembly: UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("UnityEngine.TextRenderingModule");
+          //  MelonLogger.Msg("UnityEngine.TextRenderingModule");
            LuaRegisterType<UnityEngine.FontStyle>();
            LuaRegisterType<UnityEngine.TextGenerator>();
            LuaRegisterType<UnityEngine.TextAlignment>();
@@ -1048,7 +1037,7 @@ namespace LuaMod
            LuaRegisterType<UnityEngine.Font.FontTextureRebuildCallback>();
 
             // Types from assembly: UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("UnityEngine.ParticleSystemModule");
+          //  MelonLogger.Msg("UnityEngine.ParticleSystemModule");
            LuaRegisterType<UnityEngine.ParticleSystem>();
            LuaRegisterType<UnityEngine.ParticleSystemRenderMode>();
            LuaRegisterType<UnityEngine.ParticleSystemSortMode>();
@@ -1120,7 +1109,7 @@ namespace LuaMod
            LuaRegisterType<UnityEngine.ParticleSystem.PlaybackState.Trail>();
 
             // Types from assembly: UnityEngine.TerrainModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("UnityEngine.TerrainModule");
+            //MelonLogger.Msg("UnityEngine.TerrainModule");
            LuaRegisterType<UnityEngine.TerrainRenderFlags>();
            LuaRegisterType<UnityEngine.Terrain>();
            LuaRegisterType<UnityEngine.TreePrototype>();
@@ -1170,7 +1159,7 @@ namespace LuaMod
 
 
             // Types from assembly: UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg(" UnityEngine.CoreModule");
+            //MelonLogger.Msg(" UnityEngine.CoreModule");
            LuaRegisterType<Unity.Jobs.IJob>();
            LuaRegisterType<Unity.Jobs.IJobFor>();
            LuaRegisterType<Unity.Jobs.IJobParallelFor>();
@@ -1519,7 +1508,7 @@ namespace LuaMod
 
 
             // Types from assembly: UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg(" UnityEngine");
+            //MelonLogger.Msg(" UnityEngine");
            LuaRegisterType<UnityEngine.BlendWeights>();
            LuaRegisterType<UnityEngine.GUIText>();
            LuaRegisterType<UnityEngine.GUITexture>();
@@ -1534,7 +1523,7 @@ namespace LuaMod
             //LuaRegisterType<UnityEngine.UIElements.IDataWatchService>();
 
             // Types from assembly: Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("Unity.TextMeshPro");
+            //MelonLogger.Msg("Unity.TextMeshPro");
            LuaRegisterType<Il2CppTMPro.MaterialReferenceManager>();
            LuaRegisterType<Il2CppTMPro.TMP_MaterialReference>();
            LuaRegisterType<Il2CppTMPro.MaterialReference>();
@@ -1659,7 +1648,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray.Meta>();
            LuaRegisterType<Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray.SpriteDataObject>();
 
-            MelonLogger.Msg("SLZ");
+            //MelonLogger.Msg("SLZ");
 
             // Types from assembly: Il2CppSLZ.Algorithms, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 
@@ -1773,7 +1762,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.PlayerDamageReceiver>();
            LuaRegisterType<Il2CppSLZ.Marrow.AnimInputRig>();
            LuaRegisterType<Il2CppSLZ.Marrow.ArtRig>();
-            MelonLogger.Msg("CUT 1");
+            //MelonLogger.Msg("CUT 1");
            LuaRegisterType<Il2CppSLZ.Marrow.BaseController>();
            LuaRegisterType<Il2CppSLZ.Marrow.ControllerRig>();
            LuaRegisterType<Il2CppSLZ.Marrow.GameWorldSkeletonRig>();
@@ -1842,7 +1831,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.Zones.CullerData>();
            LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneCullManager>();
            LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneGunMode>();
-            MelonLogger.Msg("CUT 1.5");
+            //MelonLogger.Msg("CUT 1.5");
            LuaRegisterType<Il2CppSLZ.Marrow.Zones.ZoneGun>();
            LuaRegisterType<Il2CppSLZ.Marrow.Zones.CrateSpawnSequencer>();
            LuaRegisterType<Il2CppSLZ.Marrow.Zones.RandomizeCrate>();
@@ -1897,7 +1886,7 @@ namespace LuaMod
          //  LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.VFXCrate>();
             */
             //   LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.DataCard>();
-            MelonLogger.Msg("CUT 2");
+            //MelonLogger.Msg("CUT 2");
           // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.CampaignData>();
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.EntityPose>();
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Fixture>();
@@ -1920,7 +1909,7 @@ namespace LuaMod
            //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.IScannable>();
           // LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.IPackedAssets>();
             //LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Scannable>();
-            MelonLogger.Msg("CUT 3");
+            //MelonLogger.Msg("CUT 3");
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.TagList>();
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.ITaggable>();
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.TagQuery>();
@@ -2002,14 +1991,14 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.Pool.AssetSpawner>();
            LuaRegisterType<Il2CppSLZ.Marrow.Pool.DespawnDelay>();
            LuaRegisterType<Il2CppSLZ.Marrow.Pool.IPoolable>();
-            MelonLogger.Msg("CUT 4");
+            //MelonLogger.Msg("CUT 4");
            LuaRegisterType<Il2CppSLZ.Marrow.Pool.Pool>();
            LuaRegisterType<Il2CppSLZ.Marrow.Pool.Poolee>();
            LuaRegisterType<Il2CppSLZ.Marrow.Pool.SpawnEvents>();
            //LuaRegisterType<Il2CppSLZ.Marrow.Pool.SpawnPolicy>();
             //LuaRegisterType<Il2CppSLZ.Marrow.Pool.VFXSpawnPolicy>();
            LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Authenticator>();
-            MelonLogger.Msg("CUT 4.1");
+            //MelonLogger.Msg("CUT 4.1");
            LuaRegisterType<Il2CppSLZ.Marrow.Redacted.AuthenticatorDock>();
            LuaRegisterType<Il2CppSLZ.Marrow.Redacted.AuthenticatorDockDecorator>();
            LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Battery>();
@@ -2020,7 +2009,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Plug>();
            LuaRegisterType<Il2CppSLZ.Marrow.Redacted.Socket>();
            LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco>();
-            MelonLogger.Msg("CUT 4.5");
+            //MelonLogger.Msg("CUT 4.5");
            LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowPreFixedUpdate>();
            LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowPostFixedUpdate>();
            LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowEndFrame>();
@@ -2043,7 +2032,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.Input.FullBodyBone>();
    
            LuaRegisterType<Il2CppSLZ.Marrow.Data.AttackType>();
-            MelonLogger.Msg("CUT 5");
+            //MelonLogger.Msg("CUT 5");
            LuaRegisterType<Il2CppSLZ.Marrow.Data.CartridgeData>();
            LuaRegisterType<Il2CppSLZ.Marrow.Data.ConfigurableJointInfo>();
            LuaRegisterType<Il2CppSLZ.Marrow.Data.CurveData>();
@@ -2065,7 +2054,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.Data.VFXSpawnPolicyData>();
            LuaRegisterType<Il2CppSLZ.Marrow.Data.DecalAtlasData>();
            LuaRegisterType<Il2CppSLZ.Marrow.Console.TokenParseContext>();
-            MelonLogger.Msg("CUT 5.1");
+           // MelonLogger.Msg("CUT 5.1");
            LuaRegisterType<Il2CppSLZ.Marrow.Combat.Attack>();
            LuaRegisterType<Il2CppSLZ.Marrow.Combat.IAttackReceiver>();
            LuaRegisterType<Il2CppSLZ.Marrow.Combat.PosespaceImpactManager>();
@@ -2085,7 +2074,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ExternalCircuit>();
            LuaRegisterType<Il2CppSLZ.Marrow.Circuits.AddCircuit>();
            LuaRegisterType<Il2CppSLZ.Marrow.Circuits.FlipflopCircuit>();
-            MelonLogger.Msg("CUT 5.15");
+          //  MelonLogger.Msg("CUT 5.15");
            LuaRegisterType<Il2CppSLZ.Marrow.Circuits.MultiplyCircuit>();
            LuaRegisterType<Il2CppSLZ.Marrow.Circuits.RemapCircuit>();
            LuaRegisterType<Il2CppSLZ.Marrow.Circuits.ValueCircuit>();
@@ -2103,7 +2092,7 @@ namespace LuaMod
            //LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.KeyedComponents>();
             //LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.IBillOfMaterials>();
            //LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.Blueprint>();
-            MelonLogger.Msg("CUT 5.5");
+         //   MelonLogger.Msg("CUT 5.5");
            LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.SpawnData>();
            LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.BlueprintSpawner>();
            LuaRegisterType<Il2CppSLZ.Marrow.Blueprints.VoidLogicEdge>();
@@ -2257,7 +2246,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Crate._LoadAssetAsync_d__23>();
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.SoundFx._PreloadAssets_d__7>();
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.MarrowAsset._LoadSceneAsync_d__26>();
-            MelonLogger.Msg("CUT 7");
+         //   MelonLogger.Msg("CUT 7");
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Pallet.ChangeLog>();
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.Pallet.__c>();
            LuaRegisterType<Il2CppSLZ.Marrow.Warehouse.PalletManifest.__c>();
@@ -2346,7 +2335,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.AI.AIBrain._CoArenaEntrance_d__29>();
            LuaRegisterType<Il2CppSLZ.Marrow.AI.AIManager.AICompareResult>();
            LuaRegisterType<Il2CppSLZ.Marrow.AI.AIManager.AICompareInput>();
-            MelonLogger.Msg("CUT 8");
+         //   MelonLogger.Msg("CUT 8");
            LuaRegisterType<Il2CppSLZ.Marrow.AI.AIManager.AICompareJob>();
            LuaRegisterType<Il2CppSLZ.Marrow.AI.Encounter.SpawnOrder>();
            LuaRegisterType<Il2CppSLZ.Marrow.AI.Encounter._WarmupLoop_d__34>();
@@ -2392,7 +2381,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.VoidLogic.VoidLogicManager.__c>();
 
             // Types from assembly: Assembly-CSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-            MelonLogger.Msg("CUT 9");
+         //   MelonLogger.Msg("CUT 9");
            LuaRegisterType<Il2Cpp.MouseLook>();
            LuaRegisterType<Il2Cpp.PlayerController>();
            LuaRegisterType<Il2Cpp.ApplyProceduralTextureProperties>();
@@ -2449,7 +2438,7 @@ namespace LuaMod
            LuaRegisterType<Il2Cpp.NavSurfIgnore>();
            LuaRegisterType<Il2Cpp.DrainSuck>();
            LuaRegisterType<Il2Cpp.DrawTrigger>();
-            MelonLogger.Msg("CUT 9.1");
+          //  MelonLogger.Msg("CUT 9.1");
            LuaRegisterType<Il2Cpp.FindBadImpactProperties>();
            LuaRegisterType<Il2Cpp.LaserCursorJockey>();
            LuaRegisterType<Il2Cpp.LightmapSwapper>();
@@ -2463,7 +2452,7 @@ namespace LuaMod
            LuaRegisterType<Il2Cpp.ItemReceptacle>();
            LuaRegisterType<Il2Cpp.KeycardDataScriptableObject>();
            LuaRegisterType<Il2Cpp.BoxCastTester>();
-            MelonLogger.Msg("CUT 9.1.01");
+         //   MelonLogger.Msg("CUT 9.1.01");
             //LuaRegisterType<Il2CppTrees.MinHashHeap>();
            //LuaRegisterType<Il2CppTrees.MinHeap>();
            //LuaRegisterType<Il2CppTrees.MinHeapTester>();
@@ -2474,7 +2463,7 @@ namespace LuaMod
            //LuaRegisterType<Il2CppTrees.SVOManager>();
            //LuaRegisterType<Il2CppTrees.UseOctree>();
            LuaRegisterType<Il2CppPuppetMasta.Booster>();
-            MelonLogger.Msg("CUT 9.1.1");
+          //  MelonLogger.Msg("CUT 9.1.1");
            LuaRegisterType<Il2CppPuppetMasta.PropSpawner>();
            LuaRegisterType<Il2CppStressLevelZero.HealthPickup>();
            LuaRegisterType<Il2CppBitOperators.DrawZCurveTester>();
@@ -2498,7 +2487,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSplineMesh.SourceMesh>();
            LuaRegisterType<Il2CppSplineMesh.SplineMeshTiling>();
            LuaRegisterType<Il2CppSplineMesh.MeshUtility>();
-            MelonLogger.Msg("CUT 9.2");
+          //  MelonLogger.Msg("CUT 9.2");
            LuaRegisterType<Il2CppRealisticEyeMovements.ControlData>();
            LuaRegisterType<Il2CppRealisticEyeMovements.DestroyNotifier>();
            LuaRegisterType<Il2CppRealisticEyeMovements.EyeAndHeadAnimatorForExport>();
@@ -2556,7 +2545,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppAra.ColorFromSpeed>();
            LuaRegisterType<Il2CppAra.ElectricalArc>();
            LuaRegisterType<Il2CppAra.TireTrack>();
-            MelonLogger.Msg("CUT 9.3");
+            //MelonLogger.Msg("CUT 9.3");
            LuaRegisterType<Il2CppReachableGames.AutoProbe.AutoProbe>();
            LuaRegisterType<Il2CppReachableGames.AutoProbe.ForceLightProbeHere>();
            LuaRegisterType<Il2CppReachableGames.AutoProbe.FlyCamera>();
@@ -2652,7 +2641,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Combat.GibletEllipsoid>();
            LuaRegisterType<Il2CppSLZ.Combat.VisualDamageReceiver>();
            LuaRegisterType<Il2CppSLZ.SLZEditorTools.LightBakeSceneGroup>();
-            MelonLogger.Msg("CUT 9.4");
+            //MelonLogger.Msg("CUT 9.4");
            LuaRegisterType<Il2CppSLZ.Marrow.TagTree>();
            LuaRegisterType<Il2CppSLZ.Marrow.TagTreeNode>();
            LuaRegisterType<Il2CppSLZ.Marrow.Interp>();
@@ -2729,7 +2718,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Bonelab.HealthPickupProxy>();
            LuaRegisterType<Il2CppSLZ.Bonelab.NavMeshHeightGen>();
            LuaRegisterType<Il2CppSLZ.Bonelab.SimpleGripJointMover>();
-            MelonLogger.Msg("CUT 9.5");
+            //MelonLogger.Msg("CUT 9.5");
            LuaRegisterType<Il2CppSLZ.Bonelab.TimeBender>();
            LuaRegisterType<Il2CppSLZ.Bonelab.TunnelTipper_Chunker>();
            LuaRegisterType<Il2CppSLZ.Bonelab.WeaponResetVolume>();
@@ -2944,7 +2933,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Bonelab.PatchNotesLoader>();
            LuaRegisterType<Il2CppSLZ.Bonelab.PipeLODMap>();
            LuaRegisterType<Il2CppSLZ.Bonelab.PipeLODPlacer>();
-            MelonLogger.Msg("CUT 9.6");
+            //MelonLogger.Msg("CUT 9.6");
            LuaRegisterType<Il2CppSLZ.Bonelab.PlatformDiscriminator>();
            LuaRegisterType<Il2CppSLZ.Bonelab.PlatformEvent>();
            LuaRegisterType<Il2CppSLZ.Bonelab.PlatformMaterial>();
@@ -3199,7 +3188,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.PowerSourceType>();
            LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.JoystickForwarder>();
            LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.TwoButtonRemoteController>();
-            MelonLogger.Msg("CUT 9.10");
+            //MelonLogger.Msg("CUT 9.10");
            LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.CylinderFuseGrip>();
            LuaRegisterType<Il2CppSLZ.Bonelab.Obsolete.PropLeverSwitch>();
            LuaRegisterType<Il2CppSLZ.Bonelab.Console.SceneDescriber>();
@@ -3992,6 +3981,7 @@ namespace LuaMod
             LuaMenuBehaviour.ScriptName = ("\\Examples\\UtilityScript\\TestBoneMenu.lua");
             LuaMenu.SetActive(true);
 
+            //this is temporary, will be replaced by something more moddable
 
             API_Events.BL_InvokeEvent("OnLateInitializeMelon");
         }

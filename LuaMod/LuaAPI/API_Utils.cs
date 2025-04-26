@@ -141,6 +141,7 @@ namespace LuaMod.LuaAPI
                 if (!LuaMod.RegisteredTypes.Contains(target.GetType()))
                 {
                     throw new ScriptRuntimeException("Attempt to manipulate array with unregistered type " + target.GetType().FullName);
+                    return null;
                 }
 
                 if (target is UserData tUdata)
@@ -205,11 +206,13 @@ namespace LuaMod.LuaAPI
                 if (value != null && !LuaMod.RegisteredTypes.Contains(value.GetType()))
                 {
                     throw new ScriptRuntimeException("Attempt to manipulate array with unregistered type " + value.GetType().FullName);
+                    return;
                 }
 
                 if (!LuaMod.RegisteredTypes.Contains(target.GetType()))
                 {
                     throw new ScriptRuntimeException("Attempt to manipulate array with unregistered type " + target.GetType().FullName);
+                    return;
                 }
 
                 if (target is UserData tUdata)
@@ -320,11 +323,13 @@ namespace LuaMod.LuaAPI
                 if (value != null && !LuaMod.RegisteredTypes.Contains(value.GetType()))
                 {
                     throw new ScriptRuntimeException("Attempt to manipulate array with unregistered type " + value.GetType().FullName);
+                    return;
                 }
 
                 if (!LuaMod.RegisteredTypes.Contains( target.GetType()) )
                 {
                     throw new ScriptRuntimeException("Attempt to manipulate array with unregistered type " + target.GetType().FullName);
+                    return;
                 }
 
                 if (target is UserData tUdata)

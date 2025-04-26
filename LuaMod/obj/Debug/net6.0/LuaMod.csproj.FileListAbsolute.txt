@@ -406,7 +406,6 @@ H:\My Drive\Bonelab modding\LUA mod\Bonelab_LuaMod\LuaMod\bin\Debug\net6.0\WebSo
 H:\My Drive\Bonelab modding\LUA mod\Bonelab_LuaMod\LuaMod\bin\Debug\net6.0\MonoMod.Backports.dll
 H:\My Drive\Bonelab modding\LUA mod\Bonelab_LuaMod\LuaMod\bin\Debug\net6.0\Microsoft.Diagnostics.NETCore.Client.dll
 H:\My Drive\Bonelab modding\LUA mod\Bonelab_LuaMod\LuaMod\bin\Debug\net6.0\MonoMod.ILHelpers.dll
-H:\My Drive\Bonelab modding\LUA mod\Bonelab_LuaMod\LuaMod\bin\Debug\net6.0\BoneLib.xml
 H:\My Drive\Bonelab modding\LUA mod\Bonelab_LuaMod\LuaMod\bin\Debug\net6.0\MoonSharp.Interpreter.xml
 H:\My Drive\Bonelab modding\LUA mod\Bonelab_LuaMod\LuaMod\bin\Debug\net6.0\MelonLoader.xml
 H:\My Drive\Bonelab modding\LUA mod\Bonelab_LuaMod\LuaMod\obj\Debug\net6.0\LuaMod.csproj.AssemblyReference.cache

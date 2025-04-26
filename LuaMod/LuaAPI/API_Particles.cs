@@ -72,7 +72,7 @@ namespace LuaMod.LuaAPI
         /// </remarks>
         public static DynValue BL_lineRenderer_GetPositions(LineRenderer LR)
         {
-            MelonLogger.Warning("Calling GetPositionss causes Crash To Desktop - bug report open with Melonloader team");
+            MelonLogger.Warning("Calling GetPositions causes Crash To Desktop - bug report open with Melonloader team");
             return null;
             
             //Il2CppStructArray<Vector3> Pos = new Il2CppStructArray<Vector3>(LR.positionCount);
