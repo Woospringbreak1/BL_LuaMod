@@ -29,6 +29,10 @@ This will install the following code mods:
 * [BoneLib, by Gnonme](https://thunderstore.io/c/bonelab/p/gnonme/BoneLib/)
 * [FieldInjector, by WNP78](https://thunderstore.io/c/bonelab/p/WNP78/FieldInjector/)
 
+
+Subscribe to the example content on [Mod.io](https://mod.io/g/bonelab/m/lua-modding-framework-example-content#description)
+
+
 ## Usage
 See the [Examples](https://github.com/Woospringbreak1/Luamod_Docs/wiki/Examples) page for practical usage demonstrations.
 
