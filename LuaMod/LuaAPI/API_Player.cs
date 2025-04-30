@@ -43,7 +43,7 @@ namespace LuaMod.LuaAPI
         {
             if (BoneLib.Player.Avatar != null)
             {
-                return UserData.Create(BoneLib.Player.PhysicsRig.m_chest.transform.position);
+                return UserData.Create(BoneLib.Player.PhysicsRig.m_chest.position);
             }
             return null;
 

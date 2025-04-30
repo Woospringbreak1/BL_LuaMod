@@ -1,12 +1,17 @@
-﻿using HarmonyLib;
+﻿using BoneLib;
+using HarmonyLib;
+using Il2CppRootMotion.FinalIK;
 using Il2CppSLZ.Bonelab;
 using Il2CppSLZ.Combat;
 using Il2CppSLZ.Marrow;
 using Il2CppSLZ.Marrow.Combat;
+using Il2CppSLZ.Marrow.SceneStreaming;
 using Il2CppSLZ.Marrow.Utilities;
+using Il2CppSLZ.Marrow.Warehouse;
+using MelonLoader;
 using MoonSharp.Interpreter;
 using System.Runtime.CompilerServices;
-
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
@@ -153,7 +158,60 @@ namespace LuaMod.LuaAPI
             BoneLib.BoneMenu.FloatElement.OnValueChanged += Event_FloatElement_OnValueChanged;
             BoneLib.BoneMenu.Dialog.OnDialogClosed += Event_Dialog_OnDialogClosed;
 
-        
+
+            BoneLib.Hooking.CreateHook(typeof(Projectile).GetMethod(nameof(Projectile.OnEnable), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnProjectileFired), AccessTools.all));
+
+            BoneLib.Hooking.CreateHook(typeof(Magazine).GetMethod(nameof(Magazine.OnEject), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnMagazineEject), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(Magazine).GetMethod(nameof(Magazine.OnGrab), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnMagazineGrab), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(Magazine).GetMethod(nameof(Magazine.OnInsert), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnMagazineInsert), AccessTools.all));
+
+            BoneLib.Hooking.CreateHook(typeof(CrateSpawner).GetMethod(nameof(CrateSpawner.OnPooleeSpawn), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnCrateSpawnerSpawned), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(CrateSpawner).GetMethod(nameof(CrateSpawner.OnPooleeDespawn), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnCrateSpawnerDespawned), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(CrateSpawner).GetMethod(nameof(CrateSpawner.OnPooleeRecycle), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnCrateSpawnerRecycle), AccessTools.all));
+
+
+           
+        }
+
+        private static void Event_OnProjectileFired(Projectile __instance)
+        {
+            MelonLogger.Msg("new projectile " + __instance.name);
+            BL_InvokeEvent("OnProjectileFired", UserData.Create(__instance));
+        }
+
+        private static void Event_OnCrateSpawnerSpawned(CrateSpawner __instance,GameObject go)
+        {
+            MelonLogger.Msg("Crate Spawner " + __instance.name +  " Spawned " + go.name );
+            BL_InvokeEvent("OnCrateSpawnerSpawned", UserData.Create(__instance), UserData.Create(go));
+        }
+
+        private static void Event_OnCrateSpawnerDespawned(CrateSpawner __instance, GameObject go)
+        {
+            MelonLogger.Msg("Crate Spawner " + __instance.name + " Despawned " + go.name);
+            BL_InvokeEvent("OnCrateSpawnerDespawned", UserData.Create(__instance), UserData.Create(go));
+        }
+
+        private static void Event_OnCrateSpawnerRecycle(CrateSpawner __instance, GameObject go)
+        {
+            MelonLogger.Msg("Crate Spawner " + __instance.name + " Recycled " + go.name);
+            BL_InvokeEvent("OnCrateSpawnerRecycle", UserData.Create(__instance), UserData.Create(go));
+        }
+
+        private static void Event_OnMagazineEject(Magazine __instance)
+        {
+            MelonLogger.Msg("Magazine ejected " + __instance.name);
+            BL_InvokeEvent("OnMagazineEject", UserData.Create(__instance));
+        }
+        private static void Event_OnMagazineGrab(Hand hand, Magazine __instance)
+        {
+            MelonLogger.Msg("Magazine grabbed " + __instance.name);
+            BL_InvokeEvent("OnMagazineGrab", UserData.Create(hand), UserData.Create(__instance));
+        }
+
+        private static void Event_OnMagazineInsert(Magazine __instance)
+        {
+            MelonLogger.Msg("Magazine Inserted " + __instance.name);
+            BL_InvokeEvent("OnMagazineInsert", UserData.Create(__instance));
         }
 
         private static void Event_Dialog_OnDialogClosed(BoneLib.BoneMenu.Dialog obj)

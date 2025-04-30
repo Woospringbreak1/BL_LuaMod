@@ -263,6 +263,7 @@ namespace LuaMod
         }
 
 
+
         [MoonSharpHidden]
         public static bool InheritsFromUnityComponent(System.Type type)
         {
@@ -361,23 +362,49 @@ namespace LuaMod
             }
         }
 
-        [MoonSharpHidden]
-        public static void LuaRegisterType<T>(bool includeCollections=false)
+        private void RegisterTestType()
         {
-            UserData.RegisterType<T>();
-            RegisteredTypes.Add(typeof(T));
-            if (includeCollections)
+            MethodInfo genericMethod = typeof(LuaMod).GetMethod("LuaRegisterType").MakeGenericMethod(Type.GetType("UnityEngine.MissingType, UnityEngine", false));
+
+            try
             {
-                UserData.RegisterType<T[]>();
-                UserData.RegisterType<List<T>>();
+                genericMethod.Invoke(null, new object[] { true });
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("Reflection call failed: " + ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+        [MoonSharpHidden]
+        public static void LuaRegisterType<T>(bool includeCollections = false)
+        {
+            Type type = typeof(T);
+
+            try
+            {
+                UserData.RegisterType(type);
+                RegisteredTypes.Add(type);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[LuaRegisterType] Failed to register {type.FullName}: {ex.Message}");
+                return;
             }
 
+            if (includeCollections)
+            {
+                try { UserData.RegisterType(type.MakeArrayType()); } catch (Exception ex) { MelonLogger.Warning($"[LuaRegisterType] Array<{type.FullName}> failed: {ex.Message}"); }
+                try { UserData.RegisterType(typeof(List<>).MakeGenericType(type)); } catch (Exception ex) { MelonLogger.Warning($"[LuaRegisterType] List<{type.FullName}> failed: {ex.Message}"); }
+            }
         }
+
         [MoonSharpHidden]
         public void LoadTypes()
         {
             //Moonsharp
 
+            // RegisterTestType(); //tries to register a missing type
             //lua API
             LuaRegisterType<API_GameObject>();
             LuaRegisterType<API_Input>();
@@ -1664,9 +1691,9 @@ namespace LuaMod
            LuaRegisterType<Il2Cpp.SanityTester>();
            LuaRegisterType<Il2Cpp.TextureStreamingSummary>();
            LuaRegisterType<Il2Cpp.IRecycleListenable>();
-           LuaRegisterType<Il2CppSteam.VR.Features.RefreshRateFeature>();
-           LuaRegisterType<Il2CppSteam.VR.Features.RefreshRateFeatureExample>();
-           LuaRegisterType<Il2CppSteam.VR.Features.Type_xrGetInstanceProcAddr>();
+           //LuaRegisterType<Il2CppSteam.VR.Features.RefreshRateFeature>();
+           //LuaRegisterType<Il2CppSteam.VR.Features.RefreshRateFeatureExample>();
+          // LuaRegisterType<Il2CppSteam.VR.Features.Type_xrGetInstanceProcAddr>();
            LuaRegisterType<Il2CppSLZ.EnumFlags>();
            LuaRegisterType<Il2CppSLZ.Bonelab.FadeVolume>();
            LuaRegisterType<Il2CppSLZ.Bonelab.PlayerRemappingConfigurator>();
@@ -1693,7 +1720,7 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.GripFlags>();
            LuaRegisterType<Il2CppSLZ.Marrow.HandToGripState>();
            LuaRegisterType<Il2CppSLZ.Marrow.Grip>();
-           LuaRegisterType<Il2CppSLZ.Marrow.Hand>();
+           LuaRegisterType<Il2CppSLZ.Marrow.Hand>(true);
            LuaRegisterType<Il2CppSLZ.Marrow.HandgunVirtualController>();
            LuaRegisterType<Il2CppSLZ.Marrow.HandReciever>();
            LuaRegisterType<Il2CppSLZ.Marrow.HingeVirtualController>();
@@ -2298,8 +2325,8 @@ namespace LuaMod
            LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco.Gear>();
            LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco.Grounder>();
            LuaRegisterType<Il2CppSLZ.Marrow.Mechanics.LiteLoco.Footstep>();
-           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowEntitlement._CheckEntitlementAsync_d__0>();
-           LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowEntitlement._CheckOculusEntitlementAsync_d__2>();
+           //LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowEntitlement._CheckEntitlementAsync_d__0>();
+          // LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowEntitlement._CheckOculusEntitlementAsync_d__2>();
            LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowGame._Initialize_d__12>();
            LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowGame._TryInitializeXRApi_d__13>();
            LuaRegisterType<Il2CppSLZ.Marrow.Utilities.MarrowLogger.__c>();

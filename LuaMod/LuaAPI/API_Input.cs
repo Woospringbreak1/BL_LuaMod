@@ -83,8 +83,27 @@ namespace LuaMod.LuaAPI
             if (BoneLib.Player.LeftController != null)
             {
                 return BoneLib.Player.LeftController.GetAButtonDown();
+               
             }
             return false;
+        }
+
+        public static BaseController BL_GetLeftController()
+        {
+            if (BoneLib.Player.LeftController != null)
+            {
+                return BoneLib.Player.LeftController;
+            }
+            return null;
+        }
+
+        public static BaseController BL_GetRightController()
+        {
+            if (BoneLib.Player.RightController != null)
+            {
+                return BoneLib.Player.RightController;
+            }
+            return null;
         }
 
         public static bool BL_IsXButtonUpOnce()
@@ -139,7 +158,8 @@ namespace LuaMod.LuaAPI
         public static GameObject BL_RightHand()
         {
             if (BoneLib.Player.RightHand != null)
-            {
+            { 
+                //(BoneLib.Player.RightHand.Controller.Haptic()
                 return BoneLib.Player.RightHand.gameObject;
             }
             return null;

@@ -1,4 +1,5 @@
 ﻿using Il2CppCysharp.Threading.Tasks;
+using Il2CppSLZ.Marrow;
 using Il2CppSLZ.Marrow.Circuits;
 using Il2CppSLZ.Marrow.Data;
 using Il2CppSLZ.Marrow.Pool;
@@ -16,6 +17,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms;
 
 namespace LuaMod.LuaAPI
 {
@@ -115,6 +117,7 @@ namespace LuaMod.LuaAPI
 
         public static string RemoveDoubleSlashes(string input)
         {
+           
             while (input.Contains("//"))
             {
                 input = input.Replace("//", "/");
@@ -130,9 +133,6 @@ namespace LuaMod.LuaAPI
         {
             return LuaSafeCall.Run(() =>
             {
-
-
-
                 if (target == null)
                 {
                     throw new ScriptRuntimeException("collection object is null");
@@ -141,11 +141,12 @@ namespace LuaMod.LuaAPI
                 if (!LuaMod.RegisteredTypes.Contains(target.GetType()))
                 {
                     throw new ScriptRuntimeException("Attempt to manipulate array with unregistered type " + target.GetType().FullName);
-                    return null;
                 }
 
                 if (target is UserData tUdata)
+                {
                     target = tUdata.Object;
+                }
 
                 var type = target?.GetType();
                 var field = type?.GetField(fieldName, BindingFlags.Public | BindingFlags.Instance);
@@ -156,8 +157,17 @@ namespace LuaMod.LuaAPI
                     : prop?.GetValue(target);
 
                 if (collection == null)
-                    throw new ScriptRuntimeException($"Field '{fieldName}' not found or is null");
+                {
+                    throw new ScriptRuntimeException($"Field or property '{fieldName}' not found or is null");
+                }
 
+                var colType = collection.GetType();
+                string colTypeName = colType.FullName;
+                bool isGenericType = colType.IsGenericType;
+
+               // MelonLogger.Warning($"[BL_GetArrayElement] Attempting to get element from type: {colTypeName}");
+
+                // Standard managed array
                 if (collection is Array array)
                 {
                     if (index >= 0 && index < array.Length)
@@ -165,6 +175,7 @@ namespace LuaMod.LuaAPI
                     return DynValue.Nil;
                 }
 
+                // Standard managed IList
                 if (collection is IList list)
                 {
                     if (index >= 0 && index < list.Count)
@@ -172,19 +183,31 @@ namespace LuaMod.LuaAPI
                     return DynValue.Nil;
                 }
 
-                if (collection is IEnumerable enumerable &&
-                    collection.GetType().IsGenericType &&
-                    collection.GetType().GetGenericTypeDefinition().Name.StartsWith("Il2CppReferenceArray"))
+                // Handle IL2CPP special collections
+                if (isGenericType &&
+                    (colTypeName.StartsWith("Il2CppReferenceArray") || colTypeName.StartsWith("Il2CppSystem.Collections.Generic.List")))
                 {
-                    var listEnu = enumerable.Cast<object>().ToList();
-                    if (index >= 0 && index < listEnu.Count)
-                        return UserData.Create(listEnu[index]);
-                    return DynValue.Nil;
+                    var indexer = colType.GetMethod("get_Item", BindingFlags.Public | BindingFlags.Instance);
+                    var countProp = colType.GetProperty("Count", BindingFlags.Public | BindingFlags.Instance);
+
+                    if (indexer != null && countProp != null)
+                    {
+                        int count = (int)countProp.GetValue(collection);
+                        if (index >= 0 && index < count)
+                        {
+                            object item = indexer.Invoke(collection, new object[] { index });
+                            return UserData.Create(item);
+                        }
+                        return DynValue.Nil;
+                    }
+
+                    throw new ScriptRuntimeException($"Failed to access list structure on type {colTypeName}");
                 }
 
-                throw new ScriptRuntimeException($"Unsupported collection type: {collection.GetType().Name}");
+                throw new ScriptRuntimeException($"Unsupported collection type: {colType.Name}");
             }, $"BL_GetArrayElement({fieldName}[{index}])");
         }
+
 
 
         /// <summary>
