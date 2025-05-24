@@ -3,6 +3,7 @@ using MelonLoader;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace LuaMod
 {
@@ -26,6 +27,71 @@ namespace LuaMod
             return Assembly.GetExecutingAssembly().Location;
         }
 
+        public static bool IsLuaScript(string filename)
+        {
+            if (string.IsNullOrWhiteSpace(filename))
+                return false;
+
+            try
+            {
+                // Normalize path and filename
+                string sanitized = Path.GetFullPath(filename);
+                string extension = Path.GetExtension(sanitized);
+
+                // Basic check: only allow ".lua", case-insensitive
+                if (!string.Equals(extension, ".lua", StringComparison.OrdinalIgnoreCase))
+                    return false;
+
+                // Reject suspicious filenames like "script.lua.exe" or "script.lua.txt"
+                string nameOnly = Path.GetFileName(sanitized);
+                if (Regex.IsMatch(nameOnly, @"\.lua\.", RegexOptions.IgnoreCase))
+                    return false;
+
+                // Optionally: disallow any null bytes or control characters
+                if (nameOnly.IndexOf('\0') >= 0 || Regex.IsMatch(nameOnly, @"[\x00-\x1F]"))
+                    return false;
+
+                return true;
+            }
+            catch
+            {
+                // If path resolution fails or any exception is thrown, treat as unsafe
+                return false;
+            }
+        }
+
+        public static bool IsResourceFile(string filename)
+        {
+            if (string.IsNullOrWhiteSpace(filename))
+                return false;
+
+            try
+            {
+                string sanitized = Path.GetFullPath(filename);
+                string extension = Path.GetExtension(sanitized);
+
+                // Allow only .txt or .json (case-insensitive)
+                if (!extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) &&
+                    !extension.Equals(".json", StringComparison.OrdinalIgnoreCase))
+                    return false;
+
+                string nameOnly = Path.GetFileName(sanitized);
+
+                // Reject misleading filenames like config.json.exe or readme.txt.bat
+                if (Regex.IsMatch(nameOnly, @"\.(txt|json)\.", RegexOptions.IgnoreCase))
+                    return false;
+
+                // Disallow null bytes or control characters
+                if (nameOnly.IndexOf('\0') >= 0 || Regex.IsMatch(nameOnly, @"[\x00-\x1F]"))
+                    return false;
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public static string GetRelativePath(string filename)
         {

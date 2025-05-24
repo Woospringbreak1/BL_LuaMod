@@ -34,10 +34,10 @@ function ShouldShoot()
     local HandEmpty = false
     if(Lefthanded) then
         ControllerGrabbed = API_Input.BL_LeftController_IsGrabbed()
-        HandEmpty = API_Input.BL_LeftHandEmpty()
+        HandEmpty = (API_Input.BL_LeftHandContents()==nil)
     else
         ControllerGrabbed = API_Input.BL_RightController_IsGrabbed()
-        HandEmpty = API_Input.BL_RightHandEmpty()
+        HandEmpty = (API_Input.BL_RightHandContents()==nil)
     end
     --print("ShouldShoot? " + tostring())
     return ControllerGrabbed and HandEmpty --and WebLaunchSound ~= nil

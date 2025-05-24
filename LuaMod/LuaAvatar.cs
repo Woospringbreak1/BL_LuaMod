@@ -19,7 +19,8 @@ namespace LuaMod
         new public void Start()
         {
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
-       
+
+            
             if (ScriptName == "" || ScriptName == null)
             {
                 ScriptName = "TestAvatar.lua";

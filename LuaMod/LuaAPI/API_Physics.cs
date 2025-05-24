@@ -1,4 +1,5 @@
-﻿using MoonSharp.Interpreter;
+﻿using MelonLoader;
+using MoonSharp.Interpreter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -192,27 +193,53 @@ namespace LuaMod.LuaAPI
         }
 
 
-        public static DynValue BL_OverlapSphere(Vector3 position, float radius, int layerMask = Physics.DefaultRaycastLayers)
+        public static List<DynValue> BL_OverlapSphere(Vector3 position, float radius, int layerMask = Physics.DefaultRaycastLayers,bool DetectTriggers = false)
         {
             return LuaSafeCall.Run(() =>
             {
-                Collider[] colliders = Physics.OverlapSphere(position, radius, layerMask);
+                Collider[] colliders;
+                if (DetectTriggers)
+                {
+                    colliders = Physics.OverlapSphere(position, radius, layerMask,QueryTriggerInteraction.Collide);
+                }
+                else
+                {
+                    colliders = Physics.OverlapSphere(position, radius, layerMask, QueryTriggerInteraction.Ignore);
+                }
+               
+                //MelonLogger.Msg("colliders: " + colliders.Length);
                 if (colliders == null || colliders.Length == 0)
-                    return DynValue.Nil;
+                {
+                    return null;// DynValue.Nil;
+                }
+                    
 
                 List<DynValue> results = new List<DynValue>();
                 foreach (var c in colliders)
+                {
+                 //   MelonLogger.Msg(c.name);
                     results.Add(UserData.Create(c));
+                }
 
-                return UserData.Create(results);
+                return (results);
             }, $"BL_OverlapSphere(pos: {position}, radius: {radius}, mask: {layerMask})");
         }
 
-        public static DynValue BL_OverlapBox(Vector3 center, Vector3 halfExtents, Quaternion orientation, int layerMask = Physics.DefaultRaycastLayers)
+        public static DynValue BL_OverlapBox(Vector3 center, Vector3 halfExtents, Quaternion orientation, int layerMask = Physics.DefaultRaycastLayers, bool DetectTriggers = false)
         {
             return LuaSafeCall.Run(() =>
             {
-                Collider[] colliders = Physics.OverlapBox(center, halfExtents, orientation, layerMask);
+
+                Collider[] colliders;
+                if (DetectTriggers)
+                {
+                    colliders = Physics.OverlapBox(center, halfExtents, orientation, layerMask, QueryTriggerInteraction.Collide);
+                }
+                else
+                {
+                    colliders = Physics.OverlapBox(center, halfExtents, orientation, layerMask, QueryTriggerInteraction.Ignore);
+                }
+
                 if (colliders == null || colliders.Length == 0)
                     return DynValue.Nil;
 
@@ -224,11 +251,21 @@ namespace LuaMod.LuaAPI
             }, $"BL_OverlapBox(center: {center}, halfExtents: {halfExtents}, orientation: {orientation}, mask: {layerMask})");
         }
 
-        public static DynValue BL_OverlapCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.DefaultRaycastLayers)
+        public static DynValue BL_OverlapCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.DefaultRaycastLayers, bool DetectTriggers = false)
         {
             return LuaSafeCall.Run(() =>
             {
-                Collider[] colliders = Physics.OverlapCapsule(point0, point1, radius, layerMask);
+
+                Collider[] colliders;
+                if (DetectTriggers)
+                {
+                    colliders = Physics.OverlapCapsule(point0, point1, radius, layerMask, QueryTriggerInteraction.Collide);
+                }
+                else
+                {
+                    colliders = Physics.OverlapCapsule(point0, point1, radius, layerMask, QueryTriggerInteraction.Ignore);
+                }
+
                 if (colliders == null || colliders.Length == 0)
                     return DynValue.Nil;
 

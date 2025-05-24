@@ -29,7 +29,7 @@ namespace LuaMod.LuaAPI
             {
                 string path = ResolvedFilePath;
 
-            if (!Security.IsSafePath(path))
+            if (!Security.IsSafePath(path) || !Security.IsResourceFile(path))
             {
                 throw new UnauthorizedAccessException("Attempted to write to an unsafe file path.");
             }
@@ -49,7 +49,7 @@ namespace LuaMod.LuaAPI
             {
                 string path = ResolvedFilePath;
 
-                if (!Security.IsSafePath(path))
+                if (!Security.IsSafePath(path) || !Security.IsResourceFile(path))
                 {
                     throw new UnauthorizedAccessException("Attempted to write to an unsafe file path.");
                 }
@@ -70,7 +70,7 @@ namespace LuaMod.LuaAPI
             {
                 string path = ResolvedFilePath;
 
-                if (!Security.IsSafePath(path))
+                if (!Security.IsSafePath(path) || !Security.IsResourceFile(path))
                 {
                     throw new UnauthorizedAccessException("Attempted to read from an unsafe file path.");
                 }
@@ -88,7 +88,7 @@ namespace LuaMod.LuaAPI
             {
                 string path = ResolvedFilePath;
 
-                if (!Security.IsSafePath(path))
+                if (!Security.IsSafePath(path) || !Security.IsResourceFile(path))
                 {
                     throw new UnauthorizedAccessException("Attempted to read from an unsafe file path.");
                 }
@@ -126,7 +126,7 @@ namespace LuaMod.LuaAPI
         {
             string path = ResolvedFilePath;
 
-            if (!Security.IsSafePath(path))
+            if (!Security.IsSafePath(path) || !Security.IsResourceFile(path))
             {
                 throw new UnauthorizedAccessException("Attempted to read from an unsafe file path.");
             }

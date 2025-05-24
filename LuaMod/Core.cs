@@ -78,7 +78,9 @@ namespace LuaMod
             LoadAssemblyTypes("Il2CppSLZ.Marrow.VoidLogic.Engine");
             LoadAssemblyTypes("BoneLib");
             LoadAssemblyTypes("Assembly-CSharp");
-
+            LoadAssemblyTypes("UnityEngine.UI");
+            LoadAssemblyTypes("Il2CppUltEvents");
+            PrintEnums("Il2CppUltEvents");
             LoadAssemblyTypes();
             //come back for more later...
 
@@ -114,7 +116,7 @@ namespace LuaMod
         {
             try
             {
-                Assembly assembly;
+                Assembly assembly = null;
 
                 try
                 {
@@ -122,7 +124,7 @@ namespace LuaMod
                 }
                 catch (Exception)
                 {
-                    assembly = Assembly.LoadFrom(assemblyPathOrName);
+                    //assembly = Assembly.LoadFrom(assemblyPathOrName);
                 }
 
                 var types = assembly.GetTypes();
@@ -193,11 +195,11 @@ namespace LuaMod
         }
 
         [MoonSharpHidden]
-        private static void PrintComponents(string assemblyPathOrName)
+        private static void PrintComponents(string assemblyPathOrName, bool defaultIncludeCollections = false)
         {
             try
             {
-                Assembly assembly;
+                Assembly assembly = null;
 
                 try
                 {
@@ -205,7 +207,8 @@ namespace LuaMod
                 }
                 catch (Exception)
                 {
-                    assembly = Assembly.LoadFrom(assemblyPathOrName); // Note: potential security risk
+                    MelonLoader.MelonLogger.Warning($"Failed to load assembly by name: {assemblyPathOrName}");
+                    return;
                 }
 
                 var types = assembly.GetTypes();
@@ -226,6 +229,8 @@ namespace LuaMod
                 outputLines.Add($"// Types from assembly: {assembly.FullName}");
                 outputLines.Add("");
 
+                string shortAssemblyName = assembly.GetName().Name;
+
                 foreach (Type type in types)
                 {
                     if (type.IsAbstract || type.IsGenericTypeDefinition)
@@ -233,7 +238,6 @@ namespace LuaMod
 
                     string fullNameLower = type.FullName.ToLowerInvariant();
 
-                    // Skip methods, delegates, and blacklisted strings
                     if (blacklist.Any(b => fullNameLower.Contains(b)) ||
                         type.IsSubclassOf(typeof(MulticastDelegate)) ||
                         type.IsSubclassOf(typeof(Delegate)))
@@ -244,7 +248,7 @@ namespace LuaMod
 
                     typeCount++;
                     string fullName = type.FullName.Replace('+', '.');
-                    string line = $"LuaRegisterType<{fullName}>();";
+                    string line = $"LuaRegisterTypeByName(\"{fullName}\", \"{shortAssemblyName}\", {defaultIncludeCollections.ToString().ToLowerInvariant()});";
                     outputLines.Add(line);
                     MelonLoader.MelonLogger.Msg(line);
                 }
@@ -263,9 +267,9 @@ namespace LuaMod
             catch (Exception ex)
             {
                 MelonLoader.MelonLogger.Error($"Error loading assembly: {ex.Message}");
-
             }
         }
+
 
 
 
@@ -347,7 +351,7 @@ namespace LuaMod
                 foreach (System.Type type in types)
                 {
                     AcceptedTypesForReg.Add(type);  
-                    if (InheritsFromUnityComponent(type))
+                    if (InheritsFromUnityComponent(type) && type.FullName != "UnityEngine.Avatar") 
                     {
                         AcceptedTypes.Add(type);
                         //MelonLoader.MelonLogger.Msg(type.Name + " added to reference list");
@@ -479,10 +483,20 @@ public static void LuaRegisterType<T>(bool includeCollections = false)
         }
 
 
+        public override void OnUpdate()
+        {
+            API_Player.Update();
+           // API_Events.Update();
+            base.OnUpdate();
+        }
+
 
         [MoonSharpHidden]
         public void LoadTypes()
         {
+            MelonLogger.Error("ULTEventHodler deets");
+            MelonLogger.Error(typeof(Il2CppUltEvents.UltEventHolder).FullName);
+            MelonLogger.Error(typeof(Il2CppUltEvents.UltEventHolder).Assembly.FullName);
 
             LuaRegisterType<string>(true);
             LuaRegisterType<String>(true);
@@ -495,7 +509,30 @@ public static void LuaRegisterType<T>(bool includeCollections = false)
             LuaRegisterType<UnityEngine.GUITexture>();
             LuaRegisterType<UnityEngine.GUIElement>();
             LuaRegisterType<UnityEngine.GUILayer>();
-            
+
+            // Types from assembly: Il2CppUltEvents, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+
+            LuaRegisterTypeByName("Il2CppUltEvents.DelayedUltEventHolder", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.LifeCycleEvents", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.TriggerEvent2D", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.TriggerEvents2D", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.TriggerEvent3D", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.TriggerEvents3D", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.UltEventHolder", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.UpdateEvents", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.PersistentArgumentType", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.PersistentArgument", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.PersistentCall", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.IUltEvent", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.UltEvent", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.IUltEventBase", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.UltEventBase", "Il2CppUltEvents", false);
+            LuaRegisterTypeByName("Il2CppUltEvents.DelayedUltEventHolder._DelayedInvoke_d__6", "Il2CppUltEvents", false);
+
+
+
+
+            //LuaRegisterTypeByName("Il2CppSLZ.Marrow.Warehouse.AvatarCrateReference", "Il2CppSLZ.Marrow", false); inner member causes issues
 
             LuaRegisterTypeByName("LuaMod.LuaAPI.API_GameObject", "LuaMod", false);
             LuaRegisterTypeByName("LuaMod.LuaAPI.API_Input", "LuaMod", false);
@@ -518,6 +555,169 @@ public static void LuaRegisterType<T>(bool includeCollections = false)
             LuaRegisterTypeByName("LuaMod.LuaNPC", "LuaMod", false);
             LuaRegisterTypeByName("LuaMod.LuaAPI.BLFileAccess", "LuaMod", false);
             LuaRegisterTypeByName("LuaMod.LuaResources", "LuaMod", false);
+
+
+            // Types from assembly: UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+
+            LuaRegisterTypeByName("UnityEngine.UI.Button", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.CanvasUpdate", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ICanvasElement", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.CanvasUpdateRegistry", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ColorBlock", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ClipperRegistry", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.IClipper", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.IClippable", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.RectangularVertexClipper", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Dropdown", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.FontData", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Graphic", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.GraphicRaycaster", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.GraphicRegistry", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.IGraphicEnabledDisabled", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Image", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.IMask", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.IMaskable", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.CanvasScaler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ContentSizeFitter", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.GridLayoutGroup", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.HorizontalLayoutGroup", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.HorizontalOrVerticalLayoutGroup", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ILayoutElement", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ILayoutController", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ILayoutGroup", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ILayoutSelfController", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ILayoutIgnorer", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.LayoutElement", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.LayoutGroup", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.LayoutRebuilder", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.VerticalLayoutGroup", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Mask", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.MaskableGraphic", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.MaskUtilities", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.IMaterialModifier", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.RawImage", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.RectMask2D", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Scrollbar", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ScrollRect", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Selectable", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Slider", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.SpriteState", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Text", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Toggle", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ToggleGroup", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.VertexHelper", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.BaseVertexEffect", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.BaseMeshEffect", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.IVertexModifier", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.IMeshModifier", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Outline", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Shadow", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UIElements.PanelEventHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UIElements.PanelRaycaster", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.AxisEventData", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.AbstractEventData", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.BaseEventData", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PointerEventData", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.EventHandle", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IEventSystemHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IPointerMoveHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IPointerEnterHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IPointerExitHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IPointerDownHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IPointerUpHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IPointerClickHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IBeginDragHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IInitializePotentialDragHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IDragHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IEndDragHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IDropHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IScrollHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IUpdateSelectedHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.ISelectHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IDeselectHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.IMoveHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.ISubmitHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.ICancelHandler", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.EventSystem", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.EventTrigger", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.EventTriggerType", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.BaseInput", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.BaseInputModule", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PointerInputModule", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.StandaloneInputModule", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.TouchInputModule", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.BaseRaycaster", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.Physics2DRaycaster", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PhysicsRaycaster", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.RaycastResult", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Button.ButtonClickedEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Button._OnFinishSubmit_d__9", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.DefaultControls.IFactoryControls", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.DefaultControls.DefaultRuntimeFactory", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.DefaultControls.Resources", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Dropdown.DropdownItem", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Dropdown.DropdownEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Dropdown._DelayedDestroyDropdownList_d__75", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.GraphicRaycaster.BlockingObjects", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.GraphicRaycaster.__c", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Image.Type", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Image.FillMethod", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Image.OriginHorizontal", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Image.OriginVertical", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Image.Origin90", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Image.Origin180", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Image.Origin360", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField.ContentType", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField.InputType", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField.OnValidateInput", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField.SubmitEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField.EndEditEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField.OnChangeEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField.EditState", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField._CaretBlink_d__170", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.InputField._MouseDragOutsideRect_d__192", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.CanvasScaler.ScaleMode", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.CanvasScaler.ScreenMatchMode", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.CanvasScaler.Unit", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ContentSizeFitter.FitMode", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.GridLayoutGroup.Corner", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.GridLayoutGroup.Axis", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.GridLayoutGroup.Constraint", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.LayoutGroup._DelayedSetDirty_d__56", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.LayoutRebuilder.__c", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.LayoutUtility.__c", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.MaskableGraphic.CullStateChangedEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Scrollbar.ScrollEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Scrollbar.Axis", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Scrollbar._ClickRepeat_d__58", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ScrollRect.MovementType", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ScrollRect.ScrollbarVisibility", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ScrollRect.ScrollRectEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Slider.SliderEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Slider.Axis", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.StencilMaterial.MatEntry", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.Toggle.ToggleEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UI.ToggleGroup.__c", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UIElements.PanelEventHandler.PointerEventType", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UIElements.PanelEventHandler.PointerEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.UIElements.PanelRaycaster.FloatIntBits", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PointerEventData.InputButton", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PointerEventData.FramePressState", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.EventSystem.UIToolkitOverrideConfig", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.EventTrigger.TriggerEvent", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.EventTrigger.Entry", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PointerInputModule.ButtonState", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PointerInputModule.MouseState", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PointerInputModule.MouseButtonEventData", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.StandaloneInputModule.InputMode", "UnityEngine.UI", false);
+            LuaRegisterTypeByName("UnityEngine.EventSystems.PhysicsRaycaster.RaycastHitComparer", "UnityEngine.UI", false);
+
+
+
+
+
+
             LuaRegisterTypeByName("UnityEngine.Vector2", "UnityEngine.CoreModule", true);
             LuaRegisterTypeByName("UnityEngine.Vector3", "UnityEngine.CoreModule", true);
             LuaRegisterTypeByName("UnityEngine.Vector4", "UnityEngine.CoreModule", true);
@@ -1045,9 +1245,9 @@ public static void LuaRegisterType<T>(bool includeCollections = false)
             LuaRegisterTypeByName("UnityEngine.SharedBetweenAnimatorsAttribute", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.PlayMode", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.QueueMode", "UnityEngine.AnimationModule", false);
-            LuaRegisterTypeByName("UnityEngine.AvatarTarget", "UnityEngine.AnimationModule", false);
-            LuaRegisterTypeByName("UnityEngine.AvatarIKGoal", "UnityEngine.AnimationModule", false);
-            LuaRegisterTypeByName("UnityEngine.AvatarIKHint", "UnityEngine.AnimationModule", false);
+           // LuaRegisterTypeByName("UnityEngine.AvatarTarget", "UnityEngine.AnimationModule", false);
+          //  LuaRegisterTypeByName("UnityEngine.AvatarIKGoal", "UnityEngine.AnimationModule", false);
+          //  LuaRegisterTypeByName("UnityEngine.AvatarIKHint", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.AnimatorControllerParameterType", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.StateInfoIndex", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.AnimatorRecorderMode", "UnityEngine.AnimationModule", false);
@@ -1060,15 +1260,15 @@ public static void LuaRegisterType<T>(bool includeCollections = false)
             LuaRegisterTypeByName("UnityEngine.AnimatorControllerParameter", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.AnimatorOverrideController", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.HumanBodyBones", "UnityEngine.AnimationModule", false);
-            LuaRegisterTypeByName("UnityEngine.Avatar", "UnityEngine.AnimationModule", false);
+           // LuaRegisterTypeByName("UnityEngine.Avatar", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.SkeletonBone", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.HumanLimit", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.HumanBone", "UnityEngine.AnimationModule", false);
-            LuaRegisterTypeByName("UnityEngine.AvatarMaskBodyPart", "UnityEngine.AnimationModule", false);
-            LuaRegisterTypeByName("UnityEngine.AvatarMask", "UnityEngine.AnimationModule", false);
+           // LuaRegisterTypeByName("UnityEngine.AvatarMaskBodyPart", "UnityEngine.AnimationModule", false);
+          //  LuaRegisterTypeByName("UnityEngine.AvatarMask", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.HumanTrait", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.RuntimeAnimatorController", "UnityEngine.AnimationModule", false);
-            LuaRegisterTypeByName("UnityEngine.AvatarBuilder", "UnityEngine.AnimationModule", false);
+          //  LuaRegisterTypeByName("UnityEngine.AvatarBuilder", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.BodyDof", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.HeadDof", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.LegDof", "UnityEngine.AnimationModule", false);
@@ -3866,6 +4066,9 @@ public static void LuaRegisterType<T>(bool includeCollections = false)
         public override void OnLateInitializeMelon()
         {
 
+   
+                Physics.SphereCastAll(Vector3.zero, 1.0f, Vector3.forward);
+            
 
             MelonLogger.Msg("Starting the Lua Modding Framework vesion 0.1.1 PRE-ALPHA");
             LoadAllAssemblies();

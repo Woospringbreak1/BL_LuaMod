@@ -1,5 +1,6 @@
 ﻿using Il2CppSLZ.Marrow;
-
+using MelonLoader;
+using MoonSharp.Interpreter;
 using UnityEngine;
 
 namespace LuaMod.LuaAPI
@@ -165,22 +166,38 @@ namespace LuaMod.LuaAPI
             return null;
         }
 
-        public static bool BL_RightHandEmpty()
+        public static DynValue BL_RightHandContents()
         {
-            if (BoneLib.Player.RightHand != null)
+            return LuaSafeCall.Run(() =>
             {
-                return BoneLib.Player.GetComponentInHand<Component>(BoneLib.Player.RightHand) == null;
-            }
-            return true;
+                if (BoneLib.Player.RightHand != null)
+                {
+                    GameObject handContents = (BoneLib.Player.GetObjectInHand(BoneLib.Player.RightHand));
+                    if (handContents != null)
+                    {
+                        return UserData.Create(handContents);
+                    }
+                    return DynValue.Nil;
+                }
+                return null;
+            }, $"BL_RightHandContents()"); ;
         }
 
-        public static bool BL_LeftHandEmpty()
+        public static DynValue BL_LeftHandContents()
         {
-            if (BoneLib.Player.LeftHand != null)
+            return LuaSafeCall.Run(() =>
             {
-                return BoneLib.Player.GetComponentInHand<Component>(BoneLib.Player.LeftHand) == null;
-            }
-            return true;
+                if (BoneLib.Player.RightHand != null)
+                {
+                    GameObject handContents = (BoneLib.Player.GetObjectInHand(BoneLib.Player.LeftHand));
+                    if (handContents != null)
+                    {
+                        return UserData.Create(handContents);
+                    }
+                    return DynValue.Nil;
+                }
+                return null;
+            }, $"BL_LeftHandContents()"); ;
         }
 
 

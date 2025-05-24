@@ -127,7 +127,7 @@ namespace LuaMod
         {
             filename = API_Utils.RemoveDoubleSlashes(filename);
 
-            if (!Security.IsSafePath(filename))
+            if (!Security.IsSafePath(filename) || !Security.IsLuaScript(filename))
             {
                 throw new ScriptRuntimeException($"attempted to access an unsafe path: {filename}");
             }
@@ -283,11 +283,6 @@ namespace LuaMod
 
 
 
-        public static bool IsScriptPathSafe(string path)
-        {
-            return true;
-        }
-
         private void LoadBehaviourFunctionReferences()
         {
 
@@ -330,7 +325,7 @@ namespace LuaMod
                 {
                     string path = Security.GetRelativeScriptPath(moduleName);
 
-                    if (!Security.IsSafePath(path))
+                    if (!Security.IsSafePath(path) || !Security.IsLuaScript(path))
                     {
                         throw new ScriptRuntimeException($"attempted to access an unsafe path: {moduleName}");
                     }
@@ -400,7 +395,7 @@ namespace LuaMod
                 {
                     string path = Security.GetRelativeScriptPath(moduleName);
 
-                    if (!Security.IsSafePath(path))
+                    if (!Security.IsSafePath(path) || !Security.IsLuaScript(path))
                     {
                         throw new ScriptRuntimeException($"attempted to access an unsafe path: {moduleName}");
                     }
@@ -1022,6 +1017,43 @@ namespace LuaMod
             _LuaScript.Globals["DebugGrassDisplacementTex.DebugSize"] = UserData.CreateStatic<Il2CppLux_SRP_GrassDisplacement.DebugGrassDisplacementTex.DebugSize>();
             _LuaScript.Globals["GrassDisplacementRenderFeature.RTDisplacementSize"] = UserData.CreateStatic<Il2CppLux_SRP_GrassDisplacement.GrassDisplacementRenderFeature.RTDisplacementSize>();
             _LuaScript.Globals["IvyController.State"] = UserData.CreateStatic<Il2CppDynamite3D.RealIvy.IvyController.State>();
+
+            // Enums from assembly: UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+
+            _LuaScript.Globals["CanvasUpdate"] = UserData.CreateStatic<UnityEngine.UI.CanvasUpdate>();
+            _LuaScript.Globals["EventHandle"] = UserData.CreateStatic<UnityEngine.EventSystems.EventHandle>();
+            _LuaScript.Globals["EventTriggerType"] = UserData.CreateStatic<UnityEngine.EventSystems.EventTriggerType>();
+            _LuaScript.Globals["GraphicRaycaster.BlockingObjects"] = UserData.CreateStatic<UnityEngine.UI.GraphicRaycaster.BlockingObjects>();
+            _LuaScript.Globals["Image.Type"] = UserData.CreateStatic<UnityEngine.UI.Image.Type>();
+            _LuaScript.Globals["Image.FillMethod"] = UserData.CreateStatic<UnityEngine.UI.Image.FillMethod>();
+            _LuaScript.Globals["Image.OriginHorizontal"] = UserData.CreateStatic<UnityEngine.UI.Image.OriginHorizontal>();
+            _LuaScript.Globals["Image.OriginVertical"] = UserData.CreateStatic<UnityEngine.UI.Image.OriginVertical>();
+            _LuaScript.Globals["Image.Origin90"] = UserData.CreateStatic<UnityEngine.UI.Image.Origin90>();
+            _LuaScript.Globals["Image.Origin180"] = UserData.CreateStatic<UnityEngine.UI.Image.Origin180>();
+            _LuaScript.Globals["Image.Origin360"] = UserData.CreateStatic<UnityEngine.UI.Image.Origin360>();
+            _LuaScript.Globals["InputField.ContentType"] = UserData.CreateStatic<UnityEngine.UI.InputField.ContentType>();
+            _LuaScript.Globals["InputField.InputType"] = UserData.CreateStatic<UnityEngine.UI.InputField.InputType>();
+            _LuaScript.Globals["InputField.EditState"] = UserData.CreateStatic<UnityEngine.UI.InputField.EditState>();
+            _LuaScript.Globals["CanvasScaler.ScaleMode"] = UserData.CreateStatic<UnityEngine.UI.CanvasScaler.ScaleMode>();
+            _LuaScript.Globals["CanvasScaler.ScreenMatchMode"] = UserData.CreateStatic<UnityEngine.UI.CanvasScaler.ScreenMatchMode>();
+            _LuaScript.Globals["CanvasScaler.Unit"] = UserData.CreateStatic<UnityEngine.UI.CanvasScaler.Unit>();
+            _LuaScript.Globals["ContentSizeFitter.FitMode"] = UserData.CreateStatic<UnityEngine.UI.ContentSizeFitter.FitMode>();
+            _LuaScript.Globals["GridLayoutGroup.Corner"] = UserData.CreateStatic<UnityEngine.UI.GridLayoutGroup.Corner>();
+            _LuaScript.Globals["GridLayoutGroup.Axis"] = UserData.CreateStatic<UnityEngine.UI.GridLayoutGroup.Axis>();
+            _LuaScript.Globals["GridLayoutGroup.Constraint"] = UserData.CreateStatic<UnityEngine.UI.GridLayoutGroup.Constraint>();
+            _LuaScript.Globals["Scrollbar.Axis"] = UserData.CreateStatic<UnityEngine.UI.Scrollbar.Axis>();
+            _LuaScript.Globals["ScrollRect.MovementType"] = UserData.CreateStatic<UnityEngine.UI.ScrollRect.MovementType>();
+            _LuaScript.Globals["ScrollRect.ScrollbarVisibility"] = UserData.CreateStatic<UnityEngine.UI.ScrollRect.ScrollbarVisibility>();
+            _LuaScript.Globals["Slider.Axis"] = UserData.CreateStatic<UnityEngine.UI.Slider.Axis>();
+            _LuaScript.Globals["PanelEventHandler.PointerEventType"] = UserData.CreateStatic<UnityEngine.UIElements.PanelEventHandler.PointerEventType>();
+            _LuaScript.Globals["PointerEventData.InputButton"] = UserData.CreateStatic<UnityEngine.EventSystems.PointerEventData.InputButton>();
+            _LuaScript.Globals["PointerEventData.FramePressState"] = UserData.CreateStatic<UnityEngine.EventSystems.PointerEventData.FramePressState>();
+            _LuaScript.Globals["StandaloneInputModule.InputMode"] = UserData.CreateStatic<UnityEngine.EventSystems.StandaloneInputModule.InputMode>();
+
+            // Enums from assembly: Il2CppUltEvents, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+
+            _LuaScript.Globals["PersistentArgumentType"] = UserData.CreateStatic<Il2CppUltEvents.PersistentArgumentType>();
+
 
 
         }

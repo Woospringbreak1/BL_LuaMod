@@ -61,14 +61,14 @@ namespace LuaMod
                 if (LG != null)
                 {
                     //Lua Gun
-                    MelonLoader.MelonLogger.Msg("Calling LuaGun Onfire()");
+                   // MelonLoader.MelonLogger.Msg("Calling LuaGun Onfire()");
                     return (LG.OnFire());
 
                 }
                 else
                 {
                     //Normal gun
-                    MelonLoader.MelonLogger.Msg("Calling normal Gun Onfire()");
+                  //  MelonLoader.MelonLogger.Msg("Calling normal Gun Onfire()");
                     return true;
                 }
 
@@ -88,12 +88,12 @@ namespace LuaMod
                 if (LG != null)
                 {
                     // Lua Gun handling
-                    MelonLoader.MelonLogger.Msg("Calling LuaGun SpawnCartridge() with cartridge: " + spawnableCartridge);
+                   // MelonLoader.MelonLogger.Msg("Calling LuaGun SpawnCartridge() with cartridge: " + spawnableCartridge);
                     return (LG.LuaSpawnCartridge(spawnableCartridge));
                 }
 
                 // Normal gun handling (original method will execute)
-                MelonLoader.MelonLogger.Msg("Calling normal Gun SpawnCartridge() with cartridge: " + spawnableCartridge);
+                //MelonLoader.MelonLogger.Msg("Calling normal Gun SpawnCartridge() with cartridge: " + spawnableCartridge);
                 return true;
             }
         }
@@ -105,7 +105,7 @@ namespace LuaMod
             private static bool Prefix(Gun __instance,InteractableHost host, Hand hand)
             {
                 LuaGun LG = __instance.gameObject.GetComponent<LuaGun>();
-
+                
                 if (LG != null)
                 {
                     LG.OnGripAttached(host, hand);
@@ -113,7 +113,7 @@ namespace LuaMod
                 }
 
                 // Normal gun handling (original method will execute)
-                MelonLoader.MelonLogger.Msg("Calling normal Gun OnGripAttached() with Interactable Host : " + host.ToString() + " and hand " + hand.ToString());
+               // MelonLoader.MelonLogger.Msg("Calling normal Gun OnGripAttached() with Interactable Host : " + host.ToString() + " and hand " + hand.ToString());
                 return true;
             }
         }
@@ -302,7 +302,7 @@ namespace LuaMod
             //still generates muzzleflash etc.
 
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
-            MelonLoader.MelonLogger.Msg("OnFire called");
+           // MelonLoader.MelonLogger.Msg("OnFire called");
             DynValue FireReturn = CallScriptFunction(OnFireFunction);
 
             if(FireReturn != null&& FireReturn != DynValue.Nil && FireReturn.Type == DataType.Boolean)
@@ -328,7 +328,7 @@ namespace LuaMod
         {
             ///Note: ??
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
-            MelonLoader.MelonLogger.Msg("Cardrige barcode: " + spawnableCartridge.crateRef.Barcode.ToString() + " " + spawnableCartridge.crateRef.ToString());
+           //MelonLoader.MelonLogger.Msg("Cardrige barcode: " + spawnableCartridge.crateRef.Barcode.ToString() + " " + spawnableCartridge.crateRef.ToString());
             CallScriptFunction(SpawnCartridgeFunction);
 #endif
             return false;

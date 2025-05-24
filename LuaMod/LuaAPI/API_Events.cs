@@ -8,6 +8,7 @@ using Il2CppSLZ.Marrow.Combat;
 using Il2CppSLZ.Marrow.SceneStreaming;
 using Il2CppSLZ.Marrow.Utilities;
 using Il2CppSLZ.Marrow.Warehouse;
+using Il2CppSLZ.RoadToMarrow;
 using MelonLoader;
 using MoonSharp.Interpreter;
 using System.Runtime.CompilerServices;
@@ -126,11 +127,10 @@ namespace LuaMod.LuaAPI
                 if (Ls.owner != null && Ls.function != "")
                 {
                  //   MelonLoader.MelonLogger.Msg("invoking event " + eventName + " against " + Ls.owner.name);
-                    Ls.owner.CallFunction(Ls.function,args);
+                 return   Ls.owner.CallFunction(Ls.function,args);
                 }
             }
-           
-            return true;
+            return false;
         }
 
 
@@ -159,7 +159,10 @@ namespace LuaMod.LuaAPI
             BoneLib.BoneMenu.Dialog.OnDialogClosed += Event_Dialog_OnDialogClosed;
 
 
+
+
             BoneLib.Hooking.CreateHook(typeof(Projectile).GetMethod(nameof(Projectile.OnEnable), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnProjectileFired), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(RigidbodyProjectile).GetMethod(nameof(RigidbodyProjectile.OnEnable), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnRigidProjectileEnabled), AccessTools.all));
 
             BoneLib.Hooking.CreateHook(typeof(Magazine).GetMethod(nameof(Magazine.OnEject), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnMagazineEject), AccessTools.all));
             BoneLib.Hooking.CreateHook(typeof(Magazine).GetMethod(nameof(Magazine.OnGrab), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnMagazineGrab), AccessTools.all));
@@ -169,48 +172,134 @@ namespace LuaMod.LuaAPI
             BoneLib.Hooking.CreateHook(typeof(CrateSpawner).GetMethod(nameof(CrateSpawner.OnPooleeDespawn), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnCrateSpawnerDespawned), AccessTools.all));
             BoneLib.Hooking.CreateHook(typeof(CrateSpawner).GetMethod(nameof(CrateSpawner.OnPooleeRecycle), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnCrateSpawnerRecycle), AccessTools.all));
 
+            BoneLib.Hooking.CreateHook(typeof(SpawnGun).GetMethod(nameof(SpawnGun.OnEnable), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnDevToolSpawned), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(FlyingGun).GetMethod(nameof(FlyingGun.OnEnable), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnDevToolSpawned), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(Constrainer).GetMethod(nameof(Constrainer.OnEnable), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnDevToolSpawned), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(DevManipulatorGun).GetMethod(nameof(DevManipulatorGun.OnEnable), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_OnDevToolSpawned), AccessTools.all));
 
-           
+            BoneLib.Hooking.CreateHook(typeof(InventorySlotReceiver).GetMethod(nameof(InventorySlotReceiver.OnHandGrab), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_InventorySlot_OnHandGrab), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(InventorySlotReceiver).GetMethod(nameof(InventorySlotReceiver.OnHandDrop), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_InventorySlot_OnHandDrop), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(InventorySlotReceiver).GetMethod(nameof(InventorySlotReceiver.OnHandHoverBegin), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_InventorySlot_OnHandHoverBegin), AccessTools.all));
+            BoneLib.Hooking.CreateHook(typeof(InventorySlotReceiver).GetMethod(nameof(InventorySlotReceiver.OnHandHoverEnd), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_InventorySlot_OnHandHoverEnd), AccessTools.all));
+
+            BoneLib.Hooking.CreateHook(typeof(InventorySlotReceiver).GetMethod(nameof(InventorySlotReceiver.InsertInSlot), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_InventorySlot_OnInsertInSlot), AccessTools.all));
+
+            BoneLib.Hooking.CreateHook(typeof(ObjectDestructible).GetMethod(nameof(ObjectDestructible.Despawn), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_ObjectDestructible_OnDestruction), AccessTools.all));
+        }
+
+        private static void Event_ObjectDestructible_OnDestruction(ObjectDestructible __instance)
+        {
+            MelonLogger.Msg("destructableobject destroyed: " + __instance.name);
+            BL_InvokeEvent("ObjectDestructible_OnDestruction", UserData.Create(__instance));
+        }
+
+
+        private static void Event_OnDevToolSpawned(GameObject __instance)
+        {
+            //MelonLogger.Msg("DevTool spaned: " + __instance.name);
+            BL_InvokeEvent("OnDevToolSpawned", UserData.Create(__instance));
+        }
+
+
+        private static void Event_InventorySlot_OnInsertInSlot(InventorySlotReceiver __instance, InteractableHost host)
+        {
+            //MelonLogger.Msg("Inventory slot insertion: " + host.name);
+            BL_InvokeEvent("InventorySlot_OnInsertInSlot", UserData.Create(__instance), UserData.Create(host));
+        }
+
+        private static void Event_InventorySlot_OnHandGrab(InventorySlotReceiver __instance,Hand hand)
+        {
+            GameObject HeldObject = null;
+            Component held = BoneLib.Player.GetComponentInHand<Component>(hand);
+            DynValue heldDV = DynValue.Nil;
+            if (held != null)
+            {
+                HeldObject = held.gameObject;
+                heldDV = UserData.Create(HeldObject);
+                MelonLogger.Msg("grabbed object " + HeldObject.name);
+            }
+
+
+            //MelonLogger.Msg("Inventory slot grabbed: " + __instance.name + " " + HeldObject.name);
+            BL_InvokeEvent("InventorySlot_OnHandGrab", UserData.Create(__instance),UserData.Create(hand), heldDV);
+        }
+
+        private static void Event_InventorySlot_OnHandDrop(InventorySlotReceiver __instance, IGrippable host)
+        {
+            //MelonLogger.Msg("Inventory slot drop: " + host.GetTransform().name);
+            Grip grip = host.GetGrip();
+            GameObject dropped = null;
+            DynValue droppedDV = DynValue.Nil;
+            if(grip != null)
+            {
+                dropped = grip.transform.root.gameObject;
+
+            }
+
+            if (dropped != null)
+            {
+                droppedDV = UserData.Create(dropped);
+            }
+
+            BL_InvokeEvent("InventorySlot_OnHandDrop", UserData.Create(__instance), UserData.Create(host),droppedDV);
+        }
+
+        private static void Event_InventorySlot_OnHandHoverBegin(InventorySlotReceiver __instance, Hand hand)
+        {
+            //MelonLogger.Msg("Inventory slot hand hover begin: " + __instance.name);
+            BL_InvokeEvent("InventorySlot_OnHandHoverBegin", UserData.Create(__instance));
+        }
+
+        private static void Event_InventorySlot_OnHandHoverEnd(InventorySlotReceiver __instance, Hand hand)
+        {
+           // MelonLogger.Msg("Inventory slot hand hover end: " + __instance.name);
+            BL_InvokeEvent("InventorySlot_OnHandHoverEnd", UserData.Create(__instance));
+        }
+
+        private static void Event_OnRigidProjectileEnabled(RigidbodyProjectile __instance)
+        {
+           // MelonLogger.Msg("new projectile " + __instance.name);
+            BL_InvokeEvent("OnRigidProjectileEnabled", UserData.Create(__instance));
         }
 
         private static void Event_OnProjectileFired(Projectile __instance)
         {
-            MelonLogger.Msg("new projectile " + __instance.name);
+           // MelonLogger.Msg("new projectile " + __instance.name);
             BL_InvokeEvent("OnProjectileFired", UserData.Create(__instance));
         }
 
         private static void Event_OnCrateSpawnerSpawned(CrateSpawner __instance,GameObject go)
         {
-            MelonLogger.Msg("Crate Spawner " + __instance.name +  " Spawned " + go.name );
+           // MelonLogger.Msg("Crate Spawner " + __instance.name +  " Spawned " + go.name );
             BL_InvokeEvent("OnCrateSpawnerSpawned", UserData.Create(__instance), UserData.Create(go));
         }
 
         private static void Event_OnCrateSpawnerDespawned(CrateSpawner __instance, GameObject go)
         {
-            MelonLogger.Msg("Crate Spawner " + __instance.name + " Despawned " + go.name);
+           // MelonLogger.Msg("Crate Spawner " + __instance.name + " Despawned " + go.name);
             BL_InvokeEvent("OnCrateSpawnerDespawned", UserData.Create(__instance), UserData.Create(go));
         }
 
         private static void Event_OnCrateSpawnerRecycle(CrateSpawner __instance, GameObject go)
         {
-            MelonLogger.Msg("Crate Spawner " + __instance.name + " Recycled " + go.name);
+           // MelonLogger.Msg("Crate Spawner " + __instance.name + " Recycled " + go.name);
             BL_InvokeEvent("OnCrateSpawnerRecycle", UserData.Create(__instance), UserData.Create(go));
         }
 
         private static void Event_OnMagazineEject(Magazine __instance)
         {
-            MelonLogger.Msg("Magazine ejected " + __instance.name);
+           // MelonLogger.Msg("Magazine ejected " + __instance.name);
             BL_InvokeEvent("OnMagazineEject", UserData.Create(__instance));
         }
         private static void Event_OnMagazineGrab(Hand hand, Magazine __instance)
         {
-            MelonLogger.Msg("Magazine grabbed " + __instance.name);
+           // MelonLogger.Msg("Magazine grabbed " + __instance.name);
             BL_InvokeEvent("OnMagazineGrab", UserData.Create(hand), UserData.Create(__instance));
         }
 
         private static void Event_OnMagazineInsert(Magazine __instance)
         {
-            MelonLogger.Msg("Magazine Inserted " + __instance.name);
+           // MelonLogger.Msg("Magazine Inserted " + __instance.name);
             BL_InvokeEvent("OnMagazineInsert", UserData.Create(__instance));
         }
 

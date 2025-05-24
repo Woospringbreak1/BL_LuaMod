@@ -35,11 +35,16 @@ namespace LuaMod.LuaAPI
         /// <summary>
         /// Creates a new empty GameObject in the scene.
         /// </summary>
-        public GameObject BL_CreateEmptyGameObject()
+        public GameObject BL_CreateEmptyGameObject(string Name = "")
         {
             return LuaSafeCall.Run(() =>
             {
-                return new GameObject();
+                GameObject gameObject = new GameObject();
+                if(Name != "")
+                {
+                    gameObject.name = Name;
+                }
+                return gameObject;
             }, "BL_CreateEmptyGameObject()");
         }
 
@@ -78,6 +83,21 @@ namespace LuaMod.LuaAPI
                 return DynValue.Nil;
             }, $"BL_FindInChildren('{name}')");
         }
+
+
+        [MoonSharpHidden]
+        public GameObject FindInChildren(GameObject gameObject, string name)
+        {
+
+                Transform[] tfs = gameObject.GetComponentsInChildren<Transform>(true);
+                foreach (Transform t in tfs)
+                {
+                    if (t.name == name)
+                        return (t.gameObject);
+                }
+            return null;
+        }
+
 
         /// <summary>
         /// Finds a GameObject in the scene by name.
@@ -202,9 +222,13 @@ namespace LuaMod.LuaAPI
                 if (obj == null) throw new ScriptRuntimeException("GameObject is null");
 
                 Type type = LuaMod.LoadedTypes.Find(t => t.Name == CompType);
-                if (type == null) throw new ScriptRuntimeException($"Component type '{CompType}' not found");
+                if (type == null)
+                {
+                    throw new ScriptRuntimeException($"Component type '{CompType}' not found");
+                }
+               // MelonLogger.Msg("found componnt type " + type.Name + " fullname " +  type.FullName);
 
-                MethodInfo method = typeof(GameObject)
+                    MethodInfo method = typeof(GameObject)
                     .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .First(m => m.Name == "GetComponent" && m.IsGenericMethod);
 
@@ -327,8 +351,15 @@ namespace LuaMod.LuaAPI
                 Action<Poolee> captureSpawnedCrate = (Poolee obj) =>
                 {
                     if (obj == null || obj.gameObject == null)
+                    {
                         throw new ScriptRuntimeException("Spawned crate is null or missing GameObject");
-
+                    }
+                        
+                    if(NewParent != null)
+                    {
+                        obj.transform.SetParent(NewParent.transform);
+                    }
+                    
                     LB.SetScriptVariable(VariableName, UserData.Create(obj.gameObject));
                 };
 
@@ -346,7 +377,7 @@ namespace LuaMod.LuaAPI
                     Active,
                     new Il2CppSystem.Nullable<int>()
                 );
-
+                
                 task.ContinueWith(captureSpawnedCrate);
             }, $"BL_SpawnByBarcode_LuaVar('{SpawnBCode}', var: '{VariableName}')");
         }

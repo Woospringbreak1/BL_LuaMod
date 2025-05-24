@@ -6,7 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Security;
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
+
+
 
 
 
@@ -15,6 +16,7 @@ using UnityEngine.ProBuilder.MeshOperations;
 
 #if !(UNITY_EDITOR || UNITY_STANDALONE)
 using MelonLoader;
+using Il2CppSLZ.Marrow;
 #endif
 
 namespace LuaMod
@@ -576,7 +578,8 @@ namespace LuaMod
                     MelonLogger.Warning($"[CallFunction] Lua function '{functionname}' is nil or missing on '{this.name}'");
                     return false;
                 }
-
+      
+                
                 return CallScriptFunctionDynamic(scriptfunc, args);
             }, $"CallFunction('{functionname}')");
 #else
