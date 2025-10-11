@@ -1,6 +1,18 @@
 --LuaBehaviour
 
 LaserMaxRange = 100
+Hunter = nil
+HunterBehaviour = nil
+
+function SlowUpdate()
+    if(not IsValid(Hunter)) then
+        Hunter = API_GameObject.BL_FindInWorld("NPC_Hunter")
+        if(IsValid(Hunter)) then
+            HunterBehaviour = API_GameObject.BL_GetComponent(Hunter,"LuaBehaviour")
+        end
+    end
+
+end
 
 function Start()
     print("Hello, World from QR code scanner!")
@@ -16,7 +28,11 @@ end
 function PlayBeep()
     if(not BeepSound.isPlaying) then
         BeepSound.Play()
-    end
+
+        if(IsValid(HunterBehaviour)) then
+            HunterBehaviour.CallFunction("ScannerBeep",BL_Host.transform.position)
+        end
+    end 
 end
 
 function CheckQRCodeConeHit(scannerTransform, spotAngle, maxDistance)

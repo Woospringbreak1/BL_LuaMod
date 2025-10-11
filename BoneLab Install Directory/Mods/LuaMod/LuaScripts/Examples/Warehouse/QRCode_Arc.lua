@@ -60,60 +60,19 @@ function Start()
 end
 
 
-function AttachToSpawned(nil1, nil2, nil3, spawnedObject)
-    local SpawnedGameObject = API_Utils.BL_ConvertObjectToType(spawnedObject, "GameObject")
+function AttachToSpawned(nil1,nil2,nil3,spawnedObject)
+    SpawnedGameObject = API_Utils.BL_ConvertObjectToType(spawnedObject,"GameObject")
 
-    if not IsValid(SpawnedGameObject) then
-        return
+    if(IsValid(SpawnedGameObject)) then
+       -- print("attached to spawned object: " .. SpawnedGameObject.name)
+        BL_Host.transform.parent = SpawnedGameObject.transform
+        local rb = API_GameObject.BL_GetComponent(SpawnedGameObject.transform.root.gameObject,"Rigidbody")
+        rb.Sleep()
+    else
+      -- print("failed to attach to spawned object")
     end
 
-    -- Parent host to spawned object
-    BL_Host.transform.parent = SpawnedGameObject.transform
 
-    -- Compute combined world-space bounds from all child renderers
-    local renderers = API_GameObject.BL_GetComponentsInChildren(SpawnedGameObject, "Renderer")
-    if #renderers == 0 then
-        return
-    end
-
-    local bounds = renderers[1].bounds
-    for _, renderer in ipairs(renderers) do
-        bounds.Encapsulate(renderer.bounds)
-    end
-    local center  = bounds.center
-    local extents = bounds.extents
-
-    -- Use Unity Vector3 functions for all math
-    local forward = SpawnedGameObject.transform.forward
-    local absDir  = API_Vector.BL_Vector3(
-        math.abs(forward.x),
-        math.abs(forward.y),
-        math.abs(forward.z)
-    )
-
-    -- Equivalent to Vector3.Dot(abs(forward), extents)
-    local r = Vector3.Dot(absDir, extents)
-
-    -- Compute edge position along +forward direction
-    local edgePos = center + forward * r
-
-    -- Offset slightly in front of the object
-    local IN_FRONT_OFFSET = 0.10
-    local LATERAL_OFFSET  = 0.00
-    local HEIGHT_OFFSET   = 0.00
-
-    local target = edgePos + forward * IN_FRONT_OFFSET
-        + SpawnedGameObject.transform.right * LATERAL_OFFSET
-        + Vector3.up * HEIGHT_OFFSET
-
-    -- Move host to world position using Unity’s Vector3 operators
-    BL_Host.transform.position = target
-    -- Optionally align host orientation
-    -- BL_Host.transform.rotation = SpawnedGameObject.transform.rotation
-
-    -- Optional: settle physics
-    local rb = API_GameObject.BL_GetComponent(SpawnedGameObject.transform.root.gameObject, "Rigidbody")
-    rb.Sleep() 
 end
 
 function Scanned()

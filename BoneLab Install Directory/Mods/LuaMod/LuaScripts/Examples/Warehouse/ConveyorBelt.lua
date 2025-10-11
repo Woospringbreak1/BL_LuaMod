@@ -14,6 +14,10 @@ end
 
 function OnCollisionStay(collision)
     local other = collision.gameObject
+    if not string.match(other.name, "dest_Crate_Lite_1m") then
+        return
+    end
+
     local rb = API_GameObject.BL_GetComponent(other.transform.root.gameObject, "Rigidbody")
     if rb == nil then return end
 

@@ -145,7 +145,7 @@ namespace LuaMod
             }
             MelonLogger.Msg($"LuaBehaviour loading script: {filename}");
 
-            _LuaScript = new Script(CoreModules.Preset_HardSandbox);
+            _LuaScript = new Script(CoreModules.Preset_HardSandbox | CoreModules.Json);
             _LuaScript.Options.ScriptLoader = new FileSystemScriptLoader();
             _LuaScript.Options.DebugPrint = s => MelonLogger.Msg($"[Lua: {filename}] {s}");
             _LuaScript.Options.CheckThreadAccess = true;
@@ -227,7 +227,7 @@ namespace LuaMod
 
 
 
-        public DynValue CallScriptFunction(DynValue luaFunc, params object[] Args)
+        public DynValue CallScriptFunction(DynValue luaFunc, params DynValue[] Args)
         {
             if (luaFunc.Type != DataType.Function && luaFunc.Type != DataType.ClrFunction)
             {
@@ -242,14 +242,14 @@ namespace LuaMod
 
             var coro = _LuaScript.CreateCoroutine(luaFunc).Coroutine;
             coro.AutoYieldCounter = 1000;
-            DynValue[] dynArgs = Array.ConvertAll(Args, arg => DynValue.FromObject(_LuaScript, arg));
+            //DynValue[] dynArgs = Array.ConvertAll(Args, arg => DynValue.FromObject(_LuaScript, arg));
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             DynValue result;
 
             try
             {
-                result = coro.Resume(dynArgs);
+                result = coro.Resume(Args);
 
                 while (result.Type == DataType.YieldRequest)
                 {
@@ -349,6 +349,7 @@ namespace LuaMod
                     return result;
                 }
 
+                _LuaScript.Globals.Set(moduleName, DynValue.True);
                 _LuaScript.Globals.Set(moduleName, DynValue.True);
                 _loadedModules[moduleName] = DynValue.True;
                 return DynValue.True;

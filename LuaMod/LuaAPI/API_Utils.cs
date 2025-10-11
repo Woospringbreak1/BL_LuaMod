@@ -26,6 +26,38 @@ namespace LuaMod.LuaAPI
         public static readonly API_Utils Instance = new API_Utils();
 
 
+
+        public static DynValue BL_GetClassName(DynValue val)
+        {
+            return LuaSafeCall.Run(() =>
+            {
+
+                if(val == null)
+                {
+                    throw new ScriptRuntimeException($"Supplied object is null");
+                }
+
+                if (val.Type == DataType.UserData)
+                {
+                    string className = val.UserData.Descriptor?.Type?.FullName;
+
+                    if (className != null && className != "")
+                    {
+                        return DynValue.NewString(className);
+                    }
+                    else
+                    {
+                        return DynValue.Nil;
+                    }
+                    
+                }
+                else
+                {
+                    throw new ScriptRuntimeException($"Supplied object is not a DynValue");
+                }
+            },$"BL_GetClassName(index: {val})");
+        }
+
         public static int BL_CollectionLength(ICollection collection)
         {
             if (collection == null)

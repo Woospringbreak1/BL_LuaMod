@@ -14,8 +14,9 @@ function OnTriggerEnter(other)
         if(IsValid(qrCodeBehaviour)) then
             print("valid QR code - loading " .. qrCodeBehaviour.GetScriptVariable("ItemDescription"))
             WarehouseManager.CallFunction("ItemLoaded", qrCodeBehaviour)
+            other.transform.root.gameObject.setActive(false)
         end
     end
-    other.transform.root.gameObject.setActive(false)
+   
 end
 

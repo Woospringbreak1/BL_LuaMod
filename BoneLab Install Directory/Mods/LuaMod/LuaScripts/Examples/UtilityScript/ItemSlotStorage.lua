@@ -18,7 +18,7 @@ TrackedItems = {
     {
         name = "BackLeft",
         slot = function() return API_Player.Slot_BackLeft end,
-        barcode = "c1534c5a-38df-474e-abb3-7e81466c6173"
+        barcode = "BONELABMeridian.ItchIOHorrorTest.Spawnable.SQScanerGun"
     },
     {
         name = "BackRight",

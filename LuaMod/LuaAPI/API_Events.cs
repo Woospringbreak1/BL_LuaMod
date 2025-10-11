@@ -111,13 +111,13 @@ namespace LuaMod.LuaAPI
             return true;
         }
 
-        public static bool BL_InvokeEvent(string eventName,params DynValue[] args )
+        public static DynValue BL_InvokeEvent(string eventName,params DynValue[] args )
         {
             //MelonLoader.MelonLogger.Msg("attempting to invoke event " + eventName);
             if (!EventListeners.ContainsKey(eventName))
             {
                // MelonLoader.MelonLogger.Msg("invoking event " + eventName + " failed, no listners");
-               return false;
+               return null;
             }
 
             List<EventListner> ListenerList = EventListeners[eventName];
@@ -130,7 +130,7 @@ namespace LuaMod.LuaAPI
                  return   Ls.owner.CallFunction(Ls.function,args);
                 }
             }
-            return false;
+            return null;
         }
 
 
@@ -184,14 +184,16 @@ namespace LuaMod.LuaAPI
 
             BoneLib.Hooking.CreateHook(typeof(InventorySlotReceiver).GetMethod(nameof(InventorySlotReceiver.InsertInSlot), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_InventorySlot_OnInsertInSlot), AccessTools.all));
 
-            BoneLib.Hooking.CreateHook(typeof(ObjectDestructible).GetMethod(nameof(ObjectDestructible.Despawn), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_ObjectDestructible_OnDestruction), AccessTools.all));
-        }
+            BoneLib.Hooking.CreateHook(typeof(ObjectDestructible).GetMethod(nameof(ObjectDestructible.OnSignificantCollision), AccessTools.all), typeof(API_Events).GetMethod(nameof(Event_ObjectDestructibleOnSignificantCollision), AccessTools.all));        }
 
-        private static void Event_ObjectDestructible_OnDestruction(ObjectDestructible __instance)
+        
+      
+        private static void Event_ObjectDestructibleOnSignificantCollision(ObjectDestructible __instance, Collision c, float impactionVelocity)
         {
-            MelonLogger.Msg("destructableobject destroyed: " + __instance.name);
-            BL_InvokeEvent("ObjectDestructible_OnDestruction", UserData.Create(__instance));
+            //MelonLogger.Msg("Significant impact: " + __instance.name);
+            BL_InvokeEvent("ObjectDestructible_OnSignificantCollision", UserData.Create(__instance), UserData.Create(c),DynValue.NewNumber(impactionVelocity));
         }
+        
 
 
         private static void Event_OnDevToolSpawned(GameObject __instance)

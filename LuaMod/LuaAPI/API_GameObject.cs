@@ -135,7 +135,7 @@ namespace LuaMod.LuaAPI
         /// <summary>
         /// Finds all child GameObjects with the specified name.
         /// </summary>
-        public DynValue BL_FindAllInChildren(GameObject gameObject, string name)
+        public List<DynValue> BL_FindAllInChildren(GameObject gameObject, string name)
         {
             return LuaSafeCall.Run(() =>
             {
@@ -148,7 +148,7 @@ namespace LuaMod.LuaAPI
                         children.Add(UserData.Create(t.gameObject));
                 }
 
-                return children.Count > 0 ? UserData.Create(children) : DynValue.Nil;
+                return children.Count > 0 ? children : null;
             }, $"BL_FindAllInChildren('{name}')");
         }
 
