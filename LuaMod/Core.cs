@@ -1246,7 +1246,8 @@ public static void LuaRegisterType<T>(bool includeCollections = false)
             LuaRegisterTypeByName("UnityEngine.PlayMode", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.QueueMode", "UnityEngine.AnimationModule", false);
            // LuaRegisterTypeByName("UnityEngine.AvatarTarget", "UnityEngine.AnimationModule", false);
-          //  LuaRegisterTypeByName("UnityEngine.AvatarIKGoal", "UnityEngine.AnimationModule", false);
+          //  LuaRegisterTypeByName("UnityEngine.
+          //  ", "UnityEngine.AnimationModule", false);
           //  LuaRegisterTypeByName("UnityEngine.AvatarIKHint", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.AnimatorControllerParameterType", "UnityEngine.AnimationModule", false);
             LuaRegisterTypeByName("UnityEngine.StateInfoIndex", "UnityEngine.AnimationModule", false);

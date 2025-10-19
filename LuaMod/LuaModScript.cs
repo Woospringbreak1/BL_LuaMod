@@ -154,6 +154,7 @@ namespace LuaMod
 
             _LuaScript.Globals.Set("BL_Host", UserData.Create(host.gameObject));
             _LuaScript.Globals.Set("BL_This", UserData.Create(host));
+            _LuaScript.Globals.Set("BL_SlowUpdateTime", DynValue.NewNumber(0.0f));
 
             try
             {
@@ -244,12 +245,23 @@ namespace LuaMod
             coro.AutoYieldCounter = 1000;
             //DynValue[] dynArgs = Array.ConvertAll(Args, arg => DynValue.FromObject(_LuaScript, arg));
 
+            DynValue[] cloneArgs = new DynValue[Args.Length];
+            int i = 0;
+            foreach(DynValue v in Args)
+            {
+                if(v != null)
+                {
+                    cloneArgs[i] = LuaModScript.CloneToScript(_LuaScript, v);
+                }
+                i++;
+            }
+
             Stopwatch stopwatch = Stopwatch.StartNew();
-            DynValue result;
+            DynValue result = DynValue.Nil;
 
             try
             {
-                result = coro.Resume(Args);
+                result = coro.Resume(cloneArgs);
 
                 while (result.Type == DataType.YieldRequest)
                 {
@@ -270,7 +282,20 @@ namespace LuaMod
             }
             catch (ScriptRuntimeException e)
             {
-                MelonLogger.Error($"Lua Error: {e.DecoratedMessage}");
+                string message = e.DecoratedMessage;
+                if(String.IsNullOrWhiteSpace(message))
+                {
+                    MelonLogger.Warning("blank DecoratedMessage");
+                    message = e.Message;
+                }
+
+                MelonLogger.Error($"Lua Error: {message}");
+                throw;
+            }
+            catch(Exception e)
+            {
+                MelonLogger.Warning("generic error");
+                MelonLogger.Error(e.Message);
                 throw;
             }
             finally
@@ -281,6 +306,81 @@ namespace LuaMod
             return result;
         }
 
+
+        static DynValue CloneToScript(Script target, DynValue v)
+        {
+            if (v == null) return DynValue.Nil;
+
+            switch (v.Type)
+            {
+                case DataType.Nil:
+                case DataType.Void:
+                    return DynValue.Nil;
+
+                case DataType.Boolean:
+                case DataType.Number:
+                case DataType.String:
+                    // Primitives are safe to reuse
+                    return v;
+
+                case DataType.Table:
+                    {
+                        var src = v.Table;
+                        var dst = new Table(target);
+
+                        // Copy array part (1..Length) to preserve sequence semantics
+                        var len = src.Length;
+                        for (int i = 1; i <= len; i++)
+                        {
+                            var val = src.Get(i);
+                            dst.Set(i, CloneToScript(target, val));
+                        }
+
+                        // Copy hash part (pairs not in array part)
+                        foreach (var pair in src.Pairs)
+                        {
+                            // Skip array keys already copied
+                            if (pair.Key.Type == DataType.Number)
+                            {
+                                var n = pair.Key.Number;
+                                if (n >= 1 && n <= len && Math.Abs(n - Math.Round(n)) < double.Epsilon)
+                                    continue;
+                            }
+
+                            var k = CloneToScript(target, pair.Key);
+                            var val = CloneToScript(target, pair.Value);
+                            dst.Set(k, val);
+                        }
+
+                        return DynValue.NewTable(dst);
+                    }
+
+                case DataType.Tuple:
+                    {
+                        var arr = v.Tuple;
+                        var cloned = new DynValue[arr.Length];
+                        for (int i = 0; i < arr.Length; i++)
+                            cloned[i] = CloneToScript(target, arr[i]);
+                        return DynValue.NewTuple(cloned);
+                    }
+
+                case DataType.UserData:
+                    // Rewrap the underlying object for the target script.
+                    // Make sure the type is registered with UserData.RegisterType<T>() somewhere globally.
+                    return DynValue.FromObject(target, v.UserData.Object);
+
+                case DataType.Function:
+                case DataType.ClrFunction:
+                    // Cannot move functions across scripts directly
+                    throw new NotSupportedException("Cannot pass functions between different Lua scripts.");
+
+                case DataType.Thread:
+                    throw new NotSupportedException("Cannot pass threads/coroutines between different Lua scripts.");
+
+                default:
+                    return DynValue.Nil;
+            }
+        }
 
 
         private void LoadBehaviourFunctionReferences()
@@ -696,7 +796,7 @@ namespace LuaMod
             _LuaScript.Globals["PlayMode"] = UserData.CreateStatic<UnityEngine.PlayMode>();
             _LuaScript.Globals["QueueMode"] = UserData.CreateStatic<UnityEngine.QueueMode>();
             _LuaScript.Globals["AvatarTarget"] = UserData.CreateStatic<UnityEngine.AvatarTarget>();
-            _LuaScript.Globals["AvatarIKGoal"] = UserData.CreateStatic<UnityEngine.AvatarIKGoal>();
+            _LuaScript.Globals["UNITY_AvatarIKGoal"] = UserData.CreateStatic<UnityEngine.AvatarIKGoal>();
             _LuaScript.Globals["AvatarIKHint"] = UserData.CreateStatic<UnityEngine.AvatarIKHint>();
             _LuaScript.Globals["AnimatorControllerParameterType"] = UserData.CreateStatic<UnityEngine.AnimatorControllerParameterType>();
             _LuaScript.Globals["StateInfoIndex"] = UserData.CreateStatic<UnityEngine.StateInfoIndex>();

@@ -53,7 +53,8 @@ namespace LuaMod.LuaAPI
                 }
                 else
                 {
-                    throw new ScriptRuntimeException($"Supplied object is not a DynValue");
+                    MelonLogger.Warning($"Supplied object is not a DynValue");
+                    return null;
                 }
             },$"BL_GetClassName(index: {val})");
         }

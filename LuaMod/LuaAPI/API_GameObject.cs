@@ -293,7 +293,14 @@ namespace LuaMod.LuaAPI
         /// <summary>
         /// Gets a component of the specified type from the GameObject's children.
         /// </summary>
+        /// 
+
         public DynValue BL_GetComponentInChildren(GameObject obj, string CompType)
+        {
+            return BL_GetComponentInChildren(obj, CompType, false);
+        }
+
+        public DynValue BL_GetComponentInChildren(GameObject obj, string CompType,bool IncludeInactive=false)
         {
             
             return LuaSafeCall.Run(() =>
@@ -308,7 +315,7 @@ namespace LuaMod.LuaAPI
                     .First(m => m.Name == "GetComponentInChildren" && m.IsGenericMethod);
 
                 MethodInfo genericMethod = method.MakeGenericMethod(componentType);
-                object component = genericMethod.Invoke(obj, new object[] { });
+                object component = genericMethod.Invoke(obj, new object[] { IncludeInactive });
 
                 return component != null ? UserData.Create(component) : DynValue.Nil;
             }, $"BL_GetComponentInChildren('{CompType}')");
