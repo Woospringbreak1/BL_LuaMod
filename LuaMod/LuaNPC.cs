@@ -40,13 +40,13 @@ namespace LuaMod
 
         private void OnAIBrainDeath(AIBrain aIBrain)
         {
-            CallScriptFunction(OnDeathFunction);
+            CallScriptFunction(OnDeathFunction, "OnAIBrainDeath");
 
         }
 
         private void OnAIBrainResurrect(AIBrain aIBrain)
         {
-            CallScriptFunction(OnResurrectionFunction);
+            CallScriptFunction(OnResurrectionFunction, "OnAIBrainResurrect");
         }
 
 

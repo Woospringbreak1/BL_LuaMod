@@ -6,12 +6,17 @@ using Microsoft.VisualBasic.FileIO;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
 using System.Diagnostics;
+using System.Reflection;
 using UnityEngine;
+using static Il2Cpp.Interop;
+using MoonSharp.Interpreter.Execution;
 
 namespace LuaMod
 {
     public class LuaModScript
     {
+
+
         private Script _LuaScript;
         private string LuaFileName;
         private TextAsset LuaAsset;
@@ -37,6 +42,18 @@ namespace LuaMod
             return !string.IsNullOrEmpty(LuaFileName) ? LuaFileName : LuaAsset?.name ?? "UnknownScript";
         }
 
+        public string GetScriptName()
+        {
+            if (LuaAsset != null)
+            {
+                return LuaAsset.name;
+            }
+            else
+            {
+                return LuaFileName;
+            }
+
+        }
         private void AddStrike(StrikeReason reason)
         {
             string path = GetScriptIdentifier();
@@ -160,12 +177,25 @@ namespace LuaMod
             {
                 DynValue entry = _LuaScript.LoadFile(filename);
                 LoadFunctionPointers();
-                CallScriptFunction(entry);
+                CallScriptFunction(entry,"ScriptLoad");
             }
-            catch (ScriptRuntimeException ex)
+            catch (ScriptRuntimeException e)
             {
-                MelonLogger.Error($"Lua error while loading {filename}: {ex.DecoratedMessage}");
-                return false;
+                string message = e.DecoratedMessage;
+                if (String.IsNullOrWhiteSpace(message))
+                {
+                    MelonLogger.Warning("blank DecoratedMessage");
+                    message = e.Message;
+                }
+
+                MelonLogger.Error($"Lua error while loading {filename}: {message}");
+                throw;
+            }
+            catch (Exception e)
+            {
+                MelonLogger.Warning("generic error");
+                MelonLogger.Error(e.Message);
+                throw;
             }
 
             if (!reloading)
@@ -209,7 +239,7 @@ namespace LuaMod
             {
                 DynValue entry = _LuaScript.LoadString(scriptAsset.text);
                 LoadFunctionPointers();
-                CallScriptFunction(entry);
+                CallScriptFunction(entry,"ScriptLoad");
             }
             catch (ScriptRuntimeException ex)
             {
@@ -227,9 +257,11 @@ namespace LuaMod
         }
 
 
-
-        public DynValue CallScriptFunction(DynValue luaFunc, params DynValue[] Args)
+        
+        public DynValue CallScriptFunction(DynValue luaFunc,string FuncName, params DynValue[] Args)
         {
+            
+
             if (luaFunc.Type != DataType.Function && luaFunc.Type != DataType.ClrFunction)
             {
                 throw new ArgumentException("DynValue must be a Lua function or callback");
@@ -301,6 +333,11 @@ namespace LuaMod
             finally
             {
                 stopwatch.Stop();
+                if (LuaProfiler.IsProfiling())
+                {
+                    float functionTime = stopwatch.ElapsedMilliseconds;
+                    LuaProfiler.SubmitProfileReport(this, FuncName, functionTime);
+                }
             }
 
             return result;
@@ -440,7 +477,7 @@ namespace LuaMod
                 }
 
                 DynValue func = _LuaScript.LoadString(code, null, $"module:{moduleName}");
-                DynValue result = CallScriptFunction(func);
+                DynValue result = CallScriptFunction(func,"Load Module " + moduleName);
 
                 if (result.Type == DataType.Table || result.Type == DataType.UserData || result.Type == DataType.Function)
                 {
@@ -512,7 +549,7 @@ namespace LuaMod
                 }
 
                 DynValue func = _LuaScript.LoadString(code, null, $"require:{moduleName}");
-                DynValue result = CallScriptFunction(func);
+                DynValue result = CallScriptFunction(func, "Requre " + moduleName);
 
                 if (result.Type == DataType.Table || result.Type == DataType.UserData || result.Type == DataType.Function)
                 {
@@ -560,6 +597,9 @@ namespace LuaMod
 
         private void LoadFunctionPointers()
         {
+
+            _LuaScript.Globals["LuaProfiler"] = (LuaProfiler.Instance);
+
             _LuaScript.Globals["API_GameObject"] = (API_GameObject.Instance);
             _LuaScript.Globals["API_Input"] = (API_Input.Instance);
             _LuaScript.Globals["API_Player"] = (API_Player.Instance);

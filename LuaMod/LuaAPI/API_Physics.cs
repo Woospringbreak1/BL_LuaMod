@@ -96,12 +96,19 @@ namespace LuaMod.LuaAPI
                 return DynValue.Nil;
             }, $"BL_RayCast(start: {start_pos}, end: {end_pos})");
         }
-
-        public static DynValue BL_RayCast(Vector3 origin, Vector3 direction, float maxdistance = Mathf.Infinity)
+        
+        public static DynValue BL_RayCast(Vector3 origin, Vector3 direction, float maxdistance = Mathf.Infinity,bool HitTriggers=false,int mask = Physics.DefaultRaycastLayers)
         {
             return LuaSafeCall.Run(() =>
             {
-                if (Physics.Raycast(origin, direction, out RaycastHit hit, maxdistance))
+                QueryTriggerInteraction QTI = QueryTriggerInteraction.Ignore;
+                if (HitTriggers)
+                {
+                    QTI = QueryTriggerInteraction.Collide;
+                }
+
+
+                if (Physics.Raycast(origin, direction, out RaycastHit hit, maxdistance, mask, QTI));
                 {
                     return UserData.Create(hit);
                 }

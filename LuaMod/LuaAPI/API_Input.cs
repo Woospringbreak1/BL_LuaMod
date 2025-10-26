@@ -145,23 +145,23 @@ namespace LuaMod.LuaAPI
 
 
 
-        public static GameObject BL_LeftHand()
+        public static Hand BL_LeftHand()
         {
             if(BoneLib.Player.LeftHand != null)
             {
-                return BoneLib.Player.LeftHand.gameObject;
+                return BoneLib.Player.LeftHand;
             }
             return null;
            
             
         }
 
-        public static GameObject BL_RightHand()
+        public static Hand BL_RightHand()
         {
             if (BoneLib.Player.RightHand != null)
             { 
                 //(BoneLib.Player.RightHand.Controller.Haptic()
-                return BoneLib.Player.RightHand.gameObject;
+                return BoneLib.Player.RightHand;
             }
             return null;
         }

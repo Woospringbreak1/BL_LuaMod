@@ -274,10 +274,16 @@ namespace LuaMod.LuaAPI
         {
             return LuaSafeCall.Run(() =>
             {
-                if (obj == null) throw new ScriptRuntimeException("GameObject is null");
+                if (obj == null)
+                {
+                    throw new ScriptRuntimeException("GameObject is null");
+                }
 
                 Type type = LuaMod.LoadedTypes.Find(t => t.Name == CompType);
-                if (type == null) throw new ScriptRuntimeException($"Component type '{CompType}' not found");
+                if (type == null)
+                {
+                    throw new ScriptRuntimeException($"Component type '{CompType}' not found");
+                }
 
                 MethodInfo method = typeof(GameObject)
                     .GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -300,7 +306,7 @@ namespace LuaMod.LuaAPI
             return BL_GetComponentInChildren(obj, CompType, false);
         }
 
-        public DynValue BL_GetComponentInChildren(GameObject obj, string CompType,bool IncludeInactive=false)
+        public DynValue BL_GetComponentInChildren(GameObject obj, string CompType,bool IncludeInactive)
         {
             
             return LuaSafeCall.Run(() =>
@@ -327,10 +333,18 @@ namespace LuaMod.LuaAPI
         /// </summary>
         public static void BL_Destroy(UnityEngine.Object obj)
         {
-            if (obj != null)
+            LuaSafeCall.Run(() =>
             {
-                UnityEngine.Object.Destroy(obj);
-            }
+
+                if (obj != null)
+                {
+                    UnityEngine.Object.Destroy(obj);
+                }
+                else
+                {
+                    MelonLogger.Warning("[BL_Destroy] Supplied object is null");
+                }
+            }, $"BL_Destroy('{obj}')");
         }
 
         /// <summary>

@@ -555,7 +555,7 @@ public static void LuaRegisterType<T>(bool includeCollections = false)
             LuaRegisterTypeByName("LuaMod.LuaNPC", "LuaMod", false);
             LuaRegisterTypeByName("LuaMod.LuaAPI.BLFileAccess", "LuaMod", false);
             LuaRegisterTypeByName("LuaMod.LuaResources", "LuaMod", false);
-
+            LuaRegisterTypeByName("LuaMod.LuaProfiler", "LuaMod", false);
 
             // Types from assembly: UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 

@@ -106,6 +106,11 @@ namespace LuaMod.LuaAPI
             return LuaSafeCall.Run(() =>
             {
 
+                if(String.IsNullOrWhiteSpace(CompType))
+                {
+                    throw new ScriptRuntimeException("Component type string is nil");
+                }
+
                 if (obj == null)
                 {
                     throw new ScriptRuntimeException("Object for conversion is null");
